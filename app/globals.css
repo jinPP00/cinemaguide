@@ -23,9 +23,15 @@
   /* 브랜드 고유색은 쓰지 않는다(공식 사칭 방지). 브랜드·지역 구분은 lib/colors.ts의
      절제된 팔레트를 아이콘 칩 배경에만 쓴다. */
 
-  --radius: 8px;
-  --radius-sm: 6px;
+  /* prekart.kr 참고 — 카드를 더 둥글고 입체적으로. 기존 8px/6px보다 확실히 커야
+     "카드다운" 느낌이 산다 */
+  --radius: 14px;
+  --radius-sm: 9px;
   --shadow: 0 1px 2px rgba(22, 32, 44, 0.05), 0 4px 12px rgba(22, 32, 44, 0.04);
+  /* 카드 hover 시 뜨는 그림자. 브랜드 테마 안에서는 --brand-fg로, 없으면 --accent로
+     은은하게 색이 번지게 한다(prekart의 hover 시 파란 글로우 참고) */
+  --shadow-hover: 0 20px 44px -18px color-mix(in srgb, var(--brand-fg, var(--accent)) 30%, transparent),
+    0 6px 16px rgba(22, 32, 44, 0.08);
 
   --max: 1080px;
 }
@@ -228,13 +234,18 @@ p {
   border-radius: var(--radius);
   padding: 18px;
   background: var(--canvas);
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 a.card:hover {
   text-decoration: none;
-  border-color: #c9d2db;
-  box-shadow: var(--shadow);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+
+a.card:hover .brand-icon {
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .card .card-title {
@@ -271,6 +282,7 @@ a.card:hover {
   font-size: 14px;
   font-weight: 800;
   margin-bottom: 14px;
+  transition: transform 0.2s ease;
 }
 
 /* 뱃지 ------------------------------------------------------------ */
@@ -814,6 +826,13 @@ a.card:hover {
   border-radius: var(--radius);
   padding: 16px 18px;
   background: var(--brand-bg);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.brand-highlights li:hover {
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 45%, var(--hairline));
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
 }
 
 .brand-highlights .bh-title {
@@ -849,6 +868,13 @@ a.card:hover {
   border-radius: var(--radius);
   padding: 14px 16px;
   background: var(--canvas);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.price-card:hover {
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
 }
 
 .price-card-title {
@@ -919,6 +945,13 @@ a.card:hover {
   border-radius: var(--radius);
   padding: 16px 18px;
   background: var(--canvas);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.transit-card:hover {
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
 }
 
 .transit-card-head {
