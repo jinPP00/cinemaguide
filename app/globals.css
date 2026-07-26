@@ -819,6 +819,115 @@ a.card:hover {
   color: var(--ink-soft);
 }
 
+/* 관람료 카드 — 표 하나를 길게 늘어놓는 대신 상영관별 카드로 쪼개
+   2열로 배치한다. 한 화면에 더 많이 보이고 스캔하기도 쉽다. */
+.price-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 560px) {
+  .price-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.price-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: var(--canvas);
+}
+
+.price-card-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price-mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.price-mini th,
+.price-mini td {
+  padding: 5px 4px;
+  text-align: right;
+}
+
+.price-mini thead th {
+  color: var(--ink-faint);
+  font-weight: 600;
+  font-size: 0.74rem;
+}
+
+.price-mini tbody th {
+  text-align: left;
+  color: var(--ink-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.price-mini tbody tr + tr {
+  border-top: 1px solid var(--hairline);
+}
+
+.price-mini td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.price-youth {
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+}
+
+/* 교통·주차 카드 — 지하철/버스, 주차안내/확인/요금처럼 성격이 다른
+   내용을 한 문단에 몰아넣지 않고 아이콘 있는 카드로 나눈다. */
+.transit-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .transit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.transit-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: var(--canvas);
+}
+
+.transit-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--brand-fg, var(--ink));
+}
+
+.transit-card-body {
+  margin: 8px 0 0;
+  font-size: 0.83rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+
 /* 애니메이션 최소화 선호 사용자 존중 (가이드 8.3) ------------------ */
 @media (prefers-reduced-motion: reduce) {
   * {

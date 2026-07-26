@@ -17,7 +17,7 @@ import {
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, brandThemeVars } from '@/lib/colors';
-import type { Branch } from '@/lib/types';
+import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties } from 'react';
 
 /**
@@ -366,19 +366,93 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   );
 }
 
+/** "■ 항목명 ... ■ 다음항목명 ..." 형태의 원문을 항목별 카드로 쪼갠다 */
+function splitByMarker(raw: string, marker: string): { title: string; body: string }[] {
+  const chunks = raw.split(marker).map((c) => c.trim()).filter(Boolean);
+  return chunks.map((chunk) => {
+    const [firstLine, ...rest] = chunk.split('\n');
+    return { title: firstLine.trim(), body: rest.join('\n').trim() };
+  });
+}
+
+/** 요금 행을 상영관(label)별로 묶고, 그 안에서 시간대별 평일·주말 한 행으로 합친다 */
+function pivotPrices(rows: PriceRow[]) {
+  const byLabel = new Map<string, Map<string, { wkday?: PriceRow; wkend?: PriceRow }>>();
+  for (const r of rows) {
+    const bySlot = byLabel.get(r.label) ?? new Map();
+    const slotKey = r.timeSlot ?? '-';
+    const entry = bySlot.get(slotKey) ?? {};
+    if (r.dayType === '평일') entry.wkday = r;
+    else entry.wkend = r;
+    bySlot.set(slotKey, entry);
+    byLabel.set(r.label, bySlot);
+  }
+  return [...byLabel.entries()].map(([label, bySlot]) => ({
+    label,
+    slots: [...bySlot.entries()].map(([timeSlot, v]) => ({ timeSlot, ...v })),
+  }));
+}
+
+const won = (n: number | null | undefined) => (n != null ? n.toLocaleString() : '-');
+
+const IconSubway = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <rect x="4" y="3" width="16" height="14" rx="4" />
+    <path d="M4 11h16M8 17l-2 4M16 17l2 4" />
+    <circle cx="8.5" cy="14" r="0.6" fill="currentColor" />
+    <circle cx="15.5" cy="14" r="0.6" fill="currentColor" />
+  </svg>
+);
+const IconBus = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M3 11h18M7 16l-1.5 3M17 16l1.5 3" />
+    <circle cx="7" cy="13.2" r="0.6" fill="currentColor" />
+    <circle cx="17" cy="13.2" r="0.6" fill="currentColor" />
+  </svg>
+);
+const IconParking = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <rect x="4" y="3" width="16" height="18" rx="2" />
+    <path d="M9 16V7h3.5a2.5 2.5 0 0 1 0 5H9" />
+  </svg>
+);
+const IconTicket = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z" />
+    <path d="M9 6v12" strokeDasharray="2.5 2.5" />
+  </svg>
+);
+const IconCoin = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.2 2.5-2.2s2.5.7 2.5 1.8c0 2.6-5 1.6-5 4.3 0 1.2 1.2 1.8 2.5 1.8s2.5-.8 2.5-2.1" />
+  </svg>
+);
+
 /**
  * 2단계 콘텐츠(실제 교통·주차·요금 정보) 미리보기.
  * 서울강남-cgv 한 곳에만 붙여서 "준비 중" 자리에 실제로 채우면 어떤 모습인지 확인하는 테스트안.
  * 425곳 전체로 확장할 때는 이 컴포넌트를 그대로 재사용하면 된다.
  */
 function ContentPreview({ branch: b }: { branch: Branch }) {
-  const rows = pricesOf(b.id);
-  const byLabel = new Map<string, typeof rows>();
-  for (const r of rows) {
-    const list = byLabel.get(r.label) ?? [];
-    list.push(r);
-    byLabel.set(r.label, list);
-  }
+  const priceGroups = pivotPrices(pricesOf(b.id));
+
+  // CGV는 "# 지하철 ... # 버스 ..." 원문 한 덩어리라 마커로 쪼개고,
+  // 롯데·메가박스처럼 이미 나뉜 데이터는 그대로 쓴다.
+  const subway = b.transit.subway ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('지하철'))?.body;
+  const bus = b.transit.bus ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('버스'))?.body;
+
+  const parkingSections = b.parking.raw
+    ? splitByMarker(b.parking.raw, '■')
+    : [
+        b.parking.guide && { title: '주차안내', body: b.parking.guide },
+        b.parking.howTo && { title: '주차확인', body: b.parking.howTo },
+        b.parking.fee && { title: '주차요금', body: b.parking.fee },
+      ].filter((x): x is { title: string; body: string } => Boolean(x));
+
+  const parkingIcon = (title: string) =>
+    title.includes('요금') ? <IconCoin /> : title.includes('확인') ? <IconTicket /> : <IconParking />;
 
   return (
     <>
@@ -386,65 +460,83 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
         테스트 미리보기 — 이 지점만 실제 정보로 채웠습니다
       </span>
 
-      {(b.transit.raw || b.transit.bus || b.transit.subway) && (
-        <section className="section" aria-labelledby="transit">
-          <h2 id="transit">대중교통 이용 방법</h2>
-          <div className="note" style={{ marginTop: 12, whiteSpace: 'pre-line' }}>
-            {b.transit.raw ??
-              [
-                b.transit.subway && `[지하철]\n${b.transit.subway}`,
-                b.transit.bus && `[버스]\n${b.transit.bus}`,
-              ]
-                .filter(Boolean)
-                .join('\n\n')}
-          </div>
-        </section>
-      )}
-
-      {(b.parking.raw || b.parking.guide || b.parking.fee) && (
-        <section className="section" aria-labelledby="parking">
-          <h2 id="parking">주차 안내</h2>
-          <div className="note" style={{ marginTop: 12, whiteSpace: 'pre-line' }}>
-            {b.parking.raw ??
-              [
-                b.parking.guide && `[주차 위치]\n${b.parking.guide}`,
-                b.parking.howTo && `[주차 확인]\n${b.parking.howTo}`,
-                b.parking.fee && `[주차 요금]\n${b.parking.fee}`,
-              ]
-                .filter(Boolean)
-                .join('\n\n')}
-          </div>
-        </section>
-      )}
-
-      {byLabel.size > 0 && (
+      {priceGroups.length > 0 && (
         <section className="section" aria-labelledby="prices">
           <h2 id="prices">관람료</h2>
-          <div className="table-scroll" style={{ marginTop: 12 }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>상영관</th>
-                  <th>시간대</th>
-                  <th>요일</th>
-                  <th>성인</th>
-                  <th>청소년</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...byLabel.entries()].map(([label, group]) =>
-                  group.map((r, i) => (
-                    <tr key={`${label}-${i}`}>
-                      {i === 0 && <td rowSpan={group.length}>{label}</td>}
-                      <td>{r.timeSlot ?? '-'}</td>
-                      <td>{r.dayType}</td>
-                      <td>{r.adult != null ? `${r.adult.toLocaleString()}원` : '-'}</td>
-                      <td>{r.youth != null ? `${r.youth.toLocaleString()}원` : '-'}</td>
+          <p className="card-sub" style={{ marginTop: 4 }}>금액은 성인 · 청소년 순서입니다</p>
+          <div className="price-grid">
+            {priceGroups.map((g) => (
+              <div className="price-card" key={g.label}>
+                <div className="price-card-title">{g.label}</div>
+                <table className="price-mini">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>평일</th>
+                      <th>주말</th>
                     </tr>
-                  )),
-                )}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {g.slots.map((s) => (
+                      <tr key={s.timeSlot}>
+                        <th>{s.timeSlot}</th>
+                        <td>
+                          {won(s.wkday?.adult)}
+                          <span className="price-youth"> · {won(s.wkday?.youth)}</span>
+                        </td>
+                        <td>
+                          {won(s.wkend?.adult)}
+                          <span className="price-youth"> · {won(s.wkend?.youth)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(subway || bus) && (
+        <section className="section" aria-labelledby="transit">
+          <h2 id="transit">대중교통 이용 방법</h2>
+          <div className="transit-grid">
+            {subway && (
+              <div className="transit-card">
+                <div className="transit-card-head">
+                  <IconSubway />
+                  지하철
+                </div>
+                <p className="transit-card-body">{subway}</p>
+              </div>
+            )}
+            {bus && (
+              <div className="transit-card">
+                <div className="transit-card-head">
+                  <IconBus />
+                  버스
+                </div>
+                <p className="transit-card-body">{bus}</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {parkingSections.length > 0 && (
+        <section className="section" aria-labelledby="parking">
+          <h2 id="parking">주차 안내</h2>
+          <div className="transit-grid">
+            {parkingSections.map((s) => (
+              <div className="transit-card" key={s.title}>
+                <div className="transit-card-head">
+                  {parkingIcon(s.title)}
+                  {s.title}
+                </div>
+                <p className="transit-card-body">{s.body}</p>
+              </div>
+            ))}
           </div>
         </section>
       )}
