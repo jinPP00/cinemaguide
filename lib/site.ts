@@ -4,8 +4,8 @@
  */
 export const SITE = {
   name: '영화관 지점안내',
-  /** 배포 도메인 확정 전까지 Cloudflare Pages 임시 주소를 쓴다 */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cinema-guide.pages.dev',
+  /** 확정 도메인. canonical·sitemap·OG 전부 이 값을 기준으로 생성된다. */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cinemaguide.kr',
   description:
     'CGV·롯데시네마·메가박스 전국 425개 지점의 위치, 교통, 주차, 관람료 정보를 한 곳에서 확인하세요.',
   operator: '영화관 지점안내 운영팀',

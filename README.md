@@ -30,7 +30,7 @@ GitHub 저장소를 연결할 때 아래 값을 사용한다.
 
 | 이름 | 용도 |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | canonical·sitemap에 쓰이는 사이트 주소. 미설정 시 `https://cinema-guide.pages.dev` |
+| `NEXT_PUBLIC_SITE_URL` | canonical·sitemap에 쓰이는 사이트 주소. 미설정 시 `https://cinemaguide.kr` |
 
 ## 명령어
 
