@@ -842,17 +842,6 @@ a.card:hover .brand-icon {
   background: var(--brand-fg);
 }
 
-.brand-themed .chip {
-  background: var(--brand-bg);
-  color: var(--brand-fg);
-  border-color: transparent;
-}
-
-.brand-themed .chip:hover {
-  filter: brightness(0.95);
-  color: var(--brand-fg);
-}
-
 .brand-themed .card .card-more {
   color: var(--brand-fg);
 }

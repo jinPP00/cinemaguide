@@ -18,7 +18,7 @@ import {
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
-import { IconFilmReel } from '../icons';
+import { IconClapper } from '../icons';
 import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import BoxOfficeSection from './BoxOfficeSection';
@@ -188,7 +188,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
                 style={otherThemeVars}
               >
                 <div className="brand-card-icon" style={{ color: iconColor.fg }}>
-                  <IconFilmReel />
+                  <IconClapper />
                 </div>
                 <div className="brand-wordmark" style={{ color: iconColor.fg }}>
                   {BRAND_WORDMARK[b.key]}

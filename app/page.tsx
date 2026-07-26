@@ -3,7 +3,7 @@ import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars, sidoColor } from '@/lib/colors';
 import type { CSSProperties } from 'react';
-import { IconFilmReel } from './icons';
+import { IconClapper } from './icons';
 
 export const metadata = {
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
@@ -41,7 +41,7 @@ export default function HomePage() {
                 style={themeVars}
               >
                 <div className="brand-card-icon" style={{ color: iconColor.fg }}>
-                  <IconFilmReel />
+                  <IconClapper />
                 </div>
                 <div className="brand-wordmark" style={{ color: iconColor.fg }}>
                   {BRAND_WORDMARK[b.key]}
