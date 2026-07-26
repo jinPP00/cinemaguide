@@ -292,10 +292,10 @@ a.card:hover .brand-icon {
 /* 브랜드명 로고체 표기. 본문 폰트(Pretendard)와 다른 표시용 글꼴을 써서
    브랜드 이름만 눈에 띄게 한다. 한글 대신 로마자 표기(BRAND_WORDMARK)를 쓴다 */
 .brand-wordmark {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 1.3rem;
-  letter-spacing: 0.03em;
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 

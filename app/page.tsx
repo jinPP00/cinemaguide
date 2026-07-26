@@ -4,11 +4,17 @@ import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars, sidoColor } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 
-const IconClapper = () => (
+/* 필름 릴(영사 필름 감개) 아이콘 — 중앙 축과 스프로킷 홀 6개로 표현 */
+const IconFilmReel = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M4 10.5V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-7.5H4Z" />
-    <path d="M4 10.5 5 5h14l1 5.5" />
-    <path d="m8 5 1.5 3.2M13 5l1.5 3.2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="12" cy="6.2" r="1.4" />
+    <circle cx="17" cy="9.4" r="1.4" />
+    <circle cx="17" cy="14.9" r="1.4" />
+    <circle cx="12" cy="18.1" r="1.4" />
+    <circle cx="7" cy="14.9" r="1.4" />
+    <circle cx="7" cy="9.4" r="1.4" />
   </svg>
 );
 
@@ -48,7 +54,7 @@ export default function HomePage() {
                 style={themeVars}
               >
                 <div className="brand-card-icon" style={{ color: iconColor.fg }}>
-                  <IconClapper />
+                  <IconFilmReel />
                 </div>
                 <div className="brand-wordmark" style={{ color: iconColor.fg }}>
                   {BRAND_WORDMARK[b.key]}
