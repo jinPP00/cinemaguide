@@ -40,7 +40,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--canvas);
+  /* 페이지 배경을 옅은 회색(--surface)으로 깔아서 흰 카드(--canvas)가
+     그 위에 떠 보이게 한다 — 색을 더 쓰지 않고 명도차 하나로만 구분 */
+  background: var(--surface);
   color: var(--ink);
   font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Malgun Gothic',
     sans-serif;
@@ -283,7 +285,8 @@ a.card:hover {
   font-size: 0.76rem;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--surface);
+  /* 페이지 배경(--surface)과 겹치지 않도록 카드처럼 흰 배경을 쓴다 */
+  background: var(--canvas);
   color: var(--ink-soft);
   border: 1px solid var(--hairline);
   line-height: 1.6;
@@ -323,7 +326,7 @@ a.card:hover {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: var(--surface);
+  background: var(--canvas);
   border: 1px solid var(--hairline);
   display: flex;
   align-items: center;
@@ -599,7 +602,8 @@ a.card:hover {
 
 /* 안내 박스 ------------------------------------------------------- */
 .note {
-  background: var(--surface);
+  /* 페이지에 직접 놓이는 안내 박스라, 배경(--surface)과 겹치지 않게 흰 카드로 둔다 */
+  background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
   padding: 16px 18px;
@@ -656,6 +660,8 @@ a.card:hover {
   padding: 9px 12px;
   text-align: left;
   vertical-align: top;
+  /* 페이지 배경(--surface)과 겹치지 않도록 셀은 흰 배경으로 둔다 */
+  background: var(--canvas);
 }
 
 .prose th {
@@ -681,7 +687,8 @@ a.card:hover {
  * ------------------------------------------------------------------ */
 .site-footer {
   border-top: 1px solid var(--hairline);
-  background: var(--surface);
+  /* 페이지 배경이 이제 --surface라 헤더처럼 흰 배경으로 둬야 위아래로 구분된다 */
+  background: var(--canvas);
   padding: 32px 0 28px;
   margin-top: 64px;
   font-size: 0.88rem;
@@ -1100,7 +1107,9 @@ a.card:hover {
 .bo-skel {
   height: 41px;
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  /* 페이지 위에 바로 놓이는 스켈레톤이라 --surface 대신 흰 카드 배경을 쓴다 */
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
   overflow: hidden;
   position: relative;
 }
