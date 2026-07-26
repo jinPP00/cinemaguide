@@ -1,0 +1,43 @@
+name: 박스오피스 순위 갱신
+
+# 매일 KOBIS 일별 박스오피스를 조회해 public/boxoffice.json을 갱신한다.
+# 순위(영화 구성·순서)가 전날과 같으면 fetch-boxoffice.mjs가 파일을 건드리지
+# 않으므로, 이 워크플로도 실제로 바뀐 게 있을 때만 커밋·푸시한다.
+# main에 푸시되면 Cloudflare가 저장소 연동을 통해 자동으로 재빌드·배포한다 —
+# 여기서 Cloudflare API를 직접 호출하지 않는 이유.
+
+on:
+  schedule:
+    # UTC 00:00 = KST 09:00
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-boxoffice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 박스오피스 데이터 조회
+        env:
+          KOBIS_API_KEY: ${{ secrets.KOBIS_API_KEY }}
+        run: node scripts/fetch-boxoffice.mjs
+
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- public/boxoffice.json; then
+            echo "순위 변동 없음 — 커밋 생략"
+          else
+            git add public/boxoffice.json
+            git commit -m "박스오피스 순위 자동 갱신 [skip ci]"
+            git push
+          fi
