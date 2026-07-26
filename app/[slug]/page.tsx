@@ -17,6 +17,7 @@ import {
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, brandThemeVars } from '@/lib/colors';
+import { REGION_GROUPS } from '@/lib/regions';
 import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import BoxOfficeSection from './BoxOfficeSection';
@@ -115,28 +116,44 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
       <section className="section" aria-labelledby="branch-list">
         <h2 id="branch-list">지역별 지점</h2>
         <div style={{ marginTop: 20 }}>
-          {sidos.map((sido) => {
-            const list = branchesOfBrandSido(brandKey, sido);
+          {REGION_GROUPS.map((region) => {
+            const regionSidos = region.sidos.filter((sido) => sidos.includes(sido));
+            if (regionSidos.length === 0) return null;
+            const regionCount = regionSidos.reduce(
+              (sum, sido) => sum + branchesOfBrandSido(brandKey, sido).length,
+              0,
+            );
             return (
-              <div className="sido-block" key={sido}>
-                <div className="sido-head">
-                  <h3>
-                    <Link href={sidoPath(info.segment, sido)}>{sido}</Link>
-                  </h3>
-                  <span className="count">{list.length}곳</span>
+              <div className="region-block" key={region.name}>
+                <div className="region-head">
+                  <h3>{region.name}</h3>
+                  <span className="count">{regionCount}곳</span>
                 </div>
-                <ul className="chip-list">
-                  {list.map((b) => (
-                    <li key={b.id}>
-                      <Link className="chip" href={branchPath(b)}>
-                        {b.name}
-                        {b.status === '휴관' && (
-                          <span style={{ color: '#b42318' }}> (휴관)</span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                {regionSidos.map((sido) => {
+                  const list = branchesOfBrandSido(brandKey, sido);
+                  return (
+                    <div className="sido-block" key={sido}>
+                      <div className="sido-head">
+                        <h4>
+                          <Link href={sidoPath(info.segment, sido)}>{sido}</Link>
+                        </h4>
+                        <span className="count">{list.length}곳</span>
+                      </div>
+                      <ul className="chip-list">
+                        {list.map((b) => (
+                          <li key={b.id}>
+                            <Link className="chip" href={branchPath(b)}>
+                              {b.name}
+                              {b.status === '휴관' && (
+                                <span style={{ color: '#b42318' }}> (휴관)</span>
+                              )}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             );
           })}

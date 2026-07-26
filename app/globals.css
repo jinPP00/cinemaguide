@@ -72,7 +72,8 @@ button:focus-visible {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   line-height: 1.35;
   letter-spacing: -0.02em;
   margin: 0;
@@ -91,6 +92,12 @@ h2 {
 h3 {
   font-size: 1.05rem;
   font-weight: 600;
+}
+
+h4 {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 
 p {
@@ -388,8 +395,33 @@ a.card:hover .brand-icon {
 }
 
 /* 지역 섹션 ------------------------------------------------------- */
-.sido-block + .sido-block {
-  margin-top: 32px;
+/* 시도 17개를 그대로 나열하지 않고 가까운 권역(수도권·충청권 등)으로 묶는다 */
+.region-block + .region-block {
+  margin-top: 40px;
+}
+
+.region-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--brand-fg, var(--ink));
+  margin-bottom: 18px;
+}
+
+.region-head .count {
+  font-size: 0.86rem;
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.sido-block {
+  margin-top: 20px;
+  padding-left: 4px;
+}
+
+.sido-block:first-child {
+  margin-top: 0;
 }
 
 .sido-head {
