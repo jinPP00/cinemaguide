@@ -3,20 +3,7 @@ import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars, sidoColor } from '@/lib/colors';
 import type { CSSProperties } from 'react';
-
-/* 필름 릴(영사 필름 감개) 아이콘 — 중앙 축과 스프로킷 홀 6개로 표현 */
-const IconFilmReel = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <circle cx="12" cy="12" r="9" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="12" cy="6.2" r="1.4" />
-    <circle cx="17" cy="9.4" r="1.4" />
-    <circle cx="17" cy="14.9" r="1.4" />
-    <circle cx="12" cy="18.1" r="1.4" />
-    <circle cx="7" cy="14.9" r="1.4" />
-    <circle cx="7" cy="9.4" r="1.4" />
-  </svg>
-);
+import { IconFilmReel } from './icons';
 
 export const metadata = {
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,

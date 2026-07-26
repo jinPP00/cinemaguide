@@ -16,8 +16,9 @@ import {
   pricesOf,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
-import { BRAND_ICON_COLOR, brandThemeVars } from '@/lib/colors';
+import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
+import { IconFilmReel } from '../icons';
 import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import BoxOfficeSection from './BoxOfficeSection';
@@ -178,16 +179,20 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
         <div className="card-grid cols-2" style={{ marginTop: 16 }}>
           {others.map((b) => {
             const iconColor = BRAND_ICON_COLOR[b.key];
+            const otherThemeVars = brandThemeVars(b.key) as CSSProperties;
             return (
-              <Link key={b.key} href={brandPath(b.segment)} className="card brand-card">
-                <div
-                  className="brand-icon"
-                  style={{ background: iconColor.bg, color: iconColor.fg }}
-                  aria-hidden="true"
-                >
-                  {b.name[0]}
+              <Link
+                key={b.key}
+                href={brandPath(b.segment)}
+                className="card brand-card brand-card--stripe"
+                style={otherThemeVars}
+              >
+                <div className="brand-card-icon" style={{ color: iconColor.fg }}>
+                  <IconFilmReel />
                 </div>
-                <div className="card-title">{b.name}</div>
+                <div className="brand-wordmark" style={{ color: iconColor.fg }}>
+                  {BRAND_WORDMARK[b.key]}
+                </div>
                 <div className="card-sub">전국 {b.count}개 지점</div>
                 <div className="card-more">지점 보기 →</div>
               </Link>
