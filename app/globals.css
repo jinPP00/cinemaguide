@@ -529,69 +529,71 @@ a.card:hover {
   }
 }
 
-/* 상영시간표 바 — 지점 페이지의 최종 행동 유도 요소.
-   우리 정보를 다 읽은 다음에 나오도록 페이지 맨 아래에 둔다.
+/* 상영시간표 CTA — 지점 페이지의 최종 행동 유도 요소.
+   우리 정보를 다 읽은 다음에 나오도록 페이지 중간(관람료 다음)에 둔다.
+   눌러야 하는 액션이라는 게 분명히 보이도록 알약형 버튼으로 만든다.
    모바일에서는 화면 하단에 고정해 스크롤 중에도 항상 접근 가능하게 한다. */
-.schedule-bar {
+.schedule-cta {
   margin-top: 28px;
-  padding: 18px 22px;
-  border-radius: var(--radius);
-  background: var(--ink);
-  color: #fff;
-  display: flex;
+  text-align: center;
+}
+
+.schedule-button {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.schedule-bar:hover {
-  background: #000;
-  text-decoration: none;
-}
-
-.sb-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.sb-title {
+  gap: 10px;
+  padding: 15px 30px;
+  border-radius: 999px;
+  background: var(--brand-fg, var(--accent));
+  color: #fff;
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(22, 32, 44, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
-.sb-sub {
+.schedule-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 32, 44, 0.24);
+  filter: brightness(0.94);
+  text-decoration: none;
+}
+
+.schedule-caption {
+  margin: 10px 0 0;
   font-size: 0.78rem;
-  color: #a7afba;
-}
-
-.sb-arrow {
-  flex-shrink: 0;
+  color: var(--ink-faint);
 }
 
 @media (max-width: 640px) {
-  .schedule-bar {
+  .schedule-cta {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     margin-top: 0;
-    border-radius: 0;
-    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    background: var(--canvas);
+    border-top: 1px solid var(--hairline);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
     z-index: 40;
+  }
+
+  .schedule-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .schedule-caption {
+    display: none;
   }
 
   /* 고정 바는 페이지 맨 아래(푸터보다도 뒤)에 있는 요소라, 앞쪽(.page)이 아니라
      푸터 자체에 여유 공간을 둬야 스크롤 끝까지 내려도 푸터 마지막 줄이 가려지지 않는다.
      :has()로 이 지점 페이지에서만 적용한다. */
-  body:has(.schedule-bar) .site-footer {
-    padding-bottom: 108px;
+  body:has(.schedule-cta) .site-footer {
+    padding-bottom: 84px;
   }
 }
 
@@ -940,24 +942,6 @@ a.card:hover {
   color: #15803d;
 }
 
-.transit-card--howto {
-  background: #fffbeb;
-  border-color: #fde68a;
-}
-
-.transit-card--howto .transit-card-head {
-  color: #b45309;
-}
-
-.transit-card--fee {
-  background: #fdf4ff;
-  border-color: #f0abfc;
-}
-
-.transit-card--fee .transit-card-head {
-  color: #a21caf;
-}
-
 /* 줄글 대신 항목별 불릿으로 — "-"로 시작하는 줄이 항목, 나머지는 부연설명 */
 .transit-bullets {
   list-style: none;
@@ -1047,6 +1031,39 @@ a.card:hover {
   font-size: 0.77rem;
   color: var(--ink-faint);
   white-space: nowrap;
+}
+
+/* 박스오피스는 브라우저에서 따로 불러오므로 도착 전까지 스켈레톤을 보여준다 */
+.boxoffice-skeleton {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bo-skel {
+  height: 41px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+  position: relative;
+}
+
+.bo-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  animation: bo-shimmer 1.3s infinite;
+}
+
+@keyframes bo-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 /* 애니메이션 최소화 선호 사용자 존중 (가이드 8.3) ------------------ */

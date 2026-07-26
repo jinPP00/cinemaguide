@@ -14,12 +14,12 @@ import {
   sidoPath,
   branchPath,
   pricesOf,
-  boxOffice,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, brandThemeVars } from '@/lib/colors';
 import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
+import BoxOfficeSection from './BoxOfficeSection';
 
 /**
  * 이 라우트 하나가 두 가지 페이지를 모두 담당한다: 브랜드 허브(/cgv/)와 지점 상세
@@ -217,26 +217,23 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   // "우리 정보를 보다가 예매하러 갈지 정하는" 흐름에 자연스럽게 놓는다.
   // 준비 중인 지점은 안내문 바로 다음에 배치한다. 모바일에서는 화면 하단에 고정된다.
   const scheduleBar = (
-    <a className="schedule-bar" href={b.scheduleUrl} target="_blank" rel="noopener nofollow">
-      <span className="sb-text">
-        <span className="sb-title">
-          {b.name} {info.name} 상영시간표 확인
-        </span>
-        <span className="sb-sub">실시간 정보는 공식 사이트에서 확인됩니다</span>
-      </span>
-      <svg
-        className="sb-arrow"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.3"
-        aria-hidden="true"
-      >
-        <path d="M5 12h14M13 6l6 6-6 6" />
-      </svg>
-    </a>
+    <div className="schedule-cta">
+      <a className="schedule-button" href={b.scheduleUrl} target="_blank" rel="noopener nofollow">
+        {b.name} {info.name} 상영시간표 확인
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+      <p className="schedule-caption">실시간 정보는 공식 사이트에서 확인됩니다</p>
+    </div>
   );
 
   return (
@@ -493,8 +490,6 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
         b.parking.fee && { title: '주차요금', body: b.parking.fee },
       ].filter((x): x is { title: string; body: string } => Boolean(x));
 
-  const parkingTone = (title: string) =>
-    title.includes('요금') ? 'fee' : title.includes('확인') ? 'howto' : 'guide';
   const parkingIcon = (title: string) =>
     title.includes('요금') ? <IconCoin /> : title.includes('확인') ? <IconTicket /> : <IconParking />;
 
@@ -504,23 +499,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
         테스트 미리보기 — 이 지점만 실제 정보로 채웠습니다
       </span>
 
-      {boxOffice.movies.length > 0 && (
-        <section className="section" aria-labelledby="boxoffice">
-          <h2 id="boxoffice">현재 상영중인 영화 순위</h2>
-          <p className="card-sub" style={{ marginTop: 4 }}>
-            {formatBoxOfficeDate(boxOffice.targetDate)} 기준 일별 박스오피스 · 영화진흥위원회 제공
-          </p>
-          <ol className="boxoffice-list">
-            {boxOffice.movies.map((m) => (
-              <li className="bo-item" key={m.movieCd}>
-                <span className="bo-rank">{m.rank}</span>
-                <span className="bo-name">{m.name}</span>
-                <span className="bo-audience">누적 {m.audienceTotal.toLocaleString()}명</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      <BoxOfficeSection />
 
       {priceGroups.length > 0 && (
         <section className="section" aria-labelledby="prices">
@@ -593,7 +572,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
           <h2 id="parking">주차 안내</h2>
           <div className="transit-grid">
             {parkingSections.map((s) => (
-              <div className={`transit-card transit-card--${parkingTone(s.title)}`} key={s.title}>
+              <div className="transit-card" key={s.title}>
                 <div className="transit-card-head">
                   {parkingIcon(s.title)}
                   {s.title}
@@ -606,10 +585,6 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       )}
     </>
   );
-}
-
-function formatBoxOfficeDate(yyyymmdd: string): string {
-  return `${yyyymmdd.slice(0, 4)}.${yyyymmdd.slice(4, 6)}.${yyyymmdd.slice(6, 8)}`;
 }
 
 /** 0212345678 → 02-1234-5678 형태로 보기 좋게 */

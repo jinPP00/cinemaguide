@@ -1,13 +1,11 @@
 import branchesJson from '@/data/branches.json';
 import pricesJson from '@/data/prices.json';
 import metaJson from '@/data/meta.json';
-import boxOfficeJson from '@/data/boxoffice.json';
-import type { Branch, BrandKey, Meta, PriceRow, BoxOffice } from './types';
+import type { Branch, BrandKey, Meta, PriceRow } from './types';
 
 export const branches = branchesJson as Branch[];
 export const prices = pricesJson as Record<string, PriceRow[]>;
 export const meta = metaJson as Meta;
-export const boxOffice = boxOfficeJson as BoxOffice;
 
 export const BRAND_KEYS: BrandKey[] = ['cgv', 'lotte', 'megabox'];
 

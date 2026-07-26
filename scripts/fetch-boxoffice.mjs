@@ -1,21 +1,28 @@
 /**
- * KOBIS(영화진흥위원회) 일별 박스오피스를 받아 data/boxoffice.json으로 저장한다.
+ * KOBIS(영화진흥위원회) 일별 박스오피스를 받아 public/boxoffice.json으로 저장한다.
  *
  *   KOBIS_API_KEY=xxxx node scripts/fetch-boxoffice.mjs
  *   (.env.local에 KOBIS_API_KEY를 넣어두면 npm run boxoffice로 자동 로드된다)
  *
- * 정적 사이트라 요청마다 실시간으로 부르지 않는다. 이 스크립트를 실행한 시점의
- * 순위를 data/boxoffice.json에 굽고, 그 파일만 페이지가 읽는다.
+ * public/ 아래 두는 이유: 페이지 HTML에 굽지 않고 브라우저가 이 파일을 직접
+ * fetch해서 읽게 하기 위해서다. 그래야 순위가 바뀔 때 이 파일 하나만 새로
+ * 올리면 되고, 425개 지점 페이지를 통째로 재빌드·재배포할 필요가 없다.
  * API 키는 이 스크립트 실행에만 쓰이고 결과 JSON에는 들어가지 않는다 — 커밋해도 안전하다.
  *
  * KOBIS는 당일 데이터가 늦게 집계되므로 관례상 "어제" 날짜를 조회한다.
+ * 순위(rank 순서로 나열한 movieCd 목록)가 기존 파일과 같으면 굳이 덮어쓰지
+ * 않는다 — 불필요한 배포/캐시 무효화를 줄이기 위해서다.
  */
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = resolve(__dirname, '..', 'data', 'boxoffice.json');
+const OUT = resolve(__dirname, '..', 'public', 'boxoffice.json');
+
+function rankingOf(movies) {
+  return movies.map((m) => m.movieCd).join(',');
+}
 
 const KEY = process.env.KOBIS_API_KEY;
 if (!KEY) {
@@ -59,6 +66,14 @@ async function main() {
     audienceTotal: Number(m.audiAcc),
     salesShare: Number(m.salesShare),
   }));
+
+  if (existsSync(OUT)) {
+    const prev = JSON.parse(readFileSync(OUT, 'utf-8'));
+    if (rankingOf(prev.movies) === rankingOf(movies)) {
+      console.log(`박스오피스 순위 변동 없음 — 갱신 생략 (기준일 ${targetDt})`);
+      return;
+    }
+  }
 
   const out = {
     targetDate: targetDt,
