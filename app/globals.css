@@ -995,16 +995,27 @@ a.card:hover {
   overflow: hidden;
 }
 
+.bo-item-wrap + .bo-item-wrap {
+  border-top: 1px solid var(--hairline);
+}
+
+/* 영화 한 줄 전체를 버튼으로 만들어 눌러서 상세정보를 펼칠 수 있게 한다 */
 .bo-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
   background: var(--canvas);
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.bo-item + .bo-item {
-  border-top: 1px solid var(--hairline);
+.bo-item:hover {
+  background: var(--surface);
 }
 
 .bo-rank {
@@ -1031,6 +1042,50 @@ a.card:hover {
   font-size: 0.77rem;
   color: var(--ink-faint);
   white-space: nowrap;
+}
+
+.bo-chevron {
+  flex-shrink: 0;
+  color: var(--ink-faint);
+  transition: transform 0.15s ease;
+}
+
+.bo-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+/* 펼쳐진 상세정보 — 목록 카드와 이어지는 느낌으로 옅은 배경만 준다 */
+.bo-detail {
+  margin: 0;
+  padding: 4px 16px 14px 54px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bo-detail-empty {
+  padding: 10px 16px 14px 54px;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+.bo-detail > div {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.bo-detail dt {
+  flex-shrink: 0;
+  width: 62px;
+  color: var(--ink-faint);
+}
+
+.bo-detail dd {
+  margin: 0;
+  color: var(--ink-soft);
 }
 
 /* 박스오피스는 브라우저에서 따로 불러오므로 도착 전까지 스켈레톤을 보여준다 */

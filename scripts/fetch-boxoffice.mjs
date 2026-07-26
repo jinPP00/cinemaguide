@@ -12,6 +12,11 @@
  * KOBIS는 당일 데이터가 늦게 집계되므로 관례상 "어제" 날짜를 조회한다.
  * 순위(rank 순서로 나열한 movieCd 목록)가 기존 파일과 같으면 굳이 덮어쓰지
  * 않는다 — 불필요한 배포/캐시 무효화를 줄이기 위해서다.
+ *
+ * 순위 10개 각각의 감독·배우·장르·관람등급·러닝타임·제작국가는 searchMovieInfo로
+ * 한 편씩 추가 조회해서 같이 저장한다(총 최대 11번 호출). 이것도 API 키가
+ * 필요한 호출이라 브라우저가 아니라 여기 스크립트에서 미리 받아둬야 한다 —
+ * 그래야 클릭 시 상세정보가 이미 받아둔 JSON에서 바로 나온다.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -38,6 +43,30 @@ function yesterday() {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}${m}${day}`;
+}
+
+async function fetchMovieInfo(movieCd) {
+  const url =
+    'https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json' +
+    `?key=${KEY}&movieCd=${movieCd}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const info = data.movieInfoResult?.movieInfo;
+    if (!info) return null;
+    return {
+      directors: (info.directors ?? []).map((d) => d.peopleNm).filter(Boolean),
+      actors: (info.actors ?? []).slice(0, 5).map((a) => a.peopleNm).filter(Boolean),
+      genres: (info.genres ?? []).map((g) => g.genreNm).filter(Boolean),
+      watchGrade: info.audits?.[0]?.watchGradeNm ?? null,
+      runtime: info.showTm ? Number(info.showTm) : null,
+      nations: (info.nations ?? []).map((n) => n.nationNm).filter(Boolean),
+    };
+  } catch {
+    // 개별 영화 상세정보 하나가 실패해도 순위 전체를 실패시키지 않는다.
+    return null;
+  }
 }
 
 async function main() {
@@ -77,22 +106,47 @@ async function main() {
     salesShare: Number(m.salesShare),
   }));
 
+  let prev = null;
   if (existsSync(OUT)) {
-    const prev = JSON.parse(readFileSync(OUT, 'utf-8'));
-    if (rankingOf(prev.movies) === rankingOf(movies)) {
+    prev = JSON.parse(readFileSync(OUT, 'utf-8'));
+    // 순위도 같고 상세정보(감독 등)도 이미 붙어있으면 다시 부를 필요가 없다.
+    // 상세정보 필드가 없는 옛 파일이면(스키마 추가 전) 순위가 같아도 한 번은 채워준다.
+    const hasDetails = Boolean(prev.movies?.[0]?.directors);
+    if (hasDetails && rankingOf(prev.movies) === rankingOf(movies)) {
       console.log(`박스오피스 순위 변동 없음 — 갱신 생략 (기준일 ${targetDt})`);
       return;
     }
   }
 
+  const prevByCd = new Map((prev?.movies ?? []).map((m) => [m.movieCd, m]));
+  const moviesWithDetails = [];
+  for (const m of movies) {
+    // 이미 상세정보를 받아둔 영화면 재조회하지 않는다(API 호출 절약).
+    const cached = prevByCd.get(m.movieCd);
+    const details =
+      cached && cached.directors ? pickDetails(cached) : await fetchMovieInfo(m.movieCd);
+    moviesWithDetails.push({ ...m, ...(details ?? {}) });
+  }
+
   const out = {
     targetDate: targetDt,
     fetchedAt: new Date().toISOString(),
-    movies,
+    movies: moviesWithDetails,
   };
 
   writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf-8');
   console.log(`박스오피스 ${movies.length}건 저장: ${OUT} (기준일 ${targetDt})`);
+}
+
+function pickDetails(m) {
+  return {
+    directors: m.directors,
+    actors: m.actors,
+    genres: m.genres,
+    watchGrade: m.watchGrade,
+    runtime: m.runtime,
+    nations: m.nations,
+  };
 }
 
 main().catch((err) => {

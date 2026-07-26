@@ -1,6 +1,6 @@
 {
   "targetDate": "20260725",
-  "fetchedAt": "2026-07-26T10:37:19.565Z",
+  "fetchedAt": "2026-07-26T14:39:12.524Z",
   "movies": [
     {
       "rank": 1,
@@ -9,7 +9,27 @@
       "openDate": "2026-07-15",
       "audienceToday": 327571,
       "audienceTotal": 3129827,
-      "salesShare": 67.7
+      "salesShare": 67.7,
+      "directors": [
+        "나홍진"
+      ],
+      "actors": [
+        "황정민",
+        "조인성",
+        "정호연",
+        "테일러 러셀",
+        "카메론 브리튼"
+      ],
+      "genres": [
+        "SF",
+        "스릴러",
+        "액션"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 156,
+      "nations": [
+        "한국"
+      ]
     },
     {
       "rank": 2,
@@ -18,7 +38,19 @@
       "openDate": "2026-07-15",
       "audienceToday": 49512,
       "audienceTotal": 514520,
-      "salesShare": 9.6
+      "salesShare": 9.6,
+      "directors": [
+        "피에르 꼬팽"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 89,
+      "nations": [
+        "미국"
+      ]
     },
     {
       "rank": 3,
@@ -27,7 +59,23 @@
       "openDate": "2026-07-08",
       "audienceToday": 36190,
       "audienceTotal": 874468,
-      "salesShare": 7.1
+      "salesShare": 7.1,
+      "directors": [
+        "토마스 케일"
+      ],
+      "actors": [
+        "드웨인 존슨",
+        "캐서린 라가이아"
+      ],
+      "genres": [
+        "어드벤처",
+        "액션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 115,
+      "nations": [
+        "미국"
+      ]
     },
     {
       "rank": 4,
@@ -36,7 +84,26 @@
       "openDate": "2026-06-17",
       "audienceToday": 22032,
       "audienceTotal": 2814636,
-      "salesShare": 4.4
+      "salesShare": 4.4,
+      "directors": [
+        "앤드류 스탠튼"
+      ],
+      "actors": [
+        "톰 행크스",
+        "팀 알렌",
+        "조앤 쿠삭",
+        "그레타 리"
+      ],
+      "genres": [
+        "애니메이션",
+        "어드벤처",
+        "코미디"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 101,
+      "nations": [
+        "미국"
+      ]
     },
     {
       "rank": 5,
@@ -45,7 +112,27 @@
       "openDate": "2026-07-10",
       "audienceToday": 20331,
       "audienceTotal": 199542,
-      "salesShare": 3.8
+      "salesShare": 3.8,
+      "directors": [
+        "필 커닝햄",
+        "브렌트 도스"
+      ],
+      "actors": [
+        "브랜든 엥그먼",
+        "필 위크함",
+        "브라이언 스티베일",
+        "아담 골드",
+        "미리 메시카"
+      ],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 109,
+      "nations": [
+        "남아프리카공화국",
+        "미국"
+      ]
     },
     {
       "rank": 6,
@@ -54,7 +141,25 @@
       "openDate": "2026-06-24",
       "audienceToday": 14534,
       "audienceTotal": 1498546,
-      "salesShare": 3
+      "salesShare": 3,
+      "directors": [
+        "염지호"
+      ],
+      "actors": [
+        "신민아",
+        "김남희",
+        "이승룡",
+        "김영아",
+        "박경진"
+      ],
+      "genres": [
+        "스릴러"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 105,
+      "nations": [
+        "한국"
+      ]
     },
     {
       "rank": 7,
@@ -63,7 +168,19 @@
       "openDate": "2026-07-24",
       "audienceToday": 5690,
       "audienceTotal": 18162,
-      "salesShare": 1
+      "salesShare": 1,
+      "directors": [
+        "타케키요 히토시"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 90,
+      "nations": [
+        "일본"
+      ]
     },
     {
       "rank": 8,
@@ -72,7 +189,25 @@
       "openDate": "2026-07-01",
       "audienceToday": 1579,
       "audienceTotal": 123430,
-      "salesShare": 0.4
+      "salesShare": 0.4,
+      "directors": [
+        "조쉬 사프디"
+      ],
+      "actors": [
+        "티모시 샬라메",
+        "기네스 팰트로우",
+        "오데사 아지온",
+        "타일러 더 크리에이터",
+        "아벨 페라라"
+      ],
+      "genres": [
+        "드라마"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 149,
+      "nations": [
+        "미국"
+      ]
     },
     {
       "rank": 9,
@@ -81,7 +216,19 @@
       "openDate": "2026-08-05",
       "audienceToday": 1558,
       "audienceTotal": 2983,
-      "salesShare": 0.3
+      "salesShare": 0.3,
+      "directors": [
+        "김수훈"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 105,
+      "nations": [
+        "한국"
+      ]
     },
     {
       "rank": 10,
@@ -89,8 +236,27 @@
       "name": "군체",
       "openDate": "2026-05-21",
       "audienceToday": 1447,
-      "audienceTotal": 5948834,
-      "salesShare": 0.3
+      "audienceTotal": 5948845,
+      "salesShare": 0.3,
+      "directors": [
+        "연상호"
+      ],
+      "actors": [
+        "전지현",
+        "신건우",
+        "구교환",
+        "지창욱",
+        "신현빈"
+      ],
+      "genres": [
+        "액션",
+        "스릴러"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 122,
+      "nations": [
+        "한국"
+      ]
     }
   ]
 }

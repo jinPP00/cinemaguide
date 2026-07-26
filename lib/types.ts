@@ -79,6 +79,12 @@ export interface BoxOfficeMovie {
   audienceToday: number;
   audienceTotal: number;
   salesShare: number;
+  directors?: string[];
+  actors?: string[];
+  genres?: string[];
+  watchGrade?: string | null;
+  runtime?: number | null;
+  nations?: string[];
 }
 
 export interface BoxOffice {
