@@ -4,6 +4,11 @@
  * ------------------------------------------------------------------ */
 
 :root {
+  /* 이 사이트는 라이트 모드만 지원한다고 브라우저에 명시한다.
+     이걸 선언하지 않으면 OS/브라우저의 자동 다크모드가 배경만 반전시키거나
+     텍스트만 반전시켜 "흰 배경에 흰 글씨" 같은 대비 사고가 날 수 있다. */
+  color-scheme: light;
+
   --ink: #16202c;
   --ink-soft: #5b6875;
   --ink-faint: #8b95a1;
@@ -290,6 +295,56 @@ a.card:hover {
   border-color: #f5d0cd;
 }
 
+/* 이용방법 4단계 요약 ----------------------------------------------- */
+.how-steps {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 640px) {
+  .how-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 28px;
+  }
+}
+
+.how-steps li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.how-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.how-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.how-desc {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
 /* 지역 섹션 ------------------------------------------------------- */
 .sido-block + .sido-block {
   margin-top: 32px;
@@ -345,8 +400,8 @@ a.card:hover {
   text-decoration: none;
 }
 
-/* 상영시간표 CTA — 지점 페이지에서 가장 눈에 띄어야 하는 요소 (기획서 3.1)
-   광고를 이 요소 옆에 붙이지 않는다 (오클릭 유발, 애드센스 정책 위반) */
+/* 문의 페이지의 메일쓰기 CTA에서 쓴다. 지점 상세의 상영시간표 CTA는
+   아래 .schedule-bar를 따로 쓴다(예약성 액션이라 페이지 하단에 배치). */
 .cta-box {
   margin-top: 22px;
   padding: 18px 20px;
@@ -430,6 +485,94 @@ a.card:hover {
 .info-list dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+/* 지도 버튼 — 예전엔 그냥 텍스트 링크라 눈에 안 띄었다.
+   실제로 누르는 액션이니 버튼처럼 보이고 터치 영역도 충분히 잡는다. */
+.map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 9px 14px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.map-button:hover {
+  background: #d8f7ea;
+  text-decoration: none;
+}
+
+/* 상영시간표 바 — 지점 페이지의 최종 행동 유도 요소.
+   우리 정보를 다 읽은 다음에 나오도록 페이지 맨 아래에 둔다.
+   모바일에서는 화면 하단에 고정해 스크롤 중에도 항상 접근 가능하게 한다. */
+.schedule-bar {
+  margin-top: 28px;
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.schedule-bar:hover {
+  background: #000;
+  text-decoration: none;
+}
+
+.sb-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sb-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sb-sub {
+  font-size: 0.78rem;
+  color: #a7afba;
+}
+
+.sb-arrow {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .schedule-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    border-radius: 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+    z-index: 40;
+  }
+
+  /* 고정 바는 페이지 맨 아래(푸터보다도 뒤)에 있는 요소라, 앞쪽(.page)이 아니라
+     푸터 자체에 여유 공간을 둬야 스크롤 끝까지 내려도 푸터 마지막 줄이 가려지지 않는다.
+     :has()로 이 지점 페이지에서만 적용한다. */
+  body:has(.schedule-bar) .site-footer {
+    padding-bottom: 108px;
+  }
 }
 
 /* 안내 박스 ------------------------------------------------------- */

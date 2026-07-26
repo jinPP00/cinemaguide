@@ -7,6 +7,9 @@ import { brandPath } from '@/lib/data';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
+  // 라이트 모드 전용 사이트임을 명시한다. 없으면 OS 다크모드가 일부 요소만
+  // 반전시켜 "흰 배경에 흰 글씨" 같은 대비 사고가 날 수 있다.
+  other: { 'color-scheme': 'light' },
   title: {
     default: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
     template: `%s | ${SITE.name}`,

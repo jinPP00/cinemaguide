@@ -224,30 +224,28 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </p>
       )}
 
-      <div className="cta-box">
-        <div className="cta-text">
-          <strong>오늘 상영시간표 보기</strong>
-          <span>실시간 상영시간표는 {info.name} 공식 사이트에서 제공됩니다.</span>
-        </div>
-        <a className="cta-button" href={b.scheduleUrl} target="_blank" rel="noopener nofollow">
-          공식 상영시간표 열기 →
-        </a>
-      </div>
-
       <section className="section" aria-labelledby="basic">
         <h2 id="basic">기본 정보</h2>
         <dl className="info-list">
           <div>
             <dt>주소</dt>
             <dd>
-              {b.address}
+              <div>{b.address}</div>
               {mapUrl && (
-                <>
-                  {' '}
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer">
-                    지도에서 보기
-                  </a>
-                </>
+                <a className="map-button" href={mapUrl} target="_blank" rel="noopener noreferrer">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.3"
+                    aria-hidden="true"
+                  >
+                    <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  지도에서 길찾기
+                </a>
               )}
             </dd>
           </div>
@@ -281,25 +279,8 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         <h2 id="coming">준비 중인 정보</h2>
         <div className="note" style={{ marginTop: 12 }}>
           이 지점의 <strong>대중교통 이용 방법, 주차 조건과 요금, 상영관별 관람료</strong>는
-          현재 정리 중입니다. 그전까지는 위 버튼으로 {info.name} 공식 페이지에서 확인하실 수
-          있습니다.
+          현재 정리 중입니다. 아래 버튼으로 {info.name} 공식 페이지에서 확인하실 수 있습니다.
         </div>
-      </section>
-
-      <section className="section" aria-labelledby="official">
-        <h2 id="official">공식 사이트</h2>
-        <p className="card-sub" style={{ marginTop: 6 }}>
-          예매와 최신 정보는 공식 페이지에서 확인하세요.
-        </p>
-        <a
-          className="chip"
-          href={b.officialUrl}
-          target="_blank"
-          rel="noopener nofollow"
-          style={{ marginTop: 10, display: 'inline-block' }}
-        >
-          {info.name} {b.name} 공식 페이지 →
-        </a>
       </section>
 
       {siblings.length > 0 && (
@@ -330,6 +311,34 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           정보를 발견하셨다면 <Link href="/contact/">정정 요청</Link>으로 알려주세요.
         </div>
       </section>
+
+      {/* 예매·상영시간표는 우리 사이트가 아니라 공식 사이트의 일이므로
+          우리 정보를 다 읽은 다음 마지막에 배치한다. 모바일에서는 화면 하단에 고정된다. */}
+      <a
+        className="schedule-bar"
+        href={b.scheduleUrl}
+        target="_blank"
+        rel="noopener nofollow"
+      >
+        <span className="sb-text">
+          <span className="sb-title">
+            {b.name} {info.name} 상영시간표
+          </span>
+          <span className="sb-sub">실시간 정보는 공식 사이트에서 확인됩니다</span>
+        </span>
+        <svg
+          className="sb-arrow"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.3"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
     </div>
   );
 }

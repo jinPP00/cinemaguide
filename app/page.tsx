@@ -84,35 +84,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 사이트 안내 본문 — 얇은 페이지가 되지 않도록 문장형 설명 (가이드 3.1) */}
+      {/* 사이트 안내 — 4단계 요약. 예전엔 긴 문단 4개였는데 스캔하기 어려워
+          짧은 단계형으로 압축했다 (가이드 3.1의 '분량보다 우선하는 기준' 참고 —
+          검색 의도를 해결하면 짧아도 된다). */}
       <section className="section" aria-labelledby="about-site">
         <h2 id="about-site">이 사이트를 이용하는 방법</h2>
-        <div style={{ marginTop: 12, maxWidth: '68ch' }}>
-          <p>
-            영화를 보러 가기 전에 확인하게 되는 정보는 대개 비슷합니다. 상영시간표는 어디서
-            보는지, 지하철역에서 얼마나 걸리는지, 차를 가져가도 되는지, 주차비는 얼마나 나오는지
-            같은 것들입니다. 그런데 이 정보는 브랜드별 공식 사이트에 흩어져 있고, 지점 상세
-            정보는 여러 번 눌러 들어가야 나오는 경우가 많습니다.
-          </p>
-          <p>
-            이 사이트는 그 정보를 지점 단위로 모아 정리합니다. 브랜드를 고르면 시도별 지점 목록이
-            나오고, 지점을 선택하면 해당 지점의 주소와 교통편, 주차 조건, 관람료를 한 화면에서
-            볼 수 있습니다. 상영시간표는 실시간으로 바뀌는 정보이므로 직접 제공하지 않고, 각 지점
-            페이지 상단에서 공식 예매 페이지로 바로 이동할 수 있게 해두었습니다.
-          </p>
-          <p>
-            요금은 브랜드마다 기준이 다릅니다. CGV는 하루를 모닝·브런치·일반·심야로 나누고,
-            롯데시네마와 메가박스는 조조와 일반으로 구분합니다. 세 브랜드 모두 평일과 주말 요금이
-            따로 있으며, 특별관은 일반관보다 높은 요금이 적용됩니다. 같은 영화를 보더라도 시간대와
-            상영관 선택에 따라 실제 지출은 달라집니다.
-          </p>
-          <p>
-            주차 조건은 지점별 차이가 가장 큰 항목입니다. 영화 관람만으로 몇 시간이 무료인지,
-            초과하면 얼마가 붙는지, 정산은 어디서 하는지가 지점마다 다르고, 쇼핑몰에 입점한
-            지점은 구매 금액에 따라 무료 시간이 늘어나기도 합니다. 방문 전 해당 지점의 주차
-            안내를 확인하면 예상하지 못한 비용을 줄일 수 있습니다.
-          </p>
-        </div>
+        <ol className="how-steps">
+          <li>
+            <span className="how-num">1</span>
+            <div>
+              <div className="how-title">브랜드를 고르세요</div>
+              <p className="how-desc">CGV·롯데시네마·메가박스 중 선택하면 지역별 지점 목록이 나옵니다.</p>
+            </div>
+          </li>
+          <li>
+            <span className="how-num">2</span>
+            <div>
+              <div className="how-title">지점 정보를 한눈에</div>
+              <p className="how-desc">주소, 교통, 주차, 관람료를 한 화면에서 확인합니다.</p>
+            </div>
+          </li>
+          <li>
+            <span className="how-num">3</span>
+            <div>
+              <div className="how-title">상영시간표는 공식으로</div>
+              <p className="how-desc">실시간 정보라 직접 제공하지 않고 버튼으로 공식 페이지에 연결합니다.</p>
+            </div>
+          </li>
+          <li>
+            <span className="how-num">4</span>
+            <div>
+              <div className="how-title">요금은 시간대별로 다름</div>
+              <p className="how-desc">브랜드마다 시간대 구분이 달라 방문 전 확인하는 게 좋습니다.</p>
+            </div>
+          </li>
+        </ol>
       </section>
 
       <section className="section">
