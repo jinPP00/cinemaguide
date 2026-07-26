@@ -122,6 +122,17 @@ const joinLines = (value) => {
 };
 
 /**
+ * 전화번호 검증. 원본 CGV 크롤링 데이터 중 일부(30곳)는 지역번호만 있고
+ * 실제 국번·번호가 없다(예: "031"). 그대로 노출하면 깨진 것처럼 보이므로
+ * 자릿수가 지역번호 수준(4자리 이하)이면 버린다.
+ */
+const validTel = (value) => {
+  const t = text(value);
+  if (!t) return null;
+  return t.replace(/\D/g, '').length >= 9 ? t : null;
+};
+
+/**
  * 요금 값 정리.
  * 원본에서 0 또는 -1은 "해당 등급·시간대 없음"을 뜻하는 표식이다.
  * (예: 메가박스 김천점은 심야 상영이 없어 adult_price가 -1)
@@ -166,7 +177,7 @@ const ADAPTERS = {
       priceKey: String(row.bzplcNo).slice(0, 4), // prices.json은 siteNo(앞 4자리) 기준
       name: row.name,
       rawAddress: row.address,
-      tel: text(row.tel),
+      tel: validTel(row.tel),
       lat: text(row.latitude),
       lng: text(row.longitude),
       specialScreens: Array.isArray(row.special_screens)
@@ -367,8 +378,11 @@ function main() {
       if (key) priceIndex.set(key, entry);
     }
 
-    // 슬러그 중복 검사는 브랜드+시도 단위로 한다 (URL이 /brand/sido/branch 구조라서)
+    // slug: 시도 목록 페이지 안에서만 겹치지 않으면 되는 짧은 표시용 슬러그
     const slugTaken = new Map();
+    // pageSlug: 사이트 최상위 URL에 쓰는 전역 슬러그. 브랜드 단위로만 겹치지 않으면 된다
+    // (브랜드가 다르면 접미사가 달라 자동으로 안 겹친다).
+    const pageSlugTaken = new Map();
 
     for (const row of theaters) {
       const src = adapt(row);
@@ -382,7 +396,7 @@ function main() {
       const isClosed = /\(휴관\)/.test(src.name);
       const displayName = src.name.replace(/\s*\(휴관\)\s*/g, '').trim();
 
-      // 슬러그 결정: 짧은 형태 우선, 같은 시도 안에서 겹치면 전체 이름 사용
+      // 슬러그(시도 안 목록용) 결정: 짧은 형태 우선, 같은 시도 안에서 겹치면 전체 이름 사용
       const scope = `${sido ?? 'unknown'}`;
       let slug = baseSlug(displayName);
       const takenInScope = slugTaken.get(scope) ?? new Set();
@@ -395,6 +409,25 @@ function main() {
       }
       takenInScope.add(slug);
       slugTaken.set(scope, takenInScope);
+
+      // 페이지 슬러그(최상위 URL용): 지점명이 이미 시도명을 포함하면 그대로,
+      // 아니면 시도명을 앞에 붙인다. 예) "강남"(서울) → "서울강남", "경기광주"(경기) → 그대로
+      const brandSlugPart = cleanSlug(meta.urlSegment);
+      let locationPart = sido && !displayName.startsWith(sido)
+        ? cleanSlug(`${sido}${displayName}`)
+        : cleanSlug(displayName);
+      let pageSlug = `${locationPart}-${brandSlugPart}`;
+      const takenPageSlugs = pageSlugTaken.get(brand) ?? new Set();
+      if (takenPageSlugs.has(pageSlug)) {
+        // 시도명을 붙여도 겹치면(동일 브랜드 내 동명 지점) 시군구를 더 붙인다
+        const withSigungu = cleanSlug(`${sido ?? ''}${sigungu ?? ''}${displayName}`);
+        pageSlug = `${withSigungu}-${brandSlugPart}`;
+        if (takenPageSlugs.has(pageSlug)) {
+          warnings.push(`[${brand}] 페이지 슬러그 중복 해결 실패: ${displayName} → ${pageSlug}`);
+        }
+      }
+      takenPageSlugs.add(pageSlug);
+      pageSlugTaken.set(brand, takenPageSlugs);
 
       const id = `${brand}-${src.sourceId}`;
       const priceEntry = priceIndex.get(String(src.priceKey));
@@ -418,6 +451,7 @@ function main() {
         brandSegment: meta.urlSegment,
         name: displayName,
         slug,
+        pageSlug,
         sido,
         sigungu,
         address,

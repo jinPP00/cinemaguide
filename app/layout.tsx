@@ -73,10 +73,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/affiliate-disclosure/">광고·제휴 고지</Link>
               </li>
             </ul>
+            <hr className="footer-divider" />
             <p className="disclaimer">{DISCLAIMER}</p>
-            <p style={{ marginTop: 12, color: 'var(--ink-faint)' }}>
-              지점 정보 확인일 {meta.checkedAt} · © {SITE.name}
-            </p>
+            <p className="footer-copyright">© {SITE.name}</p>
           </div>
         </footer>
       </body>

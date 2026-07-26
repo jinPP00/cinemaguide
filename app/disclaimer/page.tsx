@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { LEGAL } from '@/lib/legal';
-import { meta } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: '면책 고지',
@@ -49,9 +48,8 @@ export default function DisclaimerPage() {
 
         <h2>정보의 한계</h2>
         <p>
-          사이트의 정보는 각 영화관 공식 웹사이트에 공개된 내용을 기준으로 정리한 것이며, 마지막
-          확인일은 <strong>{meta.checkedAt}</strong>입니다. 아래 정보는 예고 없이 변경될 수
-          있습니다.
+          사이트의 정보는 각 영화관 공식 웹사이트에 공개된 내용을 기준으로 정리한 것이며, 아래
+          정보는 예고 없이 변경될 수 있습니다.
         </p>
         <ul>
           <li>관람료 및 할인 조건</li>
@@ -95,7 +93,7 @@ export default function DisclaimerPage() {
         <h2>정보 오류 신고</h2>
         <p>
           잘못된 정보를 발견하셨다면 <Link href="/contact/">문의·정정 요청</Link>으로 알려주세요.
-          확인 후 수정하고 확인일을 갱신합니다.
+          확인 후 바로 수정합니다.
         </p>
       </div>
     </div>

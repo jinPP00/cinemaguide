@@ -15,13 +15,11 @@
   --accent: #1f6feb;
   --accent-soft: #eaf1fe;
 
-  /* 브랜드 색은 카드 테두리·뱃지에만 절제해서 쓴다 (공식 사칭 방지) */
-  --cgv: #e21b23;
-  --lotte: #e4002b;
-  --megabox: #2b333f;
+  /* 브랜드 고유색은 쓰지 않는다(공식 사칭 방지). 브랜드·지역 구분은 lib/colors.ts의
+     절제된 팔레트를 아이콘 칩 배경에만 쓴다. */
 
-  --radius: 12px;
-  --radius-sm: 8px;
+  --radius: 8px;
+  --radius-sm: 6px;
   --shadow: 0 1px 2px rgba(22, 32, 44, 0.05), 0 4px 12px rgba(22, 32, 44, 0.04);
 
   --max: 1080px;
@@ -73,12 +71,12 @@ h3 {
 
 h1 {
   font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 h2 {
   font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 h3 {
@@ -233,9 +231,9 @@ a.card:hover {
 }
 
 .card .card-title {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.1rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .card .card-sub {
@@ -246,24 +244,26 @@ a.card:hover {
 
 .card .card-more {
   margin-top: 14px;
-  font-size: 0.9rem;
-  color: var(--accent);
-  font-weight: 600;
+  font-size: 0.87rem;
+  color: var(--ink);
+  font-weight: 800;
 }
 
-/* 브랜드 카드: 위쪽 얇은 색 띠로만 브랜드를 구분한다 */
+/* 브랜드 카드: 상단 색 띠를 두르지 않는다. 대신 작은 아이콘 칩에만 색을 쓴다. */
 .brand-card {
-  border-top: 3px solid var(--brand, var(--hairline));
+  padding: 22px 20px;
 }
 
-.brand-cgv {
-  --brand: var(--cgv);
-}
-.brand-lotte {
-  --brand: var(--lotte);
-}
-.brand-megabox {
-  --brand: var(--megabox);
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px;
 }
 
 /* 뱃지 ------------------------------------------------------------ */
@@ -331,6 +331,17 @@ a.card:hover {
 .chip:hover {
   border-color: var(--accent);
   color: var(--accent);
+  text-decoration: none;
+}
+
+/* 지역 버튼: 배경을 이미 지역색으로 칠했으므로 hover 시 살짝 진해지기만 한다 */
+.chip-sido {
+  font-weight: 700;
+  border: none;
+}
+
+.chip-sido:hover {
+  filter: brightness(0.96);
   text-decoration: none;
 }
 
@@ -499,11 +510,14 @@ a.card:hover {
   font-size: 0.88rem;
 }
 
-/* 푸터 ------------------------------------------------------------ */
+/* 푸터 ------------------------------------------------------------
+ * 참조 사이트 검토 결과를 반영한 단순한 형태: 링크 한 줄 → 구분선 → 고지문 → 저작권.
+ * 여러 단으로 쪼개지 않아 문장이 페이지 폭 전체로 어색하게 퍼지지 않는다.
+ * ------------------------------------------------------------------ */
 .site-footer {
   border-top: 1px solid var(--hairline);
   background: var(--surface);
-  padding: 32px 0 48px;
+  padding: 32px 0 28px;
   margin-top: 64px;
   font-size: 0.88rem;
   color: var(--ink-soft);
@@ -512,15 +526,54 @@ a.card:hover {
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 4px 0;
+  margin: 0 0 20px;
   list-style: none;
   padding: 0;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.footer-links li {
+  display: flex;
+  align-items: center;
+}
+
+.footer-links li + li::before {
+  content: '|';
+  margin: 0 12px;
+  color: var(--hairline);
+  font-weight: 400;
+}
+
+.footer-links a {
+  color: inherit;
+}
+
+.footer-links a:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.footer-divider {
+  height: 1px;
+  background: var(--hairline);
+  border: none;
+  margin: 0 0 18px;
 }
 
 .disclaimer {
-  line-height: 1.75;
-  max-width: 62ch;
+  line-height: 1.8;
+  max-width: 68ch;
+  font-size: 0.85rem;
+}
+
+.footer-copyright {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
 }
 
 /* 애니메이션 최소화 선호 사용자 존중 (가이드 8.3) ------------------ */

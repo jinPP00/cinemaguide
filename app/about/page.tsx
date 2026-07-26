@@ -71,11 +71,6 @@ export default function AboutPage() {
           없는 항목은 임의로 채우지 않고 표시하지 않으며, 확인되지 않은 내용은 추측해서 쓰지
           않습니다.
         </p>
-        <p>
-          현재 게시된 정보의 마지막 확인일은 <strong>{meta.checkedAt}</strong>입니다. 각 지점
-          페이지에도 확인일을 함께 표시합니다.
-        </p>
-
         <h3>정보 갱신 주기</h3>
         <div className="table-scroll">
           <table>
@@ -114,7 +109,7 @@ export default function AboutPage() {
         </p>
         <p>
           잘못된 정보를 발견하셨다면 <Link href="/contact/">정정 요청</Link>으로 알려주세요. 확인
-          후 수정하고 확인일을 갱신합니다.
+          후 바로 수정합니다.
         </p>
 
         <h2>브랜드별 지점 보기</h2>

@@ -40,12 +40,26 @@ check('주소 누락 0건', noAddress.length === 0, noAddress.map((b) => b.name)
 const noUrl = branches.filter((b) => !b.officialUrl || !b.scheduleUrl);
 check('공식 URL·상영시간표 URL 누락 0건', noUrl.length === 0);
 
-/* 3. URL 고유성 — 같은 주소로 두 지점이 생기면 안 된다 */
-const urlKeys = branches.map((b) => `${b.brandSegment}/${b.sido}/${b.slug}`);
-const dupUrls = urlKeys.filter((k, i) => urlKeys.indexOf(k) !== i);
-check('URL 경로 중복 0건', dupUrls.length === 0, [...new Set(dupUrls)].join(', '));
+/* 3. 페이지 슬러그(최상위 URL) 고유성 — 사이트 전체에서 겹치면 안 된다 */
+const pageSlugs = branches.map((b) => b.pageSlug);
+const dupPageSlugs = pageSlugs.filter((k, i) => pageSlugs.indexOf(k) !== i);
+check(
+  '페이지 슬러그(URL) 전역 중복 0건',
+  dupPageSlugs.length === 0,
+  [...new Set(dupPageSlugs)].join(', '),
+);
 
-const emptySlug = branches.filter((b) => !b.slug);
+// 브랜드 허브 라우트(cgv/롯데시네마/메가박스)와 지점 페이지 슬러그가
+// 같은 [slug] 동적 세그먼트를 공유하므로 절대 겹치면 안 된다
+const brandSegments = new Set(['cgv', '롯데시네마', '메가박스']);
+const collideWithBrand = branches.filter((b) => brandSegments.has(b.pageSlug));
+check(
+  '페이지 슬러그가 브랜드 허브 경로와 겹치지 않음',
+  collideWithBrand.length === 0,
+  collideWithBrand.map((b) => b.pageSlug).join(', '),
+);
+
+const emptySlug = branches.filter((b) => !b.slug || !b.pageSlug);
 check('빈 슬러그 0건', emptySlug.length === 0, emptySlug.map((b) => b.name).join(', '));
 
 /* 4. 슬러그에 URL에서 문제되는 문자가 없는지 */
@@ -54,6 +68,12 @@ check(
   '슬러그에 공백·괄호·예약문자 없음',
   badSlug.length === 0,
   badSlug.slice(0, 5).map((b) => b.slug).join(', '),
+);
+const badPageSlug = branches.filter((b) => /[\s()[\]{}?#&=+%]/.test(b.pageSlug));
+check(
+  '페이지 슬러그에 공백·괄호·예약문자 없음',
+  badPageSlug.length === 0,
+  badPageSlug.slice(0, 5).map((b) => b.pageSlug).join(', '),
 );
 
 /* 5. id 고유성 */
@@ -108,6 +128,13 @@ check(
 
 const cgvWithTel = branches.filter((b) => b.brand === 'cgv' && b.tel).length;
 check('CGV 전화번호 보유', cgvWithTel > 0, `${cgvWithTel}건`);
+
+const shortTel = branches.filter((b) => b.tel && b.tel.replace(/\D/g, '').length < 9);
+check(
+  '전화번호가 지역번호만 있는 경우 없음(9자리 미만)',
+  shortTel.length === 0,
+  shortTel.map((b) => `${b.name}:${b.tel}`).join(', '),
+);
 
 const megaboxWithFacility = branches.filter((b) => b.brand === 'megabox' && b.facility?.floors).length;
 check('메가박스 층별안내 보유', megaboxWithFacility > 0, `${megaboxWithFacility}건`);

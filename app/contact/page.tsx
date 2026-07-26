@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
-import { meta } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: '문의·정정 요청',
-  description:
-    '지점 정보 오류 신고, 정정 요청, 제휴 및 기타 문의를 받습니다. 확인 후 수정하고 확인일을 갱신합니다.',
+  description: '지점 정보 오류 신고, 정정 요청, 제휴 및 기타 문의를 받습니다.',
   alternates: { canonical: '/contact/' },
 };
 
@@ -41,7 +39,7 @@ export default function ContactPage() {
       <div className="prose">
         <p>
           지점 정보의 오류를 발견하셨거나 문의하실 내용이 있으면 아래 이메일로 보내주세요. 확인 후
-          수정하고 해당 지점의 확인일을 갱신합니다.
+          바로 수정합니다.
         </p>
 
         <div className="cta-box" style={{ marginTop: 24 }}>
@@ -72,7 +70,7 @@ export default function ContactPage() {
         <h2>처리 절차</h2>
         <ol>
           <li>접수한 내용을 공식 사이트 등에서 확인합니다.</li>
-          <li>사실로 확인되면 수정하고 해당 지점의 확인일을 갱신합니다.</li>
+          <li>사실로 확인되면 바로 수정합니다.</li>
           <li>확인이 어려운 내용은 표시를 보류하거나 &lsquo;확인 필요&rsquo;로 남겨둡니다.</li>
         </ol>
         <p>
@@ -105,10 +103,6 @@ export default function ContactPage() {
         <p>
           문의 메일에는 답변에 필요한 최소한의 정보만 담아주세요. 메일로 받은 개인정보의 처리
           방법은 <Link href="/privacy/">개인정보처리방침</Link>에 안내되어 있습니다.
-        </p>
-
-        <p className="updated" style={{ marginTop: 32 }}>
-          지점 정보 마지막 확인일: {meta.checkedAt}
         </p>
       </div>
     </div>

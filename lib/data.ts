@@ -46,6 +46,13 @@ export function findBranch(key: BrandKey, sido: string, slug: string): Branch | 
   );
 }
 
+const PAGE_SLUG_TO_BRANCH = new Map<string, Branch>(branches.map((b) => [b.pageSlug, b]));
+
+/** 최상위 URL 슬러그(예: 서울강남-cgv)로 지점을 찾는다 */
+export function findBranchByPageSlug(pageSlug: string): Branch | null {
+  return PAGE_SLUG_TO_BRANCH.get(decodeURIComponent(pageSlug)) ?? null;
+}
+
 export function pricesOf(branchId: string): PriceRow[] {
   return prices[branchId] ?? [];
 }
@@ -63,8 +70,7 @@ export function sidoPath(segment: string, sido: string): string {
   return `/${encodeURIComponent(segment)}/${encodeURIComponent(sido)}/`;
 }
 
+/** 지점 상세 페이지는 사이트 최상위에 평탄화된 URL을 쓴다: /{시도}{지점명}-{브랜드}/ */
 export function branchPath(branch: Branch): string {
-  return `/${encodeURIComponent(branch.brandSegment)}/${encodeURIComponent(
-    branch.sido,
-  )}/${encodeURIComponent(branch.slug)}/`;
+  return `/${encodeURIComponent(branch.pageSlug)}/`;
 }

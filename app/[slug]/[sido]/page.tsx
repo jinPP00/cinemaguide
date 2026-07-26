@@ -12,21 +12,26 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
+import { sidoColor } from '@/lib/colors';
 
-/** 브랜드 × 시도 조합을 전부 정적 생성한다 (지점이 있는 조합만) */
+/**
+ * 이 라우트는 브랜드 허브([slug]/page.tsx)와 같은 동적 세그먼트 이름(slug)을 공유해야 한다.
+ * Next.js는 같은 계층에 서로 다른 이름의 동적 폴더를 둘 수 없다.
+ * 실제로는 [slug]가 브랜드일 때만(cgv/롯데시네마/메가박스) 이 페이지가 존재한다.
+ */
 export function generateStaticParams() {
   return meta.brands.flatMap((b) =>
-    sidosOfBrand(b.key).map((sido) => ({ brand: b.segment, sido })),
+    sidosOfBrand(b.key).map((sido) => ({ slug: b.segment, sido })),
   );
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ brand: string; sido: string }>;
+  params: Promise<{ slug: string; sido: string }>;
 }): Promise<Metadata> {
-  const { brand, sido: sidoRaw } = await params;
-  const key = brandBySegment(brand);
+  const { slug, sido: sidoRaw } = await params;
+  const key = brandBySegment(slug);
   if (!key) return {};
   const sido = decodeURIComponent(sidoRaw);
   const info = brandMeta(key);
@@ -42,10 +47,10 @@ export async function generateMetadata({
 export default async function SidoPage({
   params,
 }: {
-  params: Promise<{ brand: string; sido: string }>;
+  params: Promise<{ slug: string; sido: string }>;
 }) {
-  const { brand, sido: sidoRaw } = await params;
-  const key = brandBySegment(brand);
+  const { slug, sido: sidoRaw } = await params;
+  const key = brandBySegment(slug);
   if (!key) notFound();
 
   const sido = decodeURIComponent(sidoRaw);
@@ -122,16 +127,20 @@ export default async function SidoPage({
           </p>
         )}
         <ul className="chip-list" style={{ marginTop: 14 }}>
-          {nearby.map((s) => (
-            <li key={s}>
-              <Link className="chip" href={sidoPath(info.segment, s)}>
-                {s}{' '}
-                <span style={{ color: 'var(--ink-faint)' }}>
-                  {meta.byBrandSido[key]?.[s] ?? 0}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {nearby.map((s) => {
+            const c = sidoColor(s);
+            return (
+              <li key={s}>
+                <Link
+                  className="chip chip-sido"
+                  style={{ background: c.bg, color: c.fg }}
+                  href={sidoPath(info.segment, s)}
+                >
+                  {s} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[key]?.[s] ?? 0}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </section>
 
@@ -145,11 +154,7 @@ export default async function SidoPage({
               const n = meta.byBrandSido[b.key]?.[sido] ?? 0;
               if (n === 0) return null;
               return (
-                <Link
-                  key={b.key}
-                  href={sidoPath(b.segment, sido)}
-                  className={`card brand-card brand-${b.key}`}
-                >
+                <Link key={b.key} href={sidoPath(b.segment, sido)} className="card">
                   <div className="card-title">
                     {sido} {b.name}
                   </div>
@@ -163,8 +168,7 @@ export default async function SidoPage({
 
       <section className="section">
         <div className="note">
-          지점 정보 마지막 확인일은 {meta.checkedAt}입니다. 상영시간표와 요금은 변경될 수 있으므로
-          방문 전 공식 채널에서 확인하시기 바랍니다.
+          상영시간표와 요금은 변경될 수 있으므로 방문 전 공식 채널에서 확인하시기 바랍니다.
         </div>
       </section>
     </div>

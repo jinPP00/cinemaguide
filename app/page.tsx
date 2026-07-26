@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
+import { BRAND_ICON_COLOR, sidoColor } from '@/lib/colors';
 
 export const metadata = {
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
@@ -28,12 +29,16 @@ export default function HomePage() {
             const list = branchesOfBrand(b.key);
             const sidoCount = sidosOfBrand(b.key).length;
             const specialCount = list.filter((x) => x.specialScreens.length > 0).length;
+            const iconColor = BRAND_ICON_COLOR[b.key];
             return (
-              <Link
-                key={b.key}
-                href={brandPath(b.segment)}
-                className={`card brand-card brand-${b.key}`}
-              >
+              <Link key={b.key} href={brandPath(b.segment)} className="card brand-card">
+                <div
+                  className="brand-icon"
+                  style={{ background: iconColor.bg, color: iconColor.fg }}
+                  aria-hidden="true"
+                >
+                  {b.name[0]}
+                </div>
                 <div className="card-title">{b.name}</div>
                 <div className="card-sub">
                   전국 {b.count}개 지점 · {sidoCount}개 시도
@@ -59,19 +64,20 @@ export default function HomePage() {
             <div key={b.key}>
               <div style={{ fontWeight: 600, marginBottom: 8 }}>{b.name}</div>
               <ul className="chip-list">
-                {sidosOfBrand(b.key).map((sido) => (
-                  <li key={sido}>
-                    <Link
-                      className="chip"
-                      href={`${brandPath(b.segment)}${encodeURIComponent(sido)}/`}
-                    >
-                      {sido}{' '}
-                      <span style={{ color: 'var(--ink-faint)' }}>
-                        {meta.byBrandSido[b.key]?.[sido] ?? 0}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                {sidosOfBrand(b.key).map((sido) => {
+                  const c = sidoColor(sido);
+                  return (
+                    <li key={sido}>
+                      <Link
+                        className="chip chip-sido"
+                        style={{ background: c.bg, color: c.fg, borderColor: 'transparent' }}
+                        href={`${brandPath(b.segment)}${encodeURIComponent(sido)}/`}
+                      >
+                        {sido} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[b.key]?.[sido] ?? 0}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -111,10 +117,9 @@ export default function HomePage() {
 
       <section className="section">
         <div className="note">
-          지점 정보는 각 브랜드 공식 사이트에서 수집해 정리했으며, 마지막 확인일은{' '}
-          {meta.checkedAt}입니다. 요금과 주차 정책은 수시로 변경될 수 있으므로 방문 전 공식
-          채널에서 최종 정보를 확인하시기 바랍니다. 잘못된 정보를 발견하셨다면{' '}
-          <Link href="/contact/">정정 요청</Link>으로 알려주세요.
+          지점 정보는 각 브랜드 공식 사이트에서 수집해 정리했습니다. 요금과 주차 정책은 수시로
+          변경될 수 있으므로 방문 전 공식 채널에서 최종 정보를 확인하시기 바랍니다. 잘못된
+          정보를 발견하셨다면 <Link href="/contact/">정정 요청</Link>으로 알려주세요.
         </div>
       </section>
     </div>

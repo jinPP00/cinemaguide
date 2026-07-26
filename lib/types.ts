@@ -31,7 +31,10 @@ export interface Branch {
   /** URL에 쓰는 브랜드 조각 (cgv / 롯데시네마 / 메가박스) */
   brandSegment: string;
   name: string;
+  /** 시도 목록 페이지 안에서만 고유한 짧은 슬러그 */
   slug: string;
+  /** 사이트 최상위 URL에 쓰는 전역 고유 슬러그 (예: 서울강남-cgv) */
+  pageSlug: string;
   sido: string;
   sigungu: string | null;
   address: string;
