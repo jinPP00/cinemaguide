@@ -729,9 +729,10 @@ a.card:hover {
   margin: 0 0 18px;
 }
 
+/* 68ch로 좁게 잡았더니 넓은 푸터 안에서 줄이 짧게 자주 끊겨 문단이
+   조각난 것처럼 보였다. 푸터 컨테이너 폭(.wrap)까지 그대로 채운다. */
 .disclaimer {
   line-height: 1.8;
-  max-width: 68ch;
   font-size: 0.85rem;
 }
 
