@@ -487,26 +487,46 @@ a.card:hover {
   overflow-wrap: anywhere;
 }
 
-/* 지도 버튼 — 예전엔 그냥 텍스트 링크라 눈에 안 띄었다.
-   실제로 누르는 액션이니 버튼처럼 보이고 터치 영역도 충분히 잡는다. */
+/* 주소 줄: 텍스트는 왼쪽, 지도 버튼은 오른쪽에 붙인다 */
+.address-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.address-row .address-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 지도 버튼 — 예전엔 옅은 초록 텍스트라 버튼처럼 안 보였다.
+   실제로 누르는 액션이니 꽉 채운 색으로 버튼처럼 보이게 하고, 터치 영역도 충분히 잡는다. */
 .map-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 10px;
-  padding: 9px 14px;
-  min-height: 36px;
+  flex-shrink: 0;
+  padding: 9px 16px;
+  min-height: 38px;
   border-radius: var(--radius-sm);
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-  font-size: 0.86rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .map-button:hover {
-  background: #d8f7ea;
+  background: #1a5fd0;
   text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .address-row {
+    justify-content: flex-start;
+  }
 }
 
 /* 상영시간표 바 — 지점 페이지의 최종 행동 유도 요소.
@@ -717,6 +737,86 @@ a.card:hover {
   margin-top: 16px;
   font-size: 0.82rem;
   color: var(--ink-faint);
+}
+
+/* 브랜드 테마 --------------------------------------------------------
+ * 브랜드 허브·지역 목록·지점 상세 페이지 루트에 lib/colors.ts의
+ * brandThemeVars()로 --brand-bg/--brand-fg를 걸어두면 아래 규칙들이
+ * 그 브랜드 색을 쓴다. 카드에 색 띠를 두르지 않는 대신, 소제목 점·칩·
+ * 화살표처럼 작은 요소에만 색을 써서 "이 브랜드 안에 있다"는 걸 알려준다.
+ * ------------------------------------------------------------------ */
+.brand-themed h2 {
+  position: relative;
+  padding-left: 15px;
+}
+
+.brand-themed h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand-fg);
+}
+
+.brand-themed .chip {
+  background: var(--brand-bg);
+  color: var(--brand-fg);
+  border-color: transparent;
+}
+
+.brand-themed .chip:hover {
+  filter: brightness(0.95);
+  color: var(--brand-fg);
+}
+
+.brand-themed .card .card-more {
+  color: var(--brand-fg);
+}
+
+.badge-brand {
+  background: var(--brand-bg);
+  color: var(--brand-fg);
+  border-color: transparent;
+}
+
+/* 브랜드 하이라이트 카드 — "이용 전에 알아두면 좋은 것"을
+   긴 문단 대신 3개 요약 카드로 보여준다 */
+.brand-highlights {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .brand-highlights {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.brand-highlights li {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: var(--brand-bg);
+}
+
+.brand-highlights .bh-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--brand-fg);
+}
+
+.brand-highlights .bh-desc {
+  margin: 6px 0 0;
+  font-size: 0.83rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
 }
 
 /* 애니메이션 최소화 선호 사용자 존중 (가이드 8.3) ------------------ */

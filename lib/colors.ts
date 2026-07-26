@@ -31,3 +31,13 @@ export const BRAND_ICON_COLOR: Record<BrandKey, { bg: string; fg: string }> = {
   lotte: { bg: '#faece7', fg: '#712b13' },
   megabox: { bg: '#e6f1fb', fg: '#0c447c' },
 };
+
+/**
+ * 브랜드 허브·지역 목록·지점 상세 페이지에 공통으로 입히는 브랜드 색.
+ * 루트 요소에 이 값을 CSS 커스텀 속성으로 걸어두면(--brand-bg/--brand-fg)
+ * globals.css의 .brand-themed 규칙들이 알아서 그 브랜드 색을 쓴다.
+ */
+export function brandThemeVars(key: BrandKey): Record<string, string> {
+  const c = BRAND_ICON_COLOR[key];
+  return { '--brand-bg': c.bg, '--brand-fg': c.fg };
+}

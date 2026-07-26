@@ -12,7 +12,8 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
-import { sidoColor } from '@/lib/colors';
+import { sidoColor, brandThemeVars } from '@/lib/colors';
+import type { CSSProperties } from 'react';
 
 /**
  * 이 라우트는 브랜드 허브([slug]/page.tsx)와 같은 동적 세그먼트 이름(slug)을 공유해야 한다.
@@ -64,9 +65,10 @@ export default async function SidoPage({
   // 지점이 적은 지역은 인접 지역을 크게 노출해 빈약한 페이지가 되지 않게 한다 (기획서 5.3)
   const isSmall = list.length <= 2;
   const nearby = sidosOfBrand(key).filter((s) => s !== sido);
+  const themeVars = brandThemeVars(key) as CSSProperties;
 
   return (
-    <div className="wrap page">
+    <div className="wrap page brand-themed" style={themeVars}>
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>
