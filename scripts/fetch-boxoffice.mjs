@@ -46,7 +46,17 @@ async function main() {
     'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json' +
     `?key=${KEY}&targetDt=${targetDt}`;
 
-  const res = await fetch(url);
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (err) {
+    // fetch 자체가 실패하면(DNS/연결거부/타임아웃 등) 원인을 최대한 자세히 남긴다.
+    // KOBIS 같은 국내 공공 API는 해외 IP(예: GitHub Actions 러너)를 막는 경우가 있어
+    // 이 로그로 그 가능성부터 확인한다.
+    console.error('fetch 자체가 실패했습니다:', err.message);
+    if (err.cause) console.error('원인(cause):', err.cause);
+    throw err;
+  }
   if (!res.ok) {
     throw new Error(`KOBIS 응답 오류: HTTP ${res.status}`);
   }
