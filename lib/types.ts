@@ -71,6 +71,22 @@ export interface PriceRow {
   disabled: number | null;
 }
 
+export interface BoxOfficeMovie {
+  rank: number;
+  movieCd: string;
+  name: string;
+  openDate: string;
+  audienceToday: number;
+  audienceTotal: number;
+  salesShare: number;
+}
+
+export interface BoxOffice {
+  targetDate: string;
+  fetchedAt: string;
+  movies: BoxOfficeMovie[];
+}
+
 export interface Meta {
   generatedAt: string;
   checkedAt: string;

@@ -920,12 +920,133 @@ a.card:hover {
   color: var(--brand-fg, var(--ink));
 }
 
-.transit-card-body {
-  margin: 8px 0 0;
-  font-size: 0.83rem;
-  line-height: 1.7;
-  color: var(--ink-soft);
-  white-space: pre-line;
+/* 지하철·버스, 주차 항목별로 카드 배경색을 다르게 줘서 한눈에 구분되게 한다.
+   색 자체보다 "다른 성격의 정보"라는 것만 전달하면 되므로 채도를 낮게 잡는다. */
+.transit-card--subway {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.transit-card--subway .transit-card-head {
+  color: #1d4ed8;
+}
+
+.transit-card--bus {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.transit-card--bus .transit-card-head {
+  color: #15803d;
+}
+
+.transit-card--howto {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.transit-card--howto .transit-card-head {
+  color: #b45309;
+}
+
+.transit-card--fee {
+  background: #fdf4ff;
+  border-color: #f0abfc;
+}
+
+.transit-card--fee .transit-card-head {
+  color: #a21caf;
+}
+
+/* 줄글 대신 항목별 불릿으로 — "-"로 시작하는 줄이 항목, 나머지는 부연설명 */
+.transit-bullets {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.transit-bullets li {
+  padding-left: 13px;
+  position: relative;
+}
+
+.transit-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.tb-text {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.tb-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+/* 박스오피스 순위 — 관람료 위, 카드 하나에 순위 리스트를 담는다 */
+.boxoffice-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.bo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--canvas);
+}
+
+.bo-item + .bo-item {
+  border-top: 1px solid var(--hairline);
+}
+
+.bo-rank {
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--brand-fg, var(--ink));
+}
+
+.bo-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bo-audience {
+  flex-shrink: 0;
+  font-size: 0.77rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
 }
 
 /* 애니메이션 최소화 선호 사용자 존중 (가이드 8.3) ------------------ */

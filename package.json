@@ -10,7 +10,8 @@
     "verify": "node scripts/verify.mjs",
     "data": "npm run normalize && npm run verify",
     "check-links": "node scripts/check-links.mjs",
-    "check": "npm run build && npm run check-links"
+    "check": "npm run build && npm run check-links",
+    "boxoffice": "node --env-file=.env.local scripts/fetch-boxoffice.mjs"
   },
   "dependencies": {
     "next": "^16.2.12",

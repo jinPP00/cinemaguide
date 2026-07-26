@@ -14,11 +14,12 @@ import {
   sidoPath,
   branchPath,
   pricesOf,
+  boxOffice,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, brandThemeVars } from '@/lib/colors';
 import type { Branch, PriceRow } from '@/lib/types';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * 이 라우트 하나가 두 가지 페이지를 모두 담당한다: 브랜드 허브(/cgv/)와 지점 상세
@@ -211,6 +212,33 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   // "준비 중" 안내 대신 실제 교통·주차·요금 정보를 보여준다.
   const isContentPreview = b.pageSlug === '서울강남-cgv';
 
+  // 예매·상영시간표는 우리 사이트가 아니라 공식 사이트의 일이다.
+  // 콘텐츠 미리보기 지점에서는 관람료 다음, 대중교통 이용 방법 앞에 배치해
+  // "우리 정보를 보다가 예매하러 갈지 정하는" 흐름에 자연스럽게 놓는다.
+  // 준비 중인 지점은 안내문 바로 다음에 배치한다. 모바일에서는 화면 하단에 고정된다.
+  const scheduleBar = (
+    <a className="schedule-bar" href={b.scheduleUrl} target="_blank" rel="noopener nofollow">
+      <span className="sb-text">
+        <span className="sb-title">
+          {b.name} {info.name} 상영시간표 확인
+        </span>
+        <span className="sb-sub">실시간 정보는 공식 사이트에서 확인됩니다</span>
+      </span>
+      <svg
+        className="sb-arrow"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.3"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  );
+
   return (
     <div className="wrap page brand-themed" style={themeVars}>
       <nav className="crumbs" aria-label="현재 위치">
@@ -298,41 +326,19 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       </section>
 
       {isContentPreview ? (
-        <ContentPreview branch={b} />
+        <ContentPreview branch={b} scheduleBar={scheduleBar} />
       ) : (
-        <section className="section" aria-labelledby="coming">
-          <h2 id="coming">준비 중인 정보</h2>
-          <div className="note" style={{ marginTop: 12 }}>
-            이 지점의 <strong>대중교통 이용 방법, 주차 조건과 요금, 상영관별 관람료</strong>는
-            현재 정리 중입니다. 아래 버튼으로 {info.name} 공식 페이지에서 확인하실 수 있습니다.
-          </div>
-        </section>
+        <>
+          <section className="section" aria-labelledby="coming">
+            <h2 id="coming">준비 중인 정보</h2>
+            <div className="note" style={{ marginTop: 12 }}>
+              이 지점의 <strong>대중교통 이용 방법, 주차 조건과 요금, 상영관별 관람료</strong>는
+              현재 정리 중입니다. 아래 버튼으로 {info.name} 공식 페이지에서 확인하실 수 있습니다.
+            </div>
+          </section>
+          {scheduleBar}
+        </>
       )}
-
-      {/* 예매·상영시간표는 우리 사이트가 아니라 공식 사이트의 일이다.
-          우리 정보(기본정보 + 교통·주차·요금)를 다 읽은 다음, 그러나 인근 지점 링크보다는
-          앞서 배치한다 — 다음 행동은 "여기 갈지 정하기"이지 "다른 지점 찾기"가 아니라서다.
-          모바일에서는 화면 하단에 고정된다. */}
-      <a className="schedule-bar" href={b.scheduleUrl} target="_blank" rel="noopener nofollow">
-        <span className="sb-text">
-          <span className="sb-title">
-            {b.name} {info.name} 상영시간표
-          </span>
-          <span className="sb-sub">실시간 정보는 공식 사이트에서 확인됩니다</span>
-        </span>
-        <svg
-          className="sb-arrow"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.3"
-          aria-hidden="true"
-        >
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </a>
 
       {siblings.length > 0 && (
         <section className="section" aria-labelledby="siblings">
@@ -373,6 +379,42 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
     const [firstLine, ...rest] = chunk.split('\n');
     return { title: firstLine.trim(), body: rest.join('\n').trim() };
   });
+}
+
+/**
+ * "- 항목 ... : 부연설명 ... (참고)" 식으로 줄바꿈만 되어 있는 원문을
+ * 읽기 쉬운 불릿 목록으로 바꾼다. "-"로 시작하는 줄만 새 항목이고,
+ * 그 외 줄(":"로 시작하거나 그냥 이어지는 줄)은 앞 항목의 부연설명으로 붙인다.
+ */
+function toBullets(raw: string): { text: string; note?: string }[] {
+  const lines = raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const bullets: string[][] = [];
+  for (const line of lines) {
+    if (line.startsWith('-')) {
+      bullets.push([line.replace(/^-\s*/, '')]);
+    } else if (bullets.length > 0) {
+      bullets[bullets.length - 1].push(line.replace(/^:\s*/, ''));
+    } else {
+      bullets.push([line]);
+    }
+  }
+  return bullets.map(([text, ...rest]) => ({ text, note: rest.join(' ') || undefined }));
+}
+
+function BulletList({ text }: { text: string }) {
+  return (
+    <ul className="transit-bullets">
+      {toBullets(text).map((item, i) => (
+        <li key={i}>
+          <span className="tb-text">{item.text}</span>
+          {item.note && <span className="tb-note">{item.note}</span>}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 /** 요금 행을 상영관(label)별로 묶고, 그 안에서 시간대별 평일·주말 한 행으로 합친다 */
@@ -435,7 +477,7 @@ const IconCoin = () => (
  * 서울강남-cgv 한 곳에만 붙여서 "준비 중" 자리에 실제로 채우면 어떤 모습인지 확인하는 테스트안.
  * 425곳 전체로 확장할 때는 이 컴포넌트를 그대로 재사용하면 된다.
  */
-function ContentPreview({ branch: b }: { branch: Branch }) {
+function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBar: ReactNode }) {
   const priceGroups = pivotPrices(pricesOf(b.id));
 
   // CGV는 "# 지하철 ... # 버스 ..." 원문 한 덩어리라 마커로 쪼개고,
@@ -451,6 +493,8 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
         b.parking.fee && { title: '주차요금', body: b.parking.fee },
       ].filter((x): x is { title: string; body: string } => Boolean(x));
 
+  const parkingTone = (title: string) =>
+    title.includes('요금') ? 'fee' : title.includes('확인') ? 'howto' : 'guide';
   const parkingIcon = (title: string) =>
     title.includes('요금') ? <IconCoin /> : title.includes('확인') ? <IconTicket /> : <IconParking />;
 
@@ -459,6 +503,24 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
       <span className="badge badge-brand" style={{ marginBottom: -8, display: 'inline-block' }}>
         테스트 미리보기 — 이 지점만 실제 정보로 채웠습니다
       </span>
+
+      {boxOffice.movies.length > 0 && (
+        <section className="section" aria-labelledby="boxoffice">
+          <h2 id="boxoffice">현재 상영중인 영화 순위</h2>
+          <p className="card-sub" style={{ marginTop: 4 }}>
+            {formatBoxOfficeDate(boxOffice.targetDate)} 기준 일별 박스오피스 · 영화진흥위원회 제공
+          </p>
+          <ol className="boxoffice-list">
+            {boxOffice.movies.map((m) => (
+              <li className="bo-item" key={m.movieCd}>
+                <span className="bo-rank">{m.rank}</span>
+                <span className="bo-name">{m.name}</span>
+                <span className="bo-audience">누적 {m.audienceTotal.toLocaleString()}명</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       {priceGroups.length > 0 && (
         <section className="section" aria-labelledby="prices">
@@ -498,26 +560,28 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
         </section>
       )}
 
+      {scheduleBar}
+
       {(subway || bus) && (
         <section className="section" aria-labelledby="transit">
           <h2 id="transit">대중교통 이용 방법</h2>
           <div className="transit-grid">
             {subway && (
-              <div className="transit-card">
+              <div className="transit-card transit-card--subway">
                 <div className="transit-card-head">
                   <IconSubway />
                   지하철
                 </div>
-                <p className="transit-card-body">{subway}</p>
+                <BulletList text={subway} />
               </div>
             )}
             {bus && (
-              <div className="transit-card">
+              <div className="transit-card transit-card--bus">
                 <div className="transit-card-head">
                   <IconBus />
                   버스
                 </div>
-                <p className="transit-card-body">{bus}</p>
+                <BulletList text={bus} />
               </div>
             )}
           </div>
@@ -529,12 +593,12 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
           <h2 id="parking">주차 안내</h2>
           <div className="transit-grid">
             {parkingSections.map((s) => (
-              <div className="transit-card" key={s.title}>
+              <div className={`transit-card transit-card--${parkingTone(s.title)}`} key={s.title}>
                 <div className="transit-card-head">
                   {parkingIcon(s.title)}
                   {s.title}
                 </div>
-                <p className="transit-card-body">{s.body}</p>
+                <BulletList text={s.body} />
               </div>
             ))}
           </div>
@@ -542,6 +606,10 @@ function ContentPreview({ branch: b }: { branch: Branch }) {
       )}
     </>
   );
+}
+
+function formatBoxOfficeDate(yyyymmdd: string): string {
+  return `${yyyymmdd.slice(0, 4)}.${yyyymmdd.slice(4, 6)}.${yyyymmdd.slice(6, 8)}`;
 }
 
 /** 0212345678 → 02-1234-5678 형태로 보기 좋게 */
