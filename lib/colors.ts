@@ -32,6 +32,14 @@ export const BRAND_ICON_COLOR: Record<BrandKey, { bg: string; fg: string }> = {
   megabox: { bg: '#e6f1fb', fg: '#0c447c' },
 };
 
+/** 홈 브랜드 카드의 로고체 표기. 한글 브랜드명은 표시용 글꼴(Oswald)에
+ * 한글 글리프가 없어 그대로 쓰면 폰트가 깨지므로 로마자 표기를 따로 둔다. */
+export const BRAND_WORDMARK: Record<BrandKey, string> = {
+  cgv: 'CGV',
+  lotte: 'LOTTE CINEMA',
+  megabox: 'MEGABOX',
+};
+
 /**
  * 브랜드 허브·지역 목록·지점 상세 페이지에 공통으로 입히는 브랜드 색.
  * 루트 요소에 이 값을 CSS 커스텀 속성으로 걸어두면(--brand-bg/--brand-fg)

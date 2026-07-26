@@ -31,6 +31,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {/* Oswald — 홈 브랜드 카드의 로고체 표기 전용(.brand-wordmark). 본문에는 안 씀 */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap"
+        />
       </head>
       <body>
         <a className="skip" href="#main">

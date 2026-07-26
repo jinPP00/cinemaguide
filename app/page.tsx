@@ -1,8 +1,16 @@
 import Link from 'next/link';
 import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
-import { BRAND_ICON_COLOR, brandThemeVars, sidoColor } from '@/lib/colors';
+import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars, sidoColor } from '@/lib/colors';
 import type { CSSProperties } from 'react';
+
+const IconClapper = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path d="M4 10.5V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-7.5H4Z" />
+    <path d="M4 10.5 5 5h14l1 5.5" />
+    <path d="m8 5 1.5 3.2M13 5l1.5 3.2" strokeLinecap="round" />
+  </svg>
+);
 
 export const metadata = {
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
@@ -36,17 +44,15 @@ export default function HomePage() {
               <Link
                 key={b.key}
                 href={brandPath(b.segment)}
-                className="card brand-card"
+                className="card brand-card brand-card--stripe"
                 style={themeVars}
               >
-                <div
-                  className="brand-icon brand-icon-lg"
-                  style={{ background: iconColor.bg, color: iconColor.fg }}
-                  aria-hidden="true"
-                >
-                  {b.name[0]}
+                <div className="brand-card-icon" style={{ color: iconColor.fg }}>
+                  <IconClapper />
                 </div>
-                <div className="card-title">{b.name}</div>
+                <div className="brand-wordmark" style={{ color: iconColor.fg }}>
+                  {BRAND_WORDMARK[b.key]}
+                </div>
                 <div className="card-sub">
                   전국 {b.count}개 지점 · {sidoCount}개 시도
                 </div>

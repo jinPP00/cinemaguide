@@ -279,6 +279,26 @@ a.card:hover .brand-icon {
   color: var(--brand-fg, var(--ink));
 }
 
+/* 상단 색 띠 — border-radius가 걸려 있어도 브라우저가 곡선에 맞춰
+   테두리를 그대로 잘라주므로 border-top만 두껍게 해도 모서리가 자연스럽다 */
+.brand-card--stripe {
+  border-top: 3px solid var(--brand-fg, var(--accent));
+}
+
+.brand-card-icon {
+  margin-bottom: 14px;
+}
+
+/* 브랜드명 로고체 표기. 본문 폰트(Pretendard)와 다른 표시용 글꼴을 써서
+   브랜드 이름만 눈에 띄게 한다. 한글 대신 로마자 표기(BRAND_WORDMARK)를 쓴다 */
+.brand-wordmark {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 .brand-icon {
   width: 34px;
   height: 34px;
@@ -290,14 +310,6 @@ a.card:hover .brand-icon {
   font-weight: 800;
   margin-bottom: 14px;
   transition: transform 0.2s ease;
-}
-
-.brand-icon-lg {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  font-size: 19px;
-  margin-bottom: 18px;
 }
 
 /* 뱃지 ------------------------------------------------------------ */
