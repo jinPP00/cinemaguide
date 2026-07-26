@@ -123,6 +123,23 @@ export default function AboutPage() {
           ))}
         </ul>
 
+        <h2>관련 정책</h2>
+        <ul>
+          <li>
+            <Link href="/disclaimer/">면책 고지</Link> — 공식 서비스와의 관계, 정보 정확성에 대한
+            책임 범위
+          </li>
+          <li>
+            <Link href="/affiliate-disclosure/">광고·제휴 고지</Link> — 광고·제휴 링크 운영 방식
+          </li>
+          <li>
+            <Link href="/privacy/">개인정보처리방침</Link>
+          </li>
+          <li>
+            <Link href="/terms/">이용약관</Link>
+          </li>
+        </ul>
+
         <h2>운영자</h2>
         <div className="table-scroll">
           <table>

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import './globals.css';
 import { SITE, DISCLAIMER } from '@/lib/site';
 import { meta } from '@/lib/data';
-import { brandPath } from '@/lib/data';
+import NavLinks from './NavLinks';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -42,13 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="logo">
               {SITE.name}
             </Link>
-            <nav className="nav" aria-label="주요 메뉴">
-              {meta.brands.map((b) => (
-                <Link key={b.key} href={brandPath(b.segment)}>
-                  {b.name}
-                </Link>
-              ))}
-            </nav>
+            <NavLinks brands={meta.brands} />
           </div>
         </header>
 
@@ -56,13 +50,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <footer className="site-footer">
           <div className="wrap">
+            {/* 꼭 필요한 것만 노출한다. 사이트 소개·면책 고지·광고제휴 고지는
+                /about/ 페이지 안의 "관련 정책" 목록에서 연결한다. */}
             <ul className="footer-links">
-              <li>
-                <Link href="/about/">사이트 소개</Link>
-              </li>
-              <li>
-                <Link href="/contact/">문의·정정 요청</Link>
-              </li>
               <li>
                 <Link href="/privacy/">개인정보처리방침</Link>
               </li>
@@ -70,10 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/terms/">이용약관</Link>
               </li>
               <li>
-                <Link href="/disclaimer/">면책 고지</Link>
-              </li>
-              <li>
-                <Link href="/affiliate-disclosure/">광고·제휴 고지</Link>
+                <Link href="/contact/">문의·정정 요청</Link>
               </li>
             </ul>
             <hr className="footer-divider" />

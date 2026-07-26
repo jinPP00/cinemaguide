@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
-import { BRAND_ICON_COLOR, sidoColor } from '@/lib/colors';
+import { BRAND_ICON_COLOR, brandThemeVars, sidoColor } from '@/lib/colors';
+import type { CSSProperties } from 'react';
 
 export const metadata = {
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
@@ -30,10 +31,16 @@ export default function HomePage() {
             const sidoCount = sidosOfBrand(b.key).length;
             const specialCount = list.filter((x) => x.specialScreens.length > 0).length;
             const iconColor = BRAND_ICON_COLOR[b.key];
+            const themeVars = brandThemeVars(b.key) as CSSProperties;
             return (
-              <Link key={b.key} href={brandPath(b.segment)} className="card brand-card">
+              <Link
+                key={b.key}
+                href={brandPath(b.segment)}
+                className="card brand-card"
+                style={themeVars}
+              >
                 <div
-                  className="brand-icon"
+                  className="brand-icon brand-icon-lg"
                   style={{ background: iconColor.bg, color: iconColor.fg }}
                   aria-hidden="true"
                 >
@@ -44,7 +51,7 @@ export default function HomePage() {
                   전국 {b.count}개 지점 · {sidoCount}개 시도
                 </div>
                 <div className="badges">
-                  <span className="badge">특별관 {specialCount}곳</span>
+                  <span className="badge badge-brand">특별관 {specialCount}곳</span>
                 </div>
                 <div className="card-more">지점 보기 →</div>
               </Link>

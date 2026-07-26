@@ -44,7 +44,7 @@ export async function generateMetadata({
   if (brandKey) {
     const info = brandMeta(brandKey);
     return {
-      title: `${info.name} 전국 지점 목록과 이용 안내`,
+      title: `전국 ${info.name} 영화관 이용 안내`,
       description: `${info.name} 전국 ${info.count}개 지점의 위치와 상영시간표, 주차, 관람료 정보를 지역별로 정리했습니다.`,
       alternates: { canonical: brandPath(info.segment) },
     };
@@ -101,7 +101,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
         </ol>
       </nav>
 
-      <h1>{info.name} 전국 지점 목록과 이용 안내</h1>
+      <h1>전국 {info.name} 영화관 이용 안내</h1>
       <p className="lead" style={{ marginTop: 12 }}>
         {intro.lead}
       </p>
