@@ -1,0 +1,31 @@
+{
+  "name": "cinema-guide",
+  "version": "0.1.0",
+  "private": true,
+  "description": "영화관 지점안내 - CGV·롯데시네마·메가박스 전국 지점 정보",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "normalize": "node scripts/normalize.mjs",
+    "verify": "node scripts/verify.mjs",
+    "data": "npm run normalize && npm run verify",
+    "check-links": "node scripts/check-links.mjs",
+    "check": "npm run build && npm run check-links"
+  },
+  "dependencies": {
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "typescript": "^5.7.3"
+  },
+  "overridesReason": "Next.js가 끌고 오는 하위 패키지의 알려진 취약점을 패치 버전으로 올린다. sharp=libvips 취약점(GHSA-f88m-g3jw-g9cj), postcss=XSS·경로탐색(GHSA-qx2v-qp2m-jg93 외). npm audit fix --force는 Next.js를 9.x로 강등시키므로 쓰지 않는다.",
+  "overrides": {
+    "sharp": "^0.35.3",
+    "postcss": "^8.5.23"
+  }
+}

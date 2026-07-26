@@ -1,0 +1,20 @@
+# 의존성
+node_modules/
+
+# Next.js 빌드 산출물
+.next/
+out/
+
+# 환경 변수 (도메인·측정 ID 등)
+.env
+.env.local
+.env*.local
+
+# 로그·OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# 타입 선언 자동 생성
+next-env.d.ts
