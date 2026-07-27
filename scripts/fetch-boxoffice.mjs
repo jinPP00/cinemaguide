@@ -29,6 +29,27 @@ function rankingOf(movies) {
   return movies.map((m) => m.movieCd).join(',');
 }
 
+/**
+ * GitHub Actions 러너에서 KOBIS 서버로 연결이 간헐적으로 타임아웃되는 걸
+ * 몇 차례 겪었다(수동 재실행하면 되긴 했음). 매번 사람이 재실행하지 않도록
+ * 스크립트 안에서 몇 번 재시도한다.
+ */
+async function fetchWithRetry(url, attempts = 3, delayMs = 5000) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fetch(url);
+    } catch (err) {
+      lastErr = err;
+      if (i < attempts - 1) {
+        console.error(`fetch 실패(${i + 1}/${attempts}차 시도), ${delayMs}ms 후 재시도:`, err.message);
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 const KEY = process.env.KOBIS_API_KEY;
 if (!KEY) {
   console.error('KOBIS_API_KEY 환경변수가 없습니다. .env.local에 설정하거나');
@@ -50,7 +71,7 @@ async function fetchMovieInfo(movieCd) {
     'https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json' +
     `?key=${KEY}&movieCd=${movieCd}`;
   try {
-    const res = await fetch(url);
+    const res = await fetchWithRetry(url, 2, 3000);
     if (!res.ok) return null;
     const data = await res.json();
     const info = data.movieInfoResult?.movieInfo;
@@ -77,12 +98,10 @@ async function main() {
 
   let res;
   try {
-    res = await fetch(url);
+    res = await fetchWithRetry(url, 3, 5000);
   } catch (err) {
-    // fetch 자체가 실패하면(DNS/연결거부/타임아웃 등) 원인을 최대한 자세히 남긴다.
-    // KOBIS 같은 국내 공공 API는 해외 IP(예: GitHub Actions 러너)를 막는 경우가 있어
-    // 이 로그로 그 가능성부터 확인한다.
-    console.error('fetch 자체가 실패했습니다:', err.message);
+    // 재시도까지 다 실패하면 원인을 최대한 자세히 남긴다.
+    console.error('fetch 자체가 실패했습니다(재시도 포함):', err.message);
     if (err.cause) console.error('원인(cause):', err.cause);
     throw err;
   }

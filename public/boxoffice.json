@@ -1,15 +1,15 @@
 {
-  "targetDate": "20260725",
-  "fetchedAt": "2026-07-26T14:39:12.524Z",
+  "targetDate": "20260726",
+  "fetchedAt": "2026-07-27T03:01:31.226Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20233219",
       "name": "호프",
       "openDate": "2026-07-15",
-      "audienceToday": 327571,
-      "audienceTotal": 3129827,
-      "salesShare": 67.7,
+      "audienceToday": 285882,
+      "audienceTotal": 3415711,
+      "salesShare": 65,
       "directors": [
         "나홍진"
       ],
@@ -36,9 +36,9 @@
       "movieCd": "20261784",
       "name": "미니언즈 & 몬스터즈",
       "openDate": "2026-07-15",
-      "audienceToday": 49512,
-      "audienceTotal": 514520,
-      "salesShare": 9.6,
+      "audienceToday": 48445,
+      "audienceTotal": 562965,
+      "salesShare": 10.3,
       "directors": [
         "피에르 꼬팽"
       ],
@@ -57,9 +57,9 @@
       "movieCd": "20259946",
       "name": "모아나",
       "openDate": "2026-07-08",
-      "audienceToday": 36190,
-      "audienceTotal": 874468,
-      "salesShare": 7.1,
+      "audienceToday": 34802,
+      "audienceTotal": 909270,
+      "salesShare": 7.5,
       "directors": [
         "토마스 케일"
       ],
@@ -82,9 +82,9 @@
       "movieCd": "20259781",
       "name": "토이 스토리 5",
       "openDate": "2026-06-17",
-      "audienceToday": 22032,
-      "audienceTotal": 2814636,
-      "salesShare": 4.4,
+      "audienceToday": 22487,
+      "audienceTotal": 2837123,
+      "salesShare": 5,
       "directors": [
         "앤드류 스탠튼"
       ],
@@ -110,9 +110,9 @@
       "movieCd": "20262902",
       "name": "다윗",
       "openDate": "2026-07-10",
-      "audienceToday": 20331,
-      "audienceTotal": 199542,
-      "salesShare": 3.8,
+      "audienceToday": 20815,
+      "audienceTotal": 220357,
+      "salesShare": 4.3,
       "directors": [
         "필 커닝햄",
         "브렌트 도스"
@@ -139,8 +139,8 @@
       "movieCd": "20242402",
       "name": "눈동자",
       "openDate": "2026-06-24",
-      "audienceToday": 14534,
-      "audienceTotal": 1498546,
+      "audienceToday": 13076,
+      "audienceTotal": 1511619,
       "salesShare": 3,
       "directors": [
         "염지호"
@@ -166,9 +166,9 @@
       "movieCd": "20264665",
       "name": "드림 애니멀즈: 더무비",
       "openDate": "2026-07-24",
-      "audienceToday": 5690,
-      "audienceTotal": 18162,
-      "salesShare": 1,
+      "audienceToday": 6242,
+      "audienceTotal": 24404,
+      "salesShare": 1.2,
       "directors": [
         "타케키요 히토시"
       ],
@@ -187,9 +187,9 @@
       "movieCd": "20263530",
       "name": "마티 슈프림",
       "openDate": "2026-07-01",
-      "audienceToday": 1579,
-      "audienceTotal": 123430,
-      "salesShare": 0.4,
+      "audienceToday": 1877,
+      "audienceTotal": 125307,
+      "salesShare": 0.5,
       "directors": [
         "조쉬 사프디"
       ],
@@ -211,32 +211,11 @@
     },
     {
       "rank": 9,
-      "movieCd": "20262381",
-      "name": "사랑의 하츄핑: 고래보석의 전설",
-      "openDate": "2026-08-05",
-      "audienceToday": 1558,
-      "audienceTotal": 2983,
-      "salesShare": 0.3,
-      "directors": [
-        "김수훈"
-      ],
-      "actors": [],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 105,
-      "nations": [
-        "한국"
-      ]
-    },
-    {
-      "rank": 10,
       "movieCd": "20252402",
       "name": "군체",
       "openDate": "2026-05-21",
-      "audienceToday": 1447,
-      "audienceTotal": 5948845,
+      "audienceToday": 1131,
+      "audienceTotal": 5949976,
       "salesShare": 0.3,
       "directors": [
         "연상호"
@@ -256,6 +235,33 @@
       "runtime": 122,
       "nations": [
         "한국"
+      ]
+    },
+    {
+      "rank": 10,
+      "movieCd": "20264027",
+      "name": "극장판 도라에몽: 신 진구의 해저비밀성",
+      "openDate": "2026-07-01",
+      "audienceToday": 979,
+      "audienceTotal": 69574,
+      "salesShare": 0.2,
+      "directors": [
+        "야지마 테츠오"
+      ],
+      "actors": [
+        "윤아영",
+        "김정아",
+        "조현정",
+        "이현주",
+        "최낙윤"
+      ],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 101,
+      "nations": [
+        "일본"
       ]
     }
   ]
