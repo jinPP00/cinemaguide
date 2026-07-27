@@ -807,7 +807,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -1067,7 +1067,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -1104,12 +1104,12 @@
     "seatCount": null,
     "intro": null,
     "transit": {
-      "raw": "$31",
+      "raw": null,
       "bus": null,
       "subway": null
     },
     "parking": {
-      "raw": "$32",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -1123,7 +1123,7 @@
     "sourceId": "0107001",
     "originalRegion": "서울",
     "checkedAt": "2026-07-23",
-    "verificationStatus": "확인완료"
+    "verificationStatus": "확인필요"
   },
   {
     "id": "cgv-0223001",
@@ -2946,7 +2946,7 @@
     "seatCount": null,
     "intro": null,
     "transit": {
-      "raw": "$31",
+      "raw": null,
       "bus": null,
       "subway": null
     },
@@ -2965,7 +2965,7 @@
     "sourceId": "0371001",
     "originalRegion": "경기",
     "checkedAt": "2026-07-23",
-    "verificationStatus": "확인완료"
+    "verificationStatus": "확인필요"
   },
   {
     "id": "cgv-0181001",
@@ -2995,7 +2995,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -3035,7 +3035,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -3314,7 +3314,7 @@
     "seatCount": null,
     "intro": null,
     "transit": {
-      "raw": "$31",
+      "raw": null,
       "bus": null,
       "subway": null
     },
@@ -3333,7 +3333,7 @@
     "sourceId": "0365001",
     "originalRegion": "경기",
     "checkedAt": "2026-07-23",
-    "verificationStatus": "확인완료"
+    "verificationStatus": "확인필요"
   },
   {
     "id": "cgv-0043001",
@@ -4418,7 +4418,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -4914,7 +4914,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -5036,7 +5036,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -5116,7 +5116,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -5770,7 +5770,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -6212,7 +6212,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -6332,7 +6332,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -6856,7 +6856,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -6978,7 +6978,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -7060,7 +7060,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -7102,7 +7102,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null
@@ -7224,7 +7224,7 @@
       "subway": null
     },
     "parking": {
-      "raw": "$31",
+      "raw": null,
       "guide": null,
       "howTo": null,
       "fee": null

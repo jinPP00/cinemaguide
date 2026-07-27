@@ -1,13 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { meta, sidosOfBrand, brandPath, sidoPath } from '@/lib/data';
+import { meta, sidosOfBrand, brandPath, sidoPath, branches, branchPath, hasFilledContent } from '@/lib/data';
 import { SITE } from '@/lib/site';
 
 /**
  * sitemap에는 "색인 대상 canonical URL"만 넣는다. (가이드 5.7 / 기획서 10.2)
  *
- * 1단계에서 지점 상세 425개는 아직 내용이 없어 noindex이므로 여기 포함하지 않는다.
+ * 지점 상세는 hasFilledContent()가 true인 지점(현재 서울)만 포함한다 —
+ * 아직 내용이 없는 나머지 지점은 페이지 자체가 noindex라 여기 넣어도 의미가 없다.
  * robots.txt로 차단하지는 않는다 — 검색엔진이 페이지를 읽어야 noindex를 인식할 수 있기 때문이다.
- * 2단계에서 내용을 채운 뒤 지점 URL을 여기에 추가하고 noindex를 제거한다.
  */
 export const dynamic = 'force-static';
 
@@ -52,6 +52,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       });
     }
+  }
+
+  for (const branch of branches) {
+    if (!hasFilledContent(branch)) continue;
+    entries.push({
+      url: `${base}${branchPath(branch)}`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    });
   }
 
   return entries;

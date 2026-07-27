@@ -14,6 +14,7 @@ import {
   sidoPath,
   branchPath,
   pricesOf,
+  hasFilledContent,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
@@ -58,9 +59,9 @@ export async function generateMetadata({
       title: `${branch.name} ${branch.brandName} 상영시간표·주차·관람료 안내`,
       description: `${branch.name} ${branch.brandName}의 위치와 가는 길, 주차 조건, 관람료 정보입니다. 공식 상영시간표로 바로 이동할 수 있습니다.`,
       alternates: { canonical: branchPath(branch) },
-      // 1단계에서는 상세 내용이 아직 없으므로 색인하지 않는다. (기획서 10.2)
-      // 교통·주차·요금 본문을 채운 뒤 이 설정을 제거하고 색인으로 전환한다.
-      robots: { index: false, follow: true },
+      // 아직 교통·주차·요금 본문을 채우지 못한 지점만 색인하지 않는다. (기획서 10.2)
+      // 내용을 채우는 대로(현재 서울) hasFilledContent에 조건을 추가하고 색인으로 전환한다.
+      robots: hasFilledContent(branch) ? undefined : { index: false, follow: true },
     };
   }
 
@@ -230,9 +231,9 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         )}?c=${b.lng},${b.lat},15,0,0,0,dh`
       : null);
 
-  // 2단계(실제 콘텐츠 채우기) 미리보기 테스트. 서울강남-cgv 한 곳에서만
-  // "준비 중" 안내 대신 실제 교통·주차·요금 정보를 보여준다.
-  const isContentPreview = b.pageSlug === '서울강남-cgv';
+  // 서울 지점은 "준비 중" 안내 대신 실제 교통·주차·요금 정보를 보여준다.
+  // 나머지 지역은 순차적으로 hasFilledContent()의 조건을 넓혀가며 확장한다.
+  const isContentPreview = hasFilledContent(b);
 
   // 예매·상영시간표는 우리 사이트가 아니라 공식 사이트의 일이다.
   // 콘텐츠 미리보기 지점에서는 관람료 다음, 대중교통 이용 방법 앞에 배치해
@@ -492,9 +493,9 @@ const IconCoin = () => (
 );
 
 /**
- * 2단계 콘텐츠(실제 교통·주차·요금 정보) 미리보기.
- * 서울강남-cgv 한 곳에만 붙여서 "준비 중" 자리에 실제로 채우면 어떤 모습인지 확인하는 테스트안.
- * 425곳 전체로 확장할 때는 이 컴포넌트를 그대로 재사용하면 된다.
+ * 2단계 콘텐츠 — 실제 교통·주차·요금 정보. hasFilledContent()가 true인
+ * 지점(현재 서울 70곳)에서 "준비 중" 안내 대신 이 컴포넌트를 쓴다.
+ * 다른 지역으로 넓힐 때도 이 컴포넌트를 그대로 재사용하면 된다.
  */
 function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBar: ReactNode }) {
   const priceGroups = pivotPrices(pricesOf(b.id));
@@ -517,10 +518,6 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
   return (
     <>
-      <span className="badge badge-brand" style={{ marginBottom: -8, display: 'inline-block' }}>
-        테스트 미리보기 — 이 지점만 실제 정보로 채웠습니다
-      </span>
-
       <BoxOfficeSection />
 
       {priceGroups.length > 0 && (

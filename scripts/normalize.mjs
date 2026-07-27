@@ -110,9 +110,18 @@ function baseSlug(name) {
 /* ------------------------------------------------------------------ *
  * 공통 유틸
  * ------------------------------------------------------------------ */
+/**
+ * CGV 원본 크롤링 데이터 일부(20곳)의 traffic_info/parking_info가 "$31"/"$32"
+ * 같은 값으로 들어있다 — 원본 사이트 스크립트의 정규식 치환 버그로 보이는
+ * 깨진 플레이스홀더라, 실제 교통·주차 안내 문구가 아니다. 그대로 노출하면
+ * "주차 안내" 섹션에 "$31"만 덩그러니 뜨므로 비어있는 값으로 취급한다.
+ */
+const isCrawlArtifact = (s) => /^\$\d+$/.test(s);
+
 const text = (value) => {
   const s = String(value ?? '').trim();
-  return s ? s : null;
+  if (!s || isCrawlArtifact(s)) return null;
+  return s;
 };
 
 const joinLines = (value) => {

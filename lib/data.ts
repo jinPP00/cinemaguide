@@ -57,6 +57,16 @@ export function pricesOf(branchId: string): PriceRow[] {
   return prices[branchId] ?? [];
 }
 
+/**
+ * 실제 교통·주차·요금 정보를 채워서 "준비 중" 대신 보여줄 지점인지.
+ * 425곳을 한 번에 채우지 않고 지역 단위로 넓혀가는 중이라 이 조건 하나만
+ * 넓히면 된다 — 지금은 서울(70곳). 색인 여부(robots)·sitemap 포함 여부도
+ * 이 값을 그대로 따르므로 여기 한 곳에서만 관리한다.
+ */
+export function hasFilledContent(branch: Branch): boolean {
+  return branch.sido === '서울';
+}
+
 /* ------------------------------------------------------------------ *
  * URL 만들기
  * 한글이 들어가므로 링크는 항상 이 함수로만 만든다.
