@@ -472,17 +472,6 @@ a.card:hover .brand-icon {
   text-decoration: none;
 }
 
-/* 지역 버튼: 배경을 이미 지역색으로 칠했으므로 hover 시 살짝 진해지기만 한다 */
-.chip-sido {
-  font-weight: 700;
-  border: none;
-}
-
-.chip-sido:hover {
-  filter: brightness(0.96);
-  text-decoration: none;
-}
-
 /* "○○ 지역 전체 보기" 같은 목록 하단 링크 — 그냥 텍스트 링크로 묻히지 않게
    브랜드색 + 화살표 아이콘으로 눈에 띄게 한다 */
 .see-all-link {

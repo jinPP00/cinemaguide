@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { SITE } from '@/lib/site';
-import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars, sidoColor } from '@/lib/colors';
+import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 import { IconClapper } from './icons';
 
@@ -70,20 +70,13 @@ export default function HomePage() {
             <div key={b.key}>
               <div style={{ fontWeight: 600, marginBottom: 8 }}>{b.name}</div>
               <ul className="chip-list">
-                {sidosOfBrand(b.key).map((sido) => {
-                  const c = sidoColor(sido);
-                  return (
-                    <li key={sido}>
-                      <Link
-                        className="chip chip-sido"
-                        style={{ background: c.bg, color: c.fg, borderColor: 'transparent' }}
-                        href={`${brandPath(b.segment)}${encodeURIComponent(sido)}/`}
-                      >
-                        {sido} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[b.key]?.[sido] ?? 0}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
+                {sidosOfBrand(b.key).map((sido) => (
+                  <li key={sido}>
+                    <Link className="chip" href={`${brandPath(b.segment)}${encodeURIComponent(sido)}/`}>
+                      {sido} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[b.key]?.[sido] ?? 0}</span>
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           ))}

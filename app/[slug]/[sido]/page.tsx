@@ -12,7 +12,7 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
-import { sidoColor, brandThemeVars } from '@/lib/colors';
+import { brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 
 /**
@@ -129,20 +129,13 @@ export default async function SidoPage({
           </p>
         )}
         <ul className="chip-list" style={{ marginTop: 14 }}>
-          {nearby.map((s) => {
-            const c = sidoColor(s);
-            return (
-              <li key={s}>
-                <Link
-                  className="chip chip-sido"
-                  style={{ background: c.bg, color: c.fg }}
-                  href={sidoPath(info.segment, s)}
-                >
-                  {s} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[key]?.[s] ?? 0}</span>
-                </Link>
-              </li>
-            );
-          })}
+          {nearby.map((s) => (
+            <li key={s}>
+              <Link className="chip" href={sidoPath(info.segment, s)}>
+                {s} <span style={{ opacity: 0.7 }}>{meta.byBrandSido[key]?.[s] ?? 0}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </section>
 
