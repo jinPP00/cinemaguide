@@ -47,7 +47,7 @@ export async function generateMetadata({
   if (brandKey) {
     const info = brandMeta(brandKey);
     return {
-      title: `전국 ${info.name} 영화관 이용 안내`,
+      title: `${info.name} 영화관 이용 안내`,
       description: `${info.name} 전국 ${info.count}개 지점의 위치와 상영시간표, 주차, 관람료 정보를 지역별로 정리했습니다.`,
       alternates: { canonical: brandPath(info.segment) },
     };
@@ -104,7 +104,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
         </ol>
       </nav>
 
-      <h1>전국 {info.name} 영화관 이용 안내</h1>
+      <h1>{info.name} 영화관 이용 안내</h1>
       <p className="lead" style={{ marginTop: 12 }}>
         {intro.lead}
       </p>
@@ -116,7 +116,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
       </div>
 
       <section className="section" aria-labelledby="branch-list">
-        <h2 id="branch-list">지역별 지점</h2>
+        <h2 id="branch-list">전국 {info.name} 영화관 지역별 안내</h2>
         <div style={{ marginTop: 20 }}>
           {REGION_GROUPS.map((region) => {
             const regionSidos = region.sidos.filter((sido) => sidos.includes(sido));
@@ -374,9 +374,12 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
               </li>
             ))}
           </ul>
-          <p style={{ marginTop: 14 }}>
-            <Link href={sidoPath(info.segment, b.sido)}>
-              {b.sido} {info.name} 지점 전체 보기 →
+          <p style={{ marginTop: 16 }}>
+            <Link className="see-all-link" href={sidoPath(info.segment, b.sido)}>
+              {b.sido} {info.name} 지점 전체 보기
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
             </Link>
           </p>
         </section>
@@ -565,7 +568,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
           <h2 id="transit">대중교통 이용 방법</h2>
           <div className="transit-grid">
             {subway && (
-              <div className="transit-card transit-card--subway">
+              <div className="transit-card">
                 <div className="transit-card-head">
                   <IconSubway />
                   지하철
@@ -574,7 +577,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
               </div>
             )}
             {bus && (
-              <div className="transit-card transit-card--bus">
+              <div className="transit-card">
                 <div className="transit-card-head">
                   <IconBus />
                   버스
