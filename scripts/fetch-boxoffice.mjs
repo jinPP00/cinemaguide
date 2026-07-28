@@ -110,12 +110,16 @@ function normalizeTitle(s) {
  * 차이를 무시하고) 정확히 같은 것만 후보로 삼고, 그중에서도 KOBIS 개봉연도와
  * 2년 이상 차이나면 버린다 — 동명이인일 뿐 실제로는 다른 영화일 가능성이 커서다.
  * 잘못된 포스터를 붙이는 것보다는 포스터 없이 두는 게 낫다.
+ *
+ * listCount는 넉넉히 잡는다. KMDb는 관련도순이 아니라 다른 기준으로 정렬돼서
+ * "군체"처럼 흔한 단어는 옛 뉴스릴·다큐 수십 건이 앞에 나오고 정작 찾는 영화는
+ * 40~50번째에 있기도 했다(실측: listCount=10으로는 놓쳤던 영화가 100이면 잡힘).
  */
 async function fetchPoster(name, releaseYear) {
   if (!KMDB_KEY) return null;
   const url =
     'http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json2.jsp' +
-    `?collection=kmdb_new2&detail=Y&listCount=10&title=${encodeURIComponent(name)}&ServiceKey=${KMDB_KEY}`;
+    `?collection=kmdb_new2&detail=Y&listCount=100&title=${encodeURIComponent(name)}&ServiceKey=${KMDB_KEY}`;
   try {
     const res = await fetchWithRetry(url, 2, 3000);
     if (!res.ok) return null;

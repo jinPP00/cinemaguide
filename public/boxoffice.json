@@ -1,6 +1,6 @@
 {
   "targetDate": "20260727",
-  "fetchedAt": "2026-07-28T11:16:02.935Z",
+  "fetchedAt": "2026-07-28T11:37:55.632Z",
   "movies": [
     {
       "rank": 1,
@@ -30,7 +30,7 @@
       "nations": [
         "한국"
       ],
-      "posterUrl": null
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/43/tn_DPK025867.jpg"
     },
     {
       "rank": 2,
@@ -165,7 +165,7 @@
         "남아프리카공화국",
         "미국"
       ],
-      "posterUrl": null
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPF033233.jpg"
     },
     {
       "rank": 7,
@@ -244,7 +244,7 @@
       "nations": [
         "한국"
       ],
-      "posterUrl": null
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/38/tn_DPK025535.jpg"
     },
     {
       "rank": 10,
