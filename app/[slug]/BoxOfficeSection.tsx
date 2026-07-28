@@ -58,6 +58,11 @@ export default function BoxOfficeSection() {
                   onClick={() => setOpenCd(isOpen ? null : m.movieCd)}
                 >
                   <span className="bo-rank">{m.rank}</span>
+                  {m.posterUrl ? (
+                    <img className="bo-poster" src={m.posterUrl} alt="" aria-hidden="true" />
+                  ) : (
+                    <span className="bo-poster bo-poster-empty" aria-hidden="true" />
+                  )}
                   <span className="bo-name">{m.name}</span>
                   <span className="bo-audience">누적 {m.audienceTotal.toLocaleString()}명</span>
                   <svg
@@ -79,6 +84,7 @@ export default function BoxOfficeSection() {
           })}
         </ol>
       )}
+      <p className="bo-credit">영화 정보 제공: 영화진흥위원회(KOBIS)·한국영상자료원(KMDb)</p>
     </section>
   );
 }
@@ -92,18 +98,25 @@ function MovieDetail({ movie: m }: { movie: BoxOfficeMovie }) {
   if (m.runtime) rows.push({ label: '러닝타임', value: `${m.runtime}분` });
   if (m.nations?.length) rows.push({ label: '제작국가', value: m.nations.join(', ') });
 
-  if (rows.length === 0) {
+  if (rows.length === 0 && !m.posterUrl) {
     return <div className="bo-detail bo-detail-empty">상세정보를 찾을 수 없습니다</div>;
   }
 
   return (
-    <dl className="bo-detail">
-      {rows.map((r) => (
-        <div key={r.label}>
-          <dt>{r.label}</dt>
-          <dd>{r.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="bo-detail">
+      {m.posterUrl && <img className="bo-poster-lg" src={m.posterUrl} alt={`${m.name} 포스터`} />}
+      {rows.length > 0 ? (
+        <dl className="bo-detail-rows">
+          {rows.map((r) => (
+            <div key={r.label}>
+              <dt>{r.label}</dt>
+              <dd>{r.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="bo-detail-empty" style={{ padding: 0 }}>상세정보를 찾을 수 없습니다</p>
+      )}
+    </div>
   );
 }

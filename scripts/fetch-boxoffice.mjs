@@ -1,8 +1,12 @@
 /**
  * KOBIS(영화진흥위원회) 일별 박스오피스를 받아 public/boxoffice.json으로 저장한다.
  *
- *   KOBIS_API_KEY=xxxx node scripts/fetch-boxoffice.mjs
- *   (.env.local에 KOBIS_API_KEY를 넣어두면 npm run boxoffice로 자동 로드된다)
+ *   KOBIS_API_KEY=xxxx KMDB_API_KEY=yyyy node scripts/fetch-boxoffice.mjs
+ *   (.env.local에 넣어두면 npm run boxoffice로 자동 로드된다)
+ *
+ * KMDB_API_KEY(한국영상자료원 KMDb Open API "영화상세정보")는 선택값이다 —
+ * 없으면 포스터 없이(다른 정보는 그대로) 저장한다. KOBIS는 포스터 필드가 없어서
+ * 영화명으로 KMDb를 한 번 더 검색해 붙인다.
  *
  * public/ 아래 두는 이유: 페이지 HTML에 굽지 않고 브라우저가 이 파일을 직접
  * fetch해서 읽게 하기 위해서다. 그래야 순위가 바뀔 때 이 파일 하나만 새로
@@ -57,6 +61,11 @@ if (!KEY) {
   process.exit(1);
 }
 
+const KMDB_KEY = process.env.KMDB_API_KEY;
+if (!KMDB_KEY) {
+  console.log('KMDB_API_KEY가 없어 포스터 없이 진행합니다.');
+}
+
 function yesterday() {
   const d = new Date();
   d.setDate(d.getDate() - 1);
@@ -86,6 +95,48 @@ async function fetchMovieInfo(movieCd) {
     };
   } catch {
     // 개별 영화 상세정보 하나가 실패해도 순위 전체를 실패시키지 않는다.
+    return null;
+  }
+}
+
+/** 비교용으로 제목에서 흔한 구두점 차이(&, :, · 등)와 공백을 없앤다 */
+function normalizeTitle(s) {
+  return s.replace(/[&:·\-.,!?"'()]/g, '').replace(/\s+/g, '').trim();
+}
+
+/**
+ * KMDb는 영화명으로 검색하면 동명이인 영화가 여러 편 섞여 나온다(예: "호프"로
+ * 검색하면 2019년 노르웨이 영화·1951년 오페라 영화까지 나옴). 제목이 (구두점
+ * 차이를 무시하고) 정확히 같은 것만 후보로 삼고, 그중에서도 KOBIS 개봉연도와
+ * 2년 이상 차이나면 버린다 — 동명이인일 뿐 실제로는 다른 영화일 가능성이 커서다.
+ * 잘못된 포스터를 붙이는 것보다는 포스터 없이 두는 게 낫다.
+ */
+async function fetchPoster(name, releaseYear) {
+  if (!KMDB_KEY) return null;
+  const url =
+    'http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json2.jsp' +
+    `?collection=kmdb_new2&detail=Y&listCount=10&title=${encodeURIComponent(name)}&ServiceKey=${KMDB_KEY}`;
+  try {
+    const res = await fetchWithRetry(url, 2, 3000);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const results = data.Data?.[0]?.Result ?? [];
+    const target = normalizeTitle(name);
+    const candidates = results
+      .map((r) => ({
+        ...r,
+        cleanTitle: r.title.replace(/!HS|!HE/g, '').replace(/\s+/g, ' ').trim(),
+      }))
+      .filter((r) => normalizeTitle(r.cleanTitle) === target && r.posters)
+      .filter((r) => Math.abs(Number(r.prodYear) - releaseYear) <= 2);
+    if (candidates.length === 0) return null;
+    candidates.sort(
+      (a, b) => Math.abs(Number(a.prodYear) - releaseYear) - Math.abs(Number(b.prodYear) - releaseYear),
+    );
+    const first = candidates[0].posters.split('|')[0]?.trim();
+    return first || null;
+  } catch {
+    // 포스터 하나 실패해도 순위 전체를 실패시키지 않는다.
     return null;
   }
 }
@@ -144,7 +195,10 @@ async function main() {
     const cached = prevByCd.get(m.movieCd);
     const details =
       cached && cached.directors ? pickDetails(cached) : await fetchMovieInfo(m.movieCd);
-    moviesWithDetails.push({ ...m, ...(details ?? {}) });
+    const releaseYear = Number((m.openDate || '').slice(0, 4)) || new Date().getFullYear();
+    const posterUrl =
+      cached && cached.posterUrl !== undefined ? cached.posterUrl : await fetchPoster(m.name, releaseYear);
+    moviesWithDetails.push({ ...m, ...(details ?? {}), posterUrl });
   }
 
   const out = {

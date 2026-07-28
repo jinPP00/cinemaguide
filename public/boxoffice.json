@@ -1,15 +1,15 @@
 {
-  "targetDate": "20260726",
-  "fetchedAt": "2026-07-27T03:01:31.226Z",
+  "targetDate": "20260727",
+  "fetchedAt": "2026-07-28T11:16:02.935Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20233219",
       "name": "호프",
       "openDate": "2026-07-15",
-      "audienceToday": 285882,
-      "audienceTotal": 3415711,
-      "salesShare": 65,
+      "audienceToday": 103406,
+      "audienceTotal": 3519088,
+      "salesShare": 59.5,
       "directors": [
         "나홍진"
       ],
@@ -29,16 +29,17 @@
       "runtime": 156,
       "nations": [
         "한국"
-      ]
+      ],
+      "posterUrl": null
     },
     {
       "rank": 2,
       "movieCd": "20261784",
       "name": "미니언즈 & 몬스터즈",
       "openDate": "2026-07-15",
-      "audienceToday": 48445,
-      "audienceTotal": 562965,
-      "salesShare": 10.3,
+      "audienceToday": 21401,
+      "audienceTotal": 584363,
+      "salesShare": 11.4,
       "directors": [
         "피에르 꼬팽"
       ],
@@ -50,16 +51,17 @@
       "runtime": 89,
       "nations": [
         "미국"
-      ]
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPF033536.jpg"
     },
     {
       "rank": 3,
       "movieCd": "20259946",
       "name": "모아나",
       "openDate": "2026-07-08",
-      "audienceToday": 34802,
-      "audienceTotal": 909270,
-      "salesShare": 7.5,
+      "audienceToday": 15049,
+      "audienceTotal": 924319,
+      "salesShare": 8.2,
       "directors": [
         "토마스 케일"
       ],
@@ -75,16 +77,17 @@
       "runtime": 115,
       "nations": [
         "미국"
-      ]
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/33/tn_DPF032800.jpg"
     },
     {
       "rank": 4,
       "movieCd": "20259781",
       "name": "토이 스토리 5",
       "openDate": "2026-06-17",
-      "audienceToday": 22487,
-      "audienceTotal": 2837123,
-      "salesShare": 5,
+      "audienceToday": 11521,
+      "audienceTotal": 2848642,
+      "salesShare": 6.3,
       "directors": [
         "앤드류 스탠튼"
       ],
@@ -103,16 +106,45 @@
       "runtime": 101,
       "nations": [
         "미국"
-      ]
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/37/tn_DPF033060.jpg"
     },
     {
       "rank": 5,
+      "movieCd": "20242402",
+      "name": "눈동자",
+      "openDate": "2026-06-24",
+      "audienceToday": 6698,
+      "audienceTotal": 1518317,
+      "salesShare": 3.9,
+      "directors": [
+        "염지호"
+      ],
+      "actors": [
+        "신민아",
+        "김남희",
+        "이승룡",
+        "김영아",
+        "박경진"
+      ],
+      "genres": [
+        "스릴러"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 105,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPK025634.jpg"
+    },
+    {
+      "rank": 6,
       "movieCd": "20262902",
       "name": "다윗",
       "openDate": "2026-07-10",
-      "audienceToday": 20815,
-      "audienceTotal": 220357,
-      "salesShare": 4.3,
+      "audienceToday": 5037,
+      "audienceTotal": 225388,
+      "salesShare": 2.7,
       "directors": [
         "필 커닝햄",
         "브렌트 도스"
@@ -132,43 +164,17 @@
       "nations": [
         "남아프리카공화국",
         "미국"
-      ]
-    },
-    {
-      "rank": 6,
-      "movieCd": "20242402",
-      "name": "눈동자",
-      "openDate": "2026-06-24",
-      "audienceToday": 13076,
-      "audienceTotal": 1511619,
-      "salesShare": 3,
-      "directors": [
-        "염지호"
       ],
-      "actors": [
-        "신민아",
-        "김남희",
-        "이승룡",
-        "김영아",
-        "박경진"
-      ],
-      "genres": [
-        "스릴러"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 105,
-      "nations": [
-        "한국"
-      ]
+      "posterUrl": null
     },
     {
       "rank": 7,
       "movieCd": "20264665",
       "name": "드림 애니멀즈: 더무비",
       "openDate": "2026-07-24",
-      "audienceToday": 6242,
-      "audienceTotal": 24404,
-      "salesShare": 1.2,
+      "audienceToday": 3741,
+      "audienceTotal": 28145,
+      "salesShare": 1.9,
       "directors": [
         "타케키요 히토시"
       ],
@@ -180,43 +186,45 @@
       "runtime": 90,
       "nations": [
         "일본"
-      ]
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/46/tn_DPF033413.jpg"
     },
     {
       "rank": 8,
-      "movieCd": "20263530",
-      "name": "마티 슈프림",
-      "openDate": "2026-07-01",
-      "audienceToday": 1877,
-      "audienceTotal": 125307,
-      "salesShare": 0.5,
+      "movieCd": "20255484",
+      "name": "오케이 마담2",
+      "openDate": "2026-08-12",
+      "audienceToday": 2952,
+      "audienceTotal": 3241,
+      "salesShare": 1.5,
       "directors": [
-        "조쉬 사프디"
+        "이철하"
       ],
       "actors": [
-        "티모시 샬라메",
-        "기네스 팰트로우",
-        "오데사 아지온",
-        "타일러 더 크리에이터",
-        "아벨 페라라"
+        "엄정화",
+        "박성웅",
+        "이상윤",
+        "배정남",
+        "박진주"
       ],
       "genres": [
-        "드라마"
+        "코미디"
       ],
       "watchGrade": "15세이상관람가",
-      "runtime": 149,
+      "runtime": 108,
       "nations": [
-        "미국"
-      ]
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPK026153.jpg"
     },
     {
       "rank": 9,
       "movieCd": "20252402",
       "name": "군체",
       "openDate": "2026-05-21",
-      "audienceToday": 1131,
-      "audienceTotal": 5949976,
-      "salesShare": 0.3,
+      "audienceToday": 813,
+      "audienceTotal": 5950781,
+      "salesShare": 0.5,
       "directors": [
         "연상호"
       ],
@@ -235,34 +243,36 @@
       "runtime": 122,
       "nations": [
         "한국"
-      ]
+      ],
+      "posterUrl": null
     },
     {
       "rank": 10,
-      "movieCd": "20264027",
-      "name": "극장판 도라에몽: 신 진구의 해저비밀성",
+      "movieCd": "20263530",
+      "name": "마티 슈프림",
       "openDate": "2026-07-01",
-      "audienceToday": 979,
-      "audienceTotal": 69574,
-      "salesShare": 0.2,
+      "audienceToday": 704,
+      "audienceTotal": 126011,
+      "salesShare": 0.4,
       "directors": [
-        "야지마 테츠오"
+        "조쉬 사프디"
       ],
       "actors": [
-        "윤아영",
-        "김정아",
-        "조현정",
-        "이현주",
-        "최낙윤"
+        "티모시 샬라메",
+        "기네스 팰트로우",
+        "오데사 아지온",
+        "타일러 더 크리에이터",
+        "아벨 페라라"
       ],
       "genres": [
-        "애니메이션"
+        "드라마"
       ],
-      "watchGrade": "전체관람가",
-      "runtime": 101,
+      "watchGrade": "15세이상관람가",
+      "runtime": 149,
       "nations": [
-        "일본"
-      ]
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/44/tn_DPF033315.jpg"
     }
   ]
 }

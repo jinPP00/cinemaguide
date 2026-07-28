@@ -1114,6 +1114,20 @@ a.card:hover .brand-icon {
   color: var(--brand-fg, var(--ink));
 }
 
+/* 목록 줄의 작은 포스터 썸네일. 포스터가 없는 영화는 빈 자리만 잡아 정렬을 맞춘다 */
+.bo-poster {
+  flex-shrink: 0;
+  width: 34px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--surface);
+}
+
+.bo-poster-empty {
+  border: 1px solid var(--hairline);
+}
+
 .bo-name {
   flex: 1;
   min-width: 0;
@@ -1144,11 +1158,20 @@ a.card:hover .brand-icon {
 /* 펼쳐진 상세정보 — 목록 카드와 이어지는 느낌으로 옅은 배경만 준다 */
 .bo-detail {
   margin: 0;
-  padding: 4px 16px 14px 54px;
+  padding: 10px 16px 16px 54px;
   background: var(--surface);
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 14px;
+}
+
+.bo-poster-lg {
+  flex-shrink: 0;
+  width: 84px;
+  height: 120px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
 }
 
 .bo-detail-empty {
@@ -1157,22 +1180,37 @@ a.card:hover .brand-icon {
   color: var(--ink-faint);
 }
 
-.bo-detail > div {
+.bo-detail-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.bo-detail-rows > div {
   display: flex;
   gap: 8px;
   font-size: 0.82rem;
   line-height: 1.6;
 }
 
-.bo-detail dt {
+.bo-detail-rows dt {
   flex-shrink: 0;
   width: 62px;
   color: var(--ink-faint);
 }
 
-.bo-detail dd {
+.bo-detail-rows dd {
   margin: 0;
   color: var(--ink-soft);
+}
+
+.bo-credit {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  color: var(--ink-faint);
 }
 
 /* 박스오피스는 브라우저에서 따로 불러오므로 도착 전까지 스켈레톤을 보여준다 */

@@ -85,6 +85,7 @@ export interface BoxOfficeMovie {
   watchGrade?: string | null;
   runtime?: number | null;
   nations?: string[];
+  posterUrl?: string | null;
 }
 
 export interface BoxOffice {
