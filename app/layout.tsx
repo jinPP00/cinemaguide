@@ -20,6 +20,10 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     locale: 'ko_KR',
   },
+  // 네이버 서치어드바이저 소유 확인용. 등록 절차에서만 쓰이고 이후엔 그대로 둬도 된다.
+  verification: {
+    other: { 'naver-site-verification': '344923e4820bd695f73d807549b2018d9dc235c8' },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
