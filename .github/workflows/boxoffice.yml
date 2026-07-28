@@ -28,6 +28,7 @@ jobs:
       - name: 박스오피스 데이터 조회
         env:
           KOBIS_API_KEY: ${{ secrets.KOBIS_API_KEY }}
+          KMDB_API_KEY: ${{ secrets.KMDB_API_KEY }}
         run: node scripts/fetch-boxoffice.mjs
 
       - name: 변경사항 커밋 & 푸시
