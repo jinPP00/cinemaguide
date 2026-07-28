@@ -17,6 +17,7 @@ import {
   hasFilledContent,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
+import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
 import { IconClapper } from '../icons';
@@ -259,8 +260,27 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
     </div>
   );
 
+  const theaterJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MovieTheater',
+    name: `${b.name} ${info.name}`,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: b.address,
+      addressRegion: b.sido,
+      addressCountry: 'KR',
+    },
+    ...(b.tel ? { telephone: b.tel } : {}),
+    ...(b.lat && b.lng ? { geo: { '@type': 'GeoCoordinates', latitude: b.lat, longitude: b.lng } } : {}),
+    url: `${SITE.url}${branchPath(b)}`,
+  };
+
   return (
     <div className="wrap page brand-themed" style={themeVars}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(theaterJsonLd) }}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>
