@@ -1056,12 +1056,18 @@ a.card:hover .brand-icon {
   opacity: 0.55;
 }
 
+/* 라벨(예: "간선버스")만 굵게, ":" 뒤에 오는 번호·값은 일반 굵기로 둔다 */
 .tb-text {
   display: block;
   font-size: 0.94rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--ink);
   line-height: 1.55;
+}
+
+.tb-text strong,
+.tb-note strong {
+  font-weight: 700;
 }
 
 .tb-note {

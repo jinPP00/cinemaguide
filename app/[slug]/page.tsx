@@ -430,7 +430,9 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
  * 그 외 줄(":"로 시작하거나 그냥 이어지는 줄)은 앞 항목의 부연설명으로 붙인다.
  */
 function toBullets(raw: string): { text: string; note?: string }[] {
-  const lines = raw
+  // "심야)" 형태를 다른 항목들과 같은 "라벨 : 값" 형식으로 통일한다
+  const normalized = raw.replace(/심야\)/g, '심야버스 :');
+  const lines = normalized
     .split('\n')
     .map((l) => l.trim())
     .filter(Boolean);
@@ -447,13 +449,32 @@ function toBullets(raw: string): { text: string; note?: string }[] {
   return bullets.map(([text, ...rest]) => ({ text, note: rest.join(' ') || undefined }));
 }
 
+/** "라벨 : 값" 형태의 줄을 라벨만 굵게, 값(번호 목록 등)은 일반 굵기로 나눠 보여준다 */
+function LabelValue({ text }: { text: string }) {
+  const idx = text.indexOf(':');
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      <strong>{text.slice(0, idx).trim()}</strong>
+      {' : '}
+      {text.slice(idx + 1).trim()}
+    </>
+  );
+}
+
 function BulletList({ text }: { text: string }) {
   return (
     <ul className="transit-bullets">
       {toBullets(text).map((item, i) => (
         <li key={i}>
-          <span className="tb-text">{item.text}</span>
-          {item.note && <span className="tb-note">{item.note}</span>}
+          <span className="tb-text">
+            <LabelValue text={item.text} />
+          </span>
+          {item.note && (
+            <span className="tb-note">
+              <LabelValue text={item.note} />
+            </span>
+          )}
         </li>
       ))}
     </ul>
