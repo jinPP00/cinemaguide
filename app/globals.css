@@ -1023,8 +1023,8 @@ a.card:hover .brand-icon {
 .transit-card-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--ink);
 }
@@ -1058,18 +1058,18 @@ a.card:hover .brand-icon {
 
 .tb-text {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: var(--ink);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .tb-note {
   display: block;
   margin-top: 2px;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--ink-soft);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* 박스오피스 순위 — 관람료 위, 카드 하나에 순위 리스트를 담는다 */
@@ -1105,13 +1105,26 @@ a.card:hover .brand-icon {
   background: var(--surface);
 }
 
+/* 순위 번호 — 원형 배지로 눈에 띄게. 1위는 더 크고 진하게 강조한다 */
 .bo-rank {
   flex-shrink: 0;
-  width: 22px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-fg, var(--accent));
+  color: #fff;
   font-size: 0.85rem;
   font-weight: 800;
-  color: var(--brand-fg, var(--ink));
+}
+
+.bo-rank--top {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-fg, var(--accent)) 25%, transparent);
 }
 
 /* 목록 줄의 작은 포스터 썸네일. 포스터가 없는 영화는 빈 자리만 잡아 정렬을 맞춘다 */

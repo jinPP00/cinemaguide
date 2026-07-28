@@ -57,7 +57,7 @@ export default function BoxOfficeSection() {
                   aria-expanded={isOpen}
                   onClick={() => setOpenCd(isOpen ? null : m.movieCd)}
                 >
-                  <span className="bo-rank">{m.rank}</span>
+                  <span className={`bo-rank${m.rank === 1 ? ' bo-rank--top' : ''}`}>{m.rank}</span>
                   {m.posterUrl ? (
                     <img className="bo-poster" src={m.posterUrl} alt="" aria-hidden="true" />
                   ) : (
