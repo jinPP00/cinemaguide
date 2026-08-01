@@ -544,10 +544,14 @@ const IconCoin = () => (
 function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBar: ReactNode }) {
   const priceGroups = pivotPrices(pricesOf(b.id));
 
-  // CGV는 "# 지하철 ... # 버스 ..." 원문 한 덩어리라 마커로 쪼개고,
+  // CGV는 대개 "# 지하철 ... # 버스 ..." 원문 한 덩어리라 마커로 쪼개고,
   // 롯데·메가박스처럼 이미 나뉜 데이터는 그대로 쓴다.
   const subway = b.transit.subway ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('지하철'))?.body;
   const bus = b.transit.bus ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('버스'))?.body;
+  // 일부 CGV 지점은 "■ 인근역에서의 교통 ■" + "[출발역] 도보/버스 ..." 형태로
+  // 지하철·버스 마커 자체가 없다. 이런 경우 지하철/버스로 못 쪼개도 원문 자체는
+  // 있으니, 통째로 "교통 안내" 카드 하나로 보여준다 — 정보를 조용히 숨기지 않기 위해서다.
+  const transitFallback = !subway && !bus ? b.transit.raw : null;
 
   const parkingSections = b.parking.raw
     ? splitByMarker(b.parking.raw, '■')
@@ -604,7 +608,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
       {scheduleBar}
 
-      {(subway || bus) && (
+      {(subway || bus || transitFallback) && (
         <section className="section" aria-labelledby="transit">
           <h2 id="transit">대중교통 이용 방법</h2>
           <div className="transit-grid">
@@ -615,6 +619,15 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
                   지하철
                 </div>
                 <BulletList text={subway} />
+              </div>
+            )}
+            {transitFallback && (
+              <div className="transit-card">
+                <div className="transit-card-head">
+                  <IconBus />
+                  교통 안내
+                </div>
+                <p className="tb-raw">{transitFallback}</p>
               </div>
             )}
             {bus && (
