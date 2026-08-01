@@ -300,6 +300,12 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         {b.name} {info.name} 상영시간표·주차·관람료 안내
       </h1>
 
+      {b.intro && (
+        <p className="lead" style={{ marginTop: 12 }}>
+          {b.intro}
+        </p>
+      )}
+
       {b.status === '휴관' && (
         <p className="notice-closed">
           이 지점은 현재 <strong>휴관</strong> 중입니다. 운영 재개 여부는 공식 사이트에서
@@ -364,6 +370,28 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           )}
         </dl>
       </section>
+
+      {b.facility && (b.facility.screens?.length || b.facility.floors?.length) && (
+        <section className="section" aria-labelledby="facility">
+          <h2 id="facility">상영관 안내</h2>
+          {b.facility.screens && b.facility.screens.length > 0 && (
+            <p className="card-sub" style={{ marginTop: 4 }}>
+              {b.facility.screens.join(', ')}
+            </p>
+          )}
+          {b.facility.floors && b.facility.floors.length > 0 && (
+            <ul className="transit-bullets" style={{ marginTop: 12 }}>
+              {b.facility.floors.map((line, i) => (
+                <li key={i}>
+                  <span className="tb-text">
+                    <LabelValue text={line} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {isContentPreview ? (
         <ContentPreview branch={b} scheduleBar={scheduleBar} />
@@ -542,12 +570,29 @@ const IconCoin = () => (
  * 다른 지역으로 넓힐 때도 이 컴포넌트를 그대로 재사용하면 된다.
  */
 function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBar: ReactNode }) {
+  const info = brandMeta(b.brand);
   const priceGroups = pivotPrices(pricesOf(b.id));
 
-  // CGV는 대개 "# 지하철 ... # 버스 ..." 원문 한 덩어리라 마커로 쪼개고,
-  // 롯데·메가박스처럼 이미 나뉜 데이터는 그대로 쓴다.
-  const subway = b.transit.subway ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('지하철'))?.body;
-  const bus = b.transit.bus ?? splitByMarker(b.transit.raw ?? '', '#').find((s) => s.title.includes('버스'))?.body;
+  // CGV는 "# 지하철 ... # 버스 ..." 또는 "■ 지하철 ... ■ 버스 ..." 원문 한 덩어리라
+  // 마커로 쪼개고, 롯데·메가박스처럼 이미 나뉜 데이터는 그대로 쓴다. "#"로 먼저
+  // 시도하고 지하철·버스 둘 다 못 찾으면 "■"로 다시 시도한다 — 마커 하나만 쓰면
+  // 다른 쪽 형식을 쓰는 지점에서 버스 내용이 지하철 카드에 통째로 섞여 들어간다.
+  const extractTransit = (raw: string) => {
+    for (const marker of ['#', '■']) {
+      const chunks = splitByMarker(raw, marker);
+      // marker가 실제로 원문에 없으면 통짜 한 덩어리(1개)로 돌아온다 — 그 경우
+      // 첫 줄에 우연히 "지하철"이 들어있어도 오탐이니(버스 내용까지 한 덩어리에
+      // 섞여있음) 마커가 진짜로 쪼갠 경우(2개 이상)만 유효하게 취급한다.
+      if (chunks.length < 2) continue;
+      const subway = chunks.find((s) => s.title.includes('지하철'))?.body;
+      const bus = chunks.find((s) => s.title.includes('버스'))?.body;
+      if (subway || bus) return { subway, bus };
+    }
+    return { subway: undefined, bus: undefined };
+  };
+  const extracted = b.transit.raw ? extractTransit(b.transit.raw) : { subway: undefined, bus: undefined };
+  const subway = b.transit.subway ?? extracted.subway;
+  const bus = b.transit.bus ?? extracted.bus;
   // 일부 CGV 지점은 "■ 인근역에서의 교통 ■" + "[출발역] 도보/버스 ..." 형태로
   // 지하철·버스 마커 자체가 없다. 이런 경우 지하철/버스로 못 쪼개도 원문 자체는
   // 있으니, 통째로 "교통 안내" 카드 하나로 보여준다 — 정보를 조용히 숨기지 않기 위해서다.
@@ -567,6 +612,16 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   return (
     <>
       <BoxOfficeSection />
+
+      {priceGroups.length === 0 && (
+        <section className="section" aria-labelledby="prices">
+          <h2 id="prices">관람료</h2>
+          <div className="note" style={{ marginTop: 12 }}>
+            이 지점은 드라이브인 등 상영관 형태가 일반 극장과 달라 표준 요금표를 확인하지
+            못했습니다. {info.name} 공식 사이트에서 정확한 요금을 확인해주세요.
+          </div>
+        </section>
+      )}
 
       {priceGroups.length > 0 && (
         <section className="section" aria-labelledby="prices">
@@ -608,6 +663,16 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
       {scheduleBar}
 
+      {!subway && !bus && !transitFallback && (
+        <section className="section" aria-labelledby="transit">
+          <h2 id="transit">대중교통 이용 방법</h2>
+          <div className="note" style={{ marginTop: 12 }}>
+            이 지점의 대중교통 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
+            확인해주세요.
+          </div>
+        </section>
+      )}
+
       {(subway || bus || transitFallback) && (
         <section className="section" aria-labelledby="transit">
           <h2 id="transit">대중교통 이용 방법</h2>
@@ -639,6 +704,16 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
                 <BulletList text={bus} />
               </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {parkingSections.length === 0 && (
+        <section className="section" aria-labelledby="parking">
+          <h2 id="parking">주차 안내</h2>
+          <div className="note" style={{ marginTop: 12 }}>
+            이 지점의 주차 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
+            확인해주세요.
           </div>
         </section>
       )}
