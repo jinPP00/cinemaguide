@@ -1,15 +1,15 @@
 {
-  "targetDate": "20260804",
-  "fetchedAt": "2026-08-04T16:27:26.297Z",
+  "targetDate": "20260803",
+  "fetchedAt": "2026-08-04T16:35:04.710Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20262770",
       "name": "스파이더맨: 브랜드 뉴 데이",
       "openDate": "2026-07-29",
-      "audienceToday": 348195,
-      "audienceTotal": 4134098,
-      "salesShare": 78.5,
+      "audienceToday": 401785,
+      "audienceTotal": 3785903,
+      "salesShare": 80.5,
       "directors": [
         "데스틴 다니엘 크리튼"
       ],
@@ -37,9 +37,9 @@
       "movieCd": "20233219",
       "name": "호프",
       "openDate": "2026-07-15",
-      "audienceToday": 61197,
-      "audienceTotal": 4235669,
-      "salesShare": 12.6,
+      "audienceToday": 63927,
+      "audienceTotal": 4174472,
+      "salesShare": 11.9,
       "directors": [
         "나홍진"
       ],
@@ -67,9 +67,9 @@
       "movieCd": "20261784",
       "name": "미니언즈 & 몬스터즈",
       "openDate": "2026-07-15",
-      "audienceToday": 12335,
-      "audienceTotal": 738729,
-      "salesShare": 2.4,
+      "audienceToday": 12454,
+      "audienceTotal": 726394,
+      "salesShare": 2.2,
       "directors": [
         "피에르 꼬팽"
       ],
@@ -89,9 +89,9 @@
       "movieCd": "20259781",
       "name": "토이 스토리 5",
       "openDate": "2026-06-17",
-      "audienceToday": 7887,
-      "audienceTotal": 2927551,
-      "salesShare": 1.6,
+      "audienceToday": 7454,
+      "audienceTotal": 2919664,
+      "salesShare": 1.4,
       "directors": [
         "앤드류 스탠튼"
       ],
@@ -118,9 +118,9 @@
       "movieCd": "20259946",
       "name": "모아나",
       "openDate": "2026-07-08",
-      "audienceToday": 6864,
-      "audienceTotal": 1013797,
-      "salesShare": 1.4,
+      "audienceToday": 6986,
+      "audienceTotal": 1006933,
+      "salesShare": 1.3,
       "directors": [
         "토마스 케일"
       ],
@@ -141,11 +141,31 @@
     },
     {
       "rank": 6,
+      "movieCd": "20264148",
+      "name": "어떻게 해야 했을까?",
+      "openDate": "2026-07-29",
+      "audienceToday": 3147,
+      "audienceTotal": 27155,
+      "salesShare": 0.6,
+      "directors": [],
+      "actors": [],
+      "genres": [
+        "다큐멘터리"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 101,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPB001979.jpg"
+    },
+    {
+      "rank": 7,
       "movieCd": "20262902",
       "name": "다윗",
       "openDate": "2026-07-10",
-      "audienceToday": 3059,
-      "audienceTotal": 269493,
+      "audienceToday": 3085,
+      "audienceTotal": 266434,
       "salesShare": 0.6,
       "directors": [
         "필 커닝햄",
@@ -170,32 +190,12 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPF033233.jpg"
     },
     {
-      "rank": 7,
-      "movieCd": "20264148",
-      "name": "어떻게 해야 했을까?",
-      "openDate": "2026-07-29",
-      "audienceToday": 2991,
-      "audienceTotal": 30146,
-      "salesShare": 0.6,
-      "directors": [],
-      "actors": [],
-      "genres": [
-        "다큐멘터리"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 101,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPB001979.jpg"
-    },
-    {
       "rank": 8,
       "movieCd": "20242402",
       "name": "눈동자",
       "openDate": "2026-06-24",
-      "audienceToday": 1369,
-      "audienceTotal": 1540233,
+      "audienceToday": 1489,
+      "audienceTotal": 1538864,
       "salesShare": 0.3,
       "directors": [
         "염지호"
@@ -219,12 +219,34 @@
     },
     {
       "rank": 9,
+      "movieCd": "20264665",
+      "name": "드림 애니멀즈: 더무비",
+      "openDate": "2026-07-24",
+      "audienceToday": 845,
+      "audienceTotal": 42841,
+      "salesShare": 0.1,
+      "directors": [
+        "타케키요 히토시"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 90,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/46/tn_DPF033413.jpg"
+    },
+    {
+      "rank": 10,
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 1065,
-      "audienceTotal": 2367,
-      "salesShare": 0.3,
+      "audienceToday": 678,
+      "audienceTotal": 1302,
+      "salesShare": 0.1,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -246,28 +268,6 @@
         "미국"
       ],
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033591.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20262381",
-      "name": "사랑의 하츄핑: 고래보석의 전설",
-      "openDate": "2026-08-05",
-      "audienceToday": 916,
-      "audienceTotal": 27410,
-      "salesShare": 0.2,
-      "directors": [
-        "김수훈"
-      ],
-      "actors": [],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 105,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPK026057.jpg"
     }
   ]
 }
