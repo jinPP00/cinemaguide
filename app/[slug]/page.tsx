@@ -528,14 +528,108 @@ function LabelValue({ text }: { text: string }) {
   );
 }
 
+/** "라벨 : 값" / "[라벨] 값"을 라벨과 값으로 나눈다. 라벨이 없으면 value만 채운다. */
+function splitLabel(text: string): { label?: string; value: string } {
+  const bracket = text.match(/^\[([^\]]+)\]\s*:?\s*([\s\S]*)$/);
+  if (bracket) return { label: bracket[1].trim(), value: bracket[2].trim() };
+  const idx = text.indexOf(':');
+  // 문장 중간의 콜론까지 라벨로 잡지 않도록 길이를 제한한다(롯데 정류장명 최대 47자).
+  if (idx !== -1 && idx <= 55) {
+    return { label: text.slice(0, idx).trim(), value: text.slice(idx + 1).trim() };
+  }
+  return { value: text };
+}
+
+/**
+ * "104번, 106번, 316번"처럼 노선번호만 쉼표로 나열된 값을 칩 배열로 만든다.
+ * 조각 중 하나라도 공백이 있거나 길면(= 문장) 전체를 포기하고 원문 그대로 둔다 —
+ * 메가박스의 "6630,6632,6645,6648 N65 발산역 9번 출구"처럼 번호 뒤에 설명이
+ * 붙은 경우 "9번"까지 노선으로 오인하는 걸 막기 위해서다.
+ */
+function parseRoutes(value: string): string[] | null {
+  const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
+  if (parts.length < 2) return null;
+  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p))) return null;
+  return parts.map((p) => p.replace(/번$/, ''));
+}
+
+/**
+ * "A > B > C" 형태의 길찾기 경로를 단계 배열로 나눈다.
+ * 원문이 ">"를 쓰는 지점(80곳)과 화살표 문자 "→"를 쓰는 지점(81곳)이
+ * 비슷하게 섞여 있어 둘 다 구분자로 받는다.
+ */
+function parseSteps(value: string): string[] | null {
+  if (!/-?>|→/.test(value)) return null;
+  const steps = value.split(/\s*(?:-?>|→)\s*/).map((s) => s.trim()).filter(Boolean);
+  return steps.length >= 2 ? steps : null;
+}
+
+type TransitItem = {
+  label?: string;
+  routes?: string[];
+  steps?: string[];
+  body?: string;
+  note?: string;
+};
+
+/**
+ * 교통·주차 안내 한 덩어리를 화면에 그리기 좋은 구조로 바꾼다.
+ * 노선번호는 칩으로, "A > B > C" 경로는 번호 단계로 분리한다.
+ * 롯데 버스 안내는 "[방면]: 노선" 줄과 "정류장 하차 > ..." 줄이 한 세트라
+ * 뒤따르는 경로 줄을 앞 항목에 붙여 하나로 묶는다.
+ */
+function toTransitItems(text: string): TransitItem[] {
+  const items: TransitItem[] = [];
+  for (const bullet of toBullets(text)) {
+    const { label, value } = splitLabel(bullet.text);
+    const routes = parseRoutes(value);
+    const steps = routes ? null : parseSteps(value);
+
+    const prev = items[items.length - 1];
+    if (!label && steps && prev && prev.routes && !prev.steps) {
+      prev.steps = steps;
+      if (bullet.note) prev.note = [prev.note, bullet.note].filter(Boolean).join(' ');
+      continue;
+    }
+
+    items.push({
+      label,
+      routes: routes ?? undefined,
+      steps: steps ?? undefined,
+      body: routes || steps ? undefined : value,
+      note: bullet.note,
+    });
+  }
+  return items;
+}
+
 function BulletList({ text }: { text: string }) {
   return (
     <ul className="transit-bullets">
-      {toBullets(text).map((item, i) => (
+      {toTransitItems(text).map((item, i) => (
         <li key={i}>
-          <span className="tb-text">
-            <LabelValue text={item.text} />
-          </span>
+          {item.label && <span className="tb-label">{item.label}</span>}
+          {item.routes && (
+            <span className="tb-routes">
+              {item.routes.map((r, j) => (
+                <span className="tb-route" key={`${r}-${j}`}>
+                  {r}
+                </span>
+              ))}
+            </span>
+          )}
+          {item.body && (
+            <span className="tb-text">
+              <LabelValue text={item.body} />
+            </span>
+          )}
+          {item.steps && (
+            <ol className="tb-steps">
+              {item.steps.map((s, j) => (
+                <li key={j}>{s}</li>
+              ))}
+            </ol>
+          )}
           {item.note && (
             <span className="tb-note">
               <LabelValue text={item.note} />
