@@ -59,14 +59,15 @@ export function pricesOf(branchId: string): PriceRow[] {
 
 /**
  * 실제 교통·주차·요금 정보를 채워서 "준비 중" 대신 보여줄 지점인지.
- * 425곳을 한 번에 채우지 않고 지역 단위로 넓혀가는 중이라 이 배열에
- * 시도만 추가하면 된다 — 지금은 서울·경기·인천(214곳). 색인 여부(robots)·
- * sitemap 포함 여부도 이 값을 그대로 따르므로 여기 한 곳에서만 관리한다.
+ * 서울→경기→인천 순으로 지역을 넓혀오다 전국 425곳을 모두 공개해서
+ * 지금은 항상 true다. 개별 항목(교통·주차·요금)이 원본부터 없는 지점은
+ * 각 섹션에서 "확인하지 못했습니다" 안내로 처리하므로 여기서 거르지 않는다.
+ *
+ * 색인 여부(robots)·sitemap 포함 여부도 이 값을 따르므로, 앞으로 특정
+ * 지점을 다시 비공개로 돌릴 일이 생기면 여기 한 곳만 고치면 된다.
  */
-const FILLED_SIDOS = ['서울', '경기', '인천'];
-
-export function hasFilledContent(branch: Branch): boolean {
-  return FILLED_SIDOS.includes(branch.sido);
+export function hasFilledContent(_branch: Branch): boolean {
+  return true;
 }
 
 /* ------------------------------------------------------------------ *
