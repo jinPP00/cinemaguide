@@ -542,14 +542,19 @@ function splitLabel(text: string): { label?: string; value: string } {
 
 /**
  * "104번, 106번, 316번"처럼 노선번호만 쉼표로 나열된 값을 칩 배열로 만든다.
- * 조각 중 하나라도 공백이 있거나 길면(= 문장) 전체를 포기하고 원문 그대로 둔다 —
- * 메가박스의 "6630,6632,6645,6648 N65 발산역 9번 출구"처럼 번호 뒤에 설명이
- * 붙은 경우 "9번"까지 노선으로 오인하는 걸 막기 위해서다.
+ * "801"처럼 한 줄에 하나만 있어도 칩으로 만든다 — 세종(조치원) 메가박스의
+ * 마지막 줄이 그래서 혼자 칩이 안 되고 맨텍스트로 남았었다.
+ *
+ * 조각이 전부 "짧고(8자 이하) 공백 없고 숫자를 포함"할 때만 칩으로 본다.
+ * - 공백 검사: 메가박스 "6630,6632,6645,6648 N65 발산역 9번 출구"처럼 번호
+ *   뒤에 설명이 붙은 경우 "9번"까지 노선으로 오인하는 걸 막는다.
+ * - 숫자 검사: "무료"·"없음" 같은 짧은 한글 단어가 칩이 되는 걸 막는다.
+ *   노선번호는 11·801·B5·급행3·서초03·M4403처럼 반드시 숫자를 포함한다.
  */
 function parseRoutes(value: string): string[] | null {
   const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
-  if (parts.length < 2) return null;
-  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p))) return null;
+  if (parts.length === 0) return null;
+  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p) && /\d/.test(p))) return null;
   return parts.map((p) => p.replace(/번$/, ''));
 }
 
@@ -592,6 +597,14 @@ function toTransitItems(text: string): TransitItem[] {
       continue;
     }
 
+    // 라벨 없이 노선번호만 있는 줄이 연달아 오면 하나로 합친다. 세종(조치원)
+    // 메가박스처럼 원문이 노선 계열별로 줄을 나눠놨는데 그룹명이 없는 경우,
+    // 줄마다 쪼개 봐야 근거 없는 구분만 남고 칩이 흩어져 읽기 나쁘다.
+    if (!label && routes && !bullet.note && prev && !prev.label && prev.routes && !prev.steps && !prev.body && !prev.note) {
+      prev.routes = [...prev.routes, ...routes];
+      continue;
+    }
+
     items.push({
       label,
       routes: routes ?? undefined,
@@ -606,8 +619,11 @@ function toTransitItems(text: string): TransitItem[] {
 function BulletList({ text }: { text: string }) {
   return (
     <ul className="transit-bullets">
-      {toTransitItems(text).map((item, i) => (
-        <li key={i}>
+      {toTransitItems(text).map((item, i) => {
+        // 칩만 있는 항목은 불릿 점이 의미 없이 지저분하기만 하다.
+        const chipsOnly = Boolean(item.routes) && !item.label && !item.body && !item.steps && !item.note;
+        return (
+        <li key={i} className={chipsOnly ? 'chips-only' : undefined}>
           {item.label && <span className="tb-label">{item.label}</span>}
           {item.routes && (
             <span className="tb-routes">
@@ -636,7 +652,8 @@ function BulletList({ text }: { text: string }) {
             </span>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }

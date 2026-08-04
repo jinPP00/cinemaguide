@@ -1087,6 +1087,20 @@ a.card:hover .brand-icon {
   line-height: 1.55;
 }
 
+/* 라벨 없이 칩만 있는 항목은 불릿 점을 숨긴다 — 구분할 항목명이 없는데
+   점만 찍히면 의미 없이 지저분해 보인다 */
+.transit-bullets li.chips-only {
+  padding-left: 0;
+}
+
+.transit-bullets li.chips-only::before {
+  display: none;
+}
+
+.transit-bullets li.chips-only .tb-routes {
+  margin-top: 0;
+}
+
 /* 버스 노선번호 — 쉼표 나열 대신 칩으로 흩어놓아야 원하는 번호를 찾기 쉽다 */
 .tb-routes {
   display: flex;
