@@ -118,15 +118,43 @@ function baseSlug(name) {
  */
 const isCrawlArtifact = (s) => /^\$\d+$/.test(s);
 
+/**
+ * 원본이 HTML에서 긁어온 텍스트라 엔티티가 그대로 남아있다(17개 지점).
+ * 특히 &nbsp;는 70번이나 나오는데 화면에 "&nbsp;"라는 글자로 찍혀버린다.
+ * 실제로 쓰이는 10종만 처리한다 — 범용 HTML 파서를 붙일 만한 규모가 아니다.
+ */
+const HTML_ENTITIES = {
+  '&nbsp;': ' ',
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&middot;': '·',
+  '&rarr;': '→',
+  '&lsquo;': '‘',
+  '&rsquo;': '’',
+  '&ldquo;': '“',
+  '&rdquo;': '”',
+};
+
+const decodeEntities = (s) =>
+  s
+    .replace(/&nbsp;|&amp;|&lt;|&gt;|&quot;|&#39;|&middot;|&rarr;|&lsquo;|&rsquo;|&ldquo;|&rdquo;/g,
+      (m) => HTML_ENTITIES[m])
+    // &nbsp;가 연달아 있던 자리는 공백이 여러 개 남으므로 하나로 줄인다.
+    // 줄바꿈은 항목 구분에 쓰이므로 보존해야 한다.
+    .replace(/[ \t]{2,}/g, ' ');
+
 const text = (value) => {
-  const s = String(value ?? '').trim();
+  const s = decodeEntities(String(value ?? '')).trim();
   if (!s || isCrawlArtifact(s)) return null;
   return s;
 };
 
 const joinLines = (value) => {
   if (!Array.isArray(value)) return text(value);
-  const lines = value.map((v) => String(v).trim()).filter(Boolean);
+  const lines = value.map((v) => decodeEntities(String(v)).trim()).filter(Boolean);
   return lines.length ? lines.join('\n') : null;
 };
 

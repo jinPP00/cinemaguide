@@ -6311,7 +6311,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "모닝",
       "dayType": "평일",
       "adult": 16000,
@@ -6320,7 +6320,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "브런치",
       "dayType": "평일",
       "adult": 21000,
@@ -6329,7 +6329,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "일반",
       "dayType": "평일",
       "adult": 22000,
@@ -6338,7 +6338,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "모닝",
       "dayType": "주말",
       "adult": 17000,
@@ -6347,7 +6347,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "브런치",
       "dayType": "주말",
       "adult": 23000,
@@ -6356,7 +6356,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(2D,  PRIME)",
+      "label": "ULTRA 4DX(2D, PRIME)",
       "timeSlot": "일반",
       "dayType": "주말",
       "adult": 23000,
@@ -6365,7 +6365,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "모닝",
       "dayType": "평일",
       "adult": 17000,
@@ -6374,7 +6374,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "브런치",
       "dayType": "평일",
       "adult": 23000,
@@ -6383,7 +6383,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "일반",
       "dayType": "평일",
       "adult": 24000,
@@ -6392,7 +6392,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "모닝",
       "dayType": "주말",
       "adult": 18000,
@@ -6401,7 +6401,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "브런치",
       "dayType": "주말",
       "adult": 25000,
@@ -6410,7 +6410,7 @@
       "disabled": null
     },
     {
-      "label": "ULTRA 4DX(3D,  PRIME)",
+      "label": "ULTRA 4DX(3D, PRIME)",
       "timeSlot": "일반",
       "dayType": "주말",
       "adult": 25000,

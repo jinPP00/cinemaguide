@@ -453,17 +453,35 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
 }
 
 /**
- * "- 항목 ... : 부연설명 ... (참고)" 식으로 줄바꿈만 되어 있는 원문을
- * 읽기 쉬운 불릿 목록으로 바꾼다. "-"로 시작하는 줄만 새 항목이고,
- * 그 외 줄(":"로 시작하거나 그냥 이어지는 줄)은 앞 항목의 부연설명으로 붙인다.
+ * 원문을 읽기 쉬운 불릿 목록으로 바꾼다. 브랜드마다 원본 형식이 달라
+ * 두 갈래로 처리한다:
+ *
+ * - CGV 스타일(원문에 "- "로 시작하는 줄이 있음): "-" 줄이 새 항목,
+ *   나머지 줄(":" 시작 등)은 앞 항목의 부연설명으로 붙인다.
+ * - 롯데·메가박스 스타일("-"가 아예 없고 줄바꿈으로만 구분): 각 줄이
+ *   독립 항목이다. 예전엔 이 경우도 CGV 규칙을 태워서 첫 줄만 남고
+ *   나머지가 전부 한 덩어리로 뭉쳐 읽기 어려웠다(전체 필드의 절반 이상).
+ *
+ * 추가로 "(1)...(2)...(3)..." 처럼 번호만 붙고 줄바꿈이 없는 원문은
+ * 번호 앞에서 끊어 각각을 별도 줄로 만든다.
  */
 function toBullets(raw: string): { text: string; note?: string }[] {
-  // "심야)" 형태를 다른 항목들과 같은 "라벨 : 값" 형식으로 통일한다
-  const normalized = raw.replace(/심야\)/g, '심야버스 :');
+  const normalized = raw
+    // "심야)" 형태를 다른 항목들과 같은 "라벨 : 값" 형식으로 통일한다
+    .replace(/심야\)/g, '심야버스 :')
+    // "(1)" 같은 순번 앞에서 줄을 나눈다. "(총 1,058대)"·"(2층)"처럼 숫자
+    // 뒤에 글자가 오는 괄호는 대상이 아니라 안전하다.
+    .replace(/\((\d+)\)\s*/g, '\n($1) ');
   const lines = normalized
     .split('\n')
     .map((l) => l.trim())
     .filter(Boolean);
+
+  const usesDash = lines.some((l) => l.startsWith('-'));
+  if (!usesDash) {
+    return lines.map((line) => ({ text: line.replace(/^:\s*/, '') }));
+  }
+
   const bullets: string[][] = [];
   for (const line of lines) {
     if (line.startsWith('-')) {
@@ -477,15 +495,35 @@ function toBullets(raw: string): { text: string; note?: string }[] {
   return bullets.map(([text, ...rest]) => ({ text, note: rest.join(' ') || undefined }));
 }
 
-/** "라벨 : 값" 형태의 줄을 라벨만 굵게, 값(번호 목록 등)은 일반 굵기로 나눠 보여준다 */
+/**
+ * "라벨 : 값" 또는 "[제목] 내용" 형태의 줄에서 라벨·제목만 굵게 보여준다.
+ * 경로 안내의 ">"는 화살표로 바꿔 단계 구분이 눈에 들어오게 한다.
+ */
 function LabelValue({ text }: { text: string }) {
-  const idx = text.indexOf(':');
-  if (idx === -1) return <>{text}</>;
+  // "->"와 ">" 둘 다 경로 화살표로 쓰인다. "-"를 남기면 "- →"처럼 어색해진다.
+  const pretty = text.replace(/\s*-?>\s*/g, ' → ');
+
+  const bracket = pretty.match(/^\[([^\]]+)\]\s*([\s\S]*)$/);
+  if (bracket) {
+    return (
+      <>
+        <strong>{bracket[1].trim()}</strong>
+        {bracket[2] ? ` ${bracket[2].trim()}` : ''}
+      </>
+    );
+  }
+
+  // 문장 중간에 우연히 있는 콜론까지 라벨로 잡으면 앞부분이 통째로 굵어진다.
+  // 라벨로 볼 만한 길이일 때만 나눈다 — 롯데 버스 안내의 정류장명이
+  // "건대입구역 사거리.건대병원(정류장번호 05232)_어린이대공원역,화양천주교교회 방면"
+  // 처럼 47자까지 가서 넉넉히 잡았다.
+  const idx = pretty.indexOf(':');
+  if (idx === -1 || idx > 55) return <>{pretty}</>;
   return (
     <>
-      <strong>{text.slice(0, idx).trim()}</strong>
+      <strong>{pretty.slice(0, idx).trim()}</strong>
       {' : '}
-      {text.slice(idx + 1).trim()}
+      {pretty.slice(idx + 1).trim()}
     </>
   );
 }
