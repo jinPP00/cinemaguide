@@ -200,8 +200,10 @@ async function main() {
     const details =
       cached && cached.directors ? pickDetails(cached) : await fetchMovieInfo(m.movieCd);
     const releaseYear = Number((m.openDate || '').slice(0, 4)) || new Date().getFullYear();
-    const posterUrl =
-      cached && cached.posterUrl !== undefined ? cached.posterUrl : await fetchPoster(m.name, releaseYear);
+    // 포스터는 "찾은 것"만 캐시한다. null까지 캐시하면(=== undefined 검사) 한 번
+    // 실패한 영화는 영영 재시도되지 않는다 — 개봉 직후라 KMDb 등록이 늦은 영화가
+    // 나중에 등록돼도 계속 빈 채로 남는 문제가 있었다.
+    const posterUrl = cached?.posterUrl || (await fetchPoster(m.name, releaseYear));
     moviesWithDetails.push({ ...m, ...(details ?? {}), posterUrl });
   }
 
@@ -213,6 +215,16 @@ async function main() {
 
   writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf-8');
   console.log(`박스오피스 ${movies.length}건 저장: ${OUT} (기준일 ${targetDt})`);
+
+  // 포스터 누락은 조용히 지나가면 알아채기 어렵다(캐시된 옛 영화는 멀쩡해 보여서
+  // 새로 진입한 영화만 빈 걸 놓치기 쉽다). 실행 로그에 요약을 남긴다.
+  const missing = moviesWithDetails.filter((m) => !m.posterUrl);
+  if (missing.length > 0) {
+    console.warn(
+      `포스터 없음 ${missing.length}/${moviesWithDetails.length}건: ${missing.map((m) => m.name).join(', ')}`,
+    );
+    if (!KMDB_KEY) console.warn('→ KMDB_API_KEY가 설정되지 않았습니다. 이게 원인일 수 있습니다.');
+  }
 }
 
 function pickDetails(m) {
