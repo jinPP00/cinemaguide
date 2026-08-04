@@ -34,11 +34,18 @@ function rankingOf(movies) {
 }
 
 /**
- * GitHub Actions 러너에서 KOBIS 서버로 연결이 간헐적으로 타임아웃되는 걸
- * 몇 차례 겪었다(수동 재실행하면 되긴 했음). 매번 사람이 재실행하지 않도록
- * 스크립트 안에서 몇 번 재시도한다.
+ * 네트워크 문제로 갱신을 못 한 경우를 나타낸다. 설정 오류(키 누락 등)와
+ * 구분해서, 이건 워크플로를 실패로 만들지 않고 기존 데이터를 유지한다.
  */
-async function fetchWithRetry(url, attempts = 3, delayMs = 5000) {
+class NetworkUnavailableError extends Error {}
+
+/**
+ * GitHub Actions 러너에서 KOBIS 서버로 연결이 자주 타임아웃된다
+ * (ConnectTimeoutError, 10초). 로컬에서는 connect가 0.05초로 즉시 되는 걸로
+ * 보아 서버 문제가 아니라 러너(해외 IP)에서의 연결이 불안정한 것으로 보인다.
+ * 사람이 매번 수동 재실행하지 않도록 지수 백오프로 넉넉히 재시도한다.
+ */
+async function fetchWithRetry(url, attempts = 5, baseDelayMs = 5000) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -46,8 +53,9 @@ async function fetchWithRetry(url, attempts = 3, delayMs = 5000) {
     } catch (err) {
       lastErr = err;
       if (i < attempts - 1) {
-        console.error(`fetch 실패(${i + 1}/${attempts}차 시도), ${delayMs}ms 후 재시도:`, err.message);
-        await new Promise((r) => setTimeout(r, delayMs));
+        const delay = baseDelayMs * 2 ** i; // 5s → 10s → 20s → 40s
+        console.error(`fetch 실패(${i + 1}/${attempts}차 시도), ${delay}ms 후 재시도:`, err.message);
+        await new Promise((r) => setTimeout(r, delay));
       }
     }
   }
@@ -153,12 +161,17 @@ async function main() {
 
   let res;
   try {
-    res = await fetchWithRetry(url, 3, 5000);
+    res = await fetchWithRetry(url);
   } catch (err) {
     // 재시도까지 다 실패하면 원인을 최대한 자세히 남긴다.
     console.error('fetch 자체가 실패했습니다(재시도 포함):', err.message);
     if (err.cause) console.error('원인(cause):', err.cause);
-    throw err;
+    throw new NetworkUnavailableError('KOBIS 서버에 연결하지 못했습니다');
+  }
+  // 5xx는 서버 쪽 일시 장애라 네트워크 실패와 같이 취급한다.
+  // 4xx는 키·파라미터 문제일 수 있으니 실패로 남겨 알아채게 한다.
+  if (res.status >= 500) {
+    throw new NetworkUnavailableError(`KOBIS 서버 오류: HTTP ${res.status}`);
   }
   if (!res.ok) {
     throw new Error(`KOBIS 응답 오류: HTTP ${res.status}`);
@@ -240,5 +253,17 @@ function pickDetails(m) {
 
 main().catch((err) => {
   console.error(err.message);
+  // 네트워크 문제로 갱신을 못 한 건 실패로 처리하지 않는다. 주간 갱신이라
+  // 한 주 건너뛰어도 기존 데이터로 사이트는 정상 동작하고, 매주 빨간불이
+  // 뜨면 정작 진짜 문제(키 누락 등)를 놓치게 된다. 대신 로그에 크게 남긴다.
+  if (err instanceof NetworkUnavailableError) {
+    console.warn('');
+    console.warn('='.repeat(60));
+    console.warn('이번 회차 갱신을 건너뜁니다 — 기존 boxoffice.json이 그대로 유지됩니다.');
+    console.warn('사이트는 정상 동작하며, 다음 예약 실행 때 다시 시도합니다.');
+    console.warn('계속 반복되면 KOBIS 서버 상태나 러너 네트워크를 확인하세요.');
+    console.warn('='.repeat(60));
+    process.exit(0);
+  }
   process.exit(1);
 });
