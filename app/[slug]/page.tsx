@@ -495,13 +495,23 @@ const BUS_WORD_LEAD_RE = new RegExp(`^(${BUS_TYPE_WORDS.join('|')})\\s+(.+)$`);
  * 번호 앞에서 끊어 각각을 별도 줄로 만든다.
  */
 function toBullets(raw: string): { text: string; note?: string }[] {
-  const busTypeRe = new RegExp(`(${BUS_TYPE_WORDS.join('|')})\\)\\s*`, 'g');
+  // 여는 괄호 "(" 바로 뒤가 아닐 때만 매칭한다 — "1000(급행)"처럼 정상적인
+  // 괄호 설명 안의 "급행"까지 "급행)" 마커로 오인해 잘라먹으면 안 된다
+  // (부산장림 롯데: "1000(급행)"의 ")"가 사라지고 "급행버스 :"가 중간에
+  // 끼어들어 뒤 내용이 전부 뭉개졌었다).
+  const busTypeRe = new RegExp(`(?<!\\()(${BUS_TYPE_WORDS.join('|')})\\)\\s*`, 'g');
   const normalized = raw
-    // "●"·"○"·"★"·"■"는 CGV 일부 지점(백석·구미·부천 등)이 쓰는 불릿 기호다 —
-    // "-"와 똑같이 새 항목 표시로 취급해야 문단 하나로 뭉개지지 않는다. ("■"는
-    // extractTransit 단계에서 구간(지하철/버스) 마커로도 쓰이지만, 여기 toBullets는
-    // 그 구간이 이미 쪼개진 뒤의 본문에서 호출되므로 항목 불릿으로만 다뤄도 안전하다.)
-    .replace(/^[ \t]*[●•○★■]\s*/gm, '- ')
+    // "●"·"○"·"★"·"■"·"ㆍ"는 CGV·롯데 일부 지점(백석·구미·부천·장림 등)이 쓰는
+    // 불릿 기호다 — "-"와 똑같이 새 항목 표시로 취급해야 문단 하나로 뭉개지지
+    // 않는다. ("■"는 extractTransit 단계에서 구간(지하철/버스) 마커로도 쓰이지만,
+    // 여기 toBullets는 그 구간이 이미 쪼개진 뒤의 본문에서 호출되므로 항목
+    // 불릿으로만 다뤄도 안전하다.)
+    .replace(/^[ \t]*[●•○★■ㆍ]\s*/gm, '- ')
+    // "[일반] 10, 83 / [간선] 160, 503 / [지선] 5615, ..."처럼 "[유형] 값" 여러
+    // 묶음이 "/"로 한 줄에 이어 붙은 표기(신도림 롯데 등)를 각각 별도 줄로
+    // 나눈다 — 안 나누면 뒤 묶음들이 앞 라벨의 값에 통째로 섞여 칩이 안 된다.
+    // (노선번호 안에 쓰이는 "5-3 / 6-2" 같은 "/"는 뒤에 "["가 없으니 안전하다.)
+    .replace(/\s*\/\s*(?=\[)/g, '\n')
     // "직행)"·"마을)"·"심야)"처럼 여는 괄호 없이 유형명 뒤에 ")"만 붙는 표기를
     // 다른 항목들과 같은 "직행버스 : 값" 형식으로 통일한다.
     .replace(busTypeRe, (_m, word: string) => `\n${word}버스 : `)
@@ -593,10 +603,16 @@ function normalizeBusLabel(label: string): string {
  *   노선번호는 11·801·B5·급행3·서초03·M4403처럼 반드시 숫자를 포함한다.
  */
 function parseRoutes(value: string): string[] | null {
-  // 쉼표가 기본이지만 일부 지점(소풍 CGV 등)은 "/"로 노선을 나열한다.
-  const parts = value.split(/[,/]/).map((s) => s.trim()).filter(Boolean);
+  // 쉼표가 기본이지만 일부 지점(소풍 CGV 등)은 "/"로, 일부(인천터미널 롯데 등)는
+  // "3. 4. 6(6-1), 11, ..."처럼 앞쪽만 마침표+공백으로 노선을 나열한다.
+  const parts = value.split(/[,/]|\.\s+/).map((s) => s.trim()).filter(Boolean);
   if (parts.length === 0) return null;
-  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p) && /\d/.test(p))) return null;
+  // "장유(58번, 59번), 장유(98번, ...)"처럼 정류장별로 괄호 안에 여러 노선이
+  // 묶인 값을 쉼표로 나누면 "장유(58번"·"59번)"처럼 괄호가 반쪽만 남은 조각이
+  // 생긴다. 그대로 두면 "장유(58"같은 깨진 칩이 나온다(김해 CGV) — 괄호가
+  // 안 맞는 조각이 하나라도 있으면 이 줄 전체는 칩화를 포기하고 텍스트로 둔다.
+  const balanced = (p: string) => (p.match(/\(/g) ?? []).length === (p.match(/\)/g) ?? []).length;
+  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p) && /\d/.test(p) && balanced(p))) return null;
   return parts.map((p) => p.replace(/번$/, ''));
 }
 
@@ -664,7 +680,22 @@ function toTransitItems(text: string): TransitItem[] {
     } else if (!routes) {
       routes = parseRoutes(value);
     }
-    const steps = routes ? null : parseSteps(value);
+    let steps = routes ? null : parseSteps(value);
+
+    // "2113, 2114 이용 시 묵동명사약국역 정류장에서 하차"(중랑 롯데 등)처럼 노선
+    // 번호 뒤에 안내 문장이 바로 붙어서 parseRoutes가 통째로 실패하던 줄도,
+    // 앞쪽 번호 목록만 떼어내면 칩으로 보여줄 수 있다.
+    let leadNote: string | undefined;
+    if (!label && !routes && !steps) {
+      const lead = value.match(/^([A-Za-z0-9](?:[A-Za-z0-9,\-\s]*[A-Za-z0-9]))\s+([가-힣].*)$/);
+      if (lead) {
+        const leadRoutes = parseRoutes(lead[1]);
+        if (leadRoutes) {
+          routes = leadRoutes;
+          leadNote = lead[2];
+        }
+      }
+    }
 
     const prev = items[items.length - 1];
     if (!label && steps && prev && prev.routes && !prev.steps) {
@@ -675,8 +706,9 @@ function toTransitItems(text: string): TransitItem[] {
 
     // 라벨 없이 노선번호만 있는 줄이 연달아 오면 하나로 합친다. 세종(조치원)
     // 메가박스처럼 원문이 노선 계열별로 줄을 나눠놨는데 그룹명이 없는 경우,
-    // 줄마다 쪼개 봐야 근거 없는 구분만 남고 칩이 흩어져 읽기 나쁘다.
-    if (!label && routes && !bullet.note && prev && !prev.label && prev.routes && !prev.steps && !prev.body && !prev.note) {
+    // 줄마다 쪼개 봐야 근거 없는 구분만 남고 칩이 흩어져 읽기 나쁘다. 위에서
+    // 안내 문장을 떼어낸 줄(leadNote 있음)은 각자 설명이 달라 합치지 않는다.
+    if (!label && routes && !bullet.note && !leadNote && prev && !prev.label && prev.routes && !prev.steps && !prev.body && !prev.note) {
       prev.routes = [...prev.routes, ...routes];
       continue;
     }
@@ -686,7 +718,7 @@ function toTransitItems(text: string): TransitItem[] {
       routes: routes ?? undefined,
       steps: steps ?? undefined,
       body: routes || steps ? undefined : value,
-      note: bullet.note,
+      note: [bullet.note, leadNote].filter(Boolean).join(' ') || undefined,
     });
   }
   return items;
@@ -709,8 +741,9 @@ function TransitItemsList({ items }: { items: TransitItem[] }) {
   return (
     <ul className="transit-bullets">
       {items.map((item, i) => {
-        // 칩만 있는 항목은 불릿 점이 의미 없이 지저분하기만 하다.
-        const chipsOnly = Boolean(item.routes) && !item.label && !item.body && !item.steps && !item.note;
+        // 칩·번호단계만 있는 항목은 불릿 점이 의미 없이 지저분하기만 하다
+        // (김포공항 롯데의 번호 단계 목록 위에 뜬금없는 점이 떠 있던 문제).
+        const chipsOnly = !item.label && !item.body && !item.note && Boolean(item.routes || item.steps);
         return (
         <li key={i} className={chipsOnly ? 'chips-only' : undefined}>
           {item.label && <span className="tb-label">{item.label}</span>}
