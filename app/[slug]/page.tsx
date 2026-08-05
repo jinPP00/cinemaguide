@@ -837,11 +837,11 @@ function TransitItemsList({ items }: { items: TransitItem[] }) {
             </span>
           )}
           {item.steps && (
-            <ol className="tb-steps">
-              {item.steps.map((s, j) => (
-                <li key={j}>{s}</li>
-              ))}
-            </ol>
+            // 예전엔 ①②③ 번호 목록으로 보여줬는데, 짧은 길찾기 단계에 굳이
+            // 번호를 매기니 어색하다는 피드백(롯데 청주용암 등)으로 화살표
+            // 한 줄로 통일했다. 버스·지하철·주차 안내가 전부 이 컴포넌트를
+            // 같이 쓰므로 여기 한 곳만 고치면 전체에 적용된다.
+            <span className="tb-text tb-steps-inline">{item.steps.join(' → ')}</span>
           )}
           {item.note && (
             <span className="tb-note">

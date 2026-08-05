@@ -1121,42 +1121,11 @@ a.card:hover .brand-icon {
   font-variant-numeric: tabular-nums;
 }
 
-/* 길찾기 경로 — "A > B > C"를 번호 붙은 단계로 세워 순서를 따라가기 쉽게 한다 */
-.tb-steps {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-  counter-reset: tb-step;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.tb-steps li {
-  counter-increment: tb-step;
-  position: relative;
-  padding-left: 26px;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-.tb-steps li::before {
-  content: counter(tb-step);
-  position: absolute;
-  left: 0;
-  top: 0.15em;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--hairline-strong);
-  color: var(--ink);
-  font-size: 0.7rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 길찾기 경로 — "A > B > C"를 화살표로 이은 한 줄로 보여준다. 예전엔 번호
+   붙은 단계(①②③)로 세로로 세웠는데, 짧은 경로에 번호가 어색하다는
+   피드백으로 폐기(2026-08-05) — .tb-text를 그대로 재사용한다. */
+.tb-steps-inline {
+  margin-top: 8px;
 }
 
 /* "■ 인근역에서의 교통 ■" 같은, 지하철/버스로 못 쪼갠 교통 안내 원문을
