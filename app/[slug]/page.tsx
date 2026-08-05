@@ -734,6 +734,24 @@ function toTransitItems(text: string): TransitItem[] {
     const split = splitLabel(bullet.text);
     let rawLabel = split.label;
     let value = split.value;
+
+    // "13번, 100-2번 : 메가박스 (하차 도보 1분 내)"처럼 콜론 앞이 노선번호
+    // 목록이고 뒤가 목적지·정류장 설명인, 순서가 반대인 지점(원주혁신
+    // 메가박스, 대전가오·Drive In 영도 CGV, 대전현대프리미엄아울렛 메가박스
+    // 등)이 있다. splitLabel은 "라벨 : 값"만 가정해 이 경우 노선번호를
+    // 볼드 라벨로, 목적지를 본문으로 잘못 보여준다 — 콜론 앞이 전부
+    // 노선처럼 생겼으면(looksLikeRouteWord) 뒤집어서 노선은 칩으로, 목적지는
+    // 부연설명(note)으로 보여준다.
+    if (rawLabel) {
+      const labelParts = rawLabel.split(/[,/]/).map((s) => s.trim()).filter(Boolean);
+      if (labelParts.length > 0 && labelParts.every((p) => looksLikeRouteWord(p))) {
+        const reversedRoutes = parseRoutes(rawLabel);
+        if (reversedRoutes) {
+          items.push({ routes: reversedRoutes, note: value || undefined });
+          continue;
+        }
+      }
+    }
     // "일반 5-3, 6-2, ..."처럼 콜론 없이 유형명 뒤에 바로 값이 오는 경우(부천 CGV
     // 등)도 라벨로 떼어낸다. splitLabel은 ":"/"[]" 형식만 인식한다.
     if (!rawLabel) {
@@ -949,6 +967,38 @@ function extractCategorizedBusRoutes(raw: string | null | undefined): { label: s
   return [...result.entries()].map(([label, set]) => ({ label, routes: [...set] }));
 }
 
+/**
+ * "514번/618번: 은어송 5단지 하차, 도보로 1분 소요"처럼 카테고리 단어 없이
+ * "노선목록 : 목적지" 줄이 여러 개 반복되는 지점(대전가오·Drive In 영도 CGV,
+ * 원주혁신·대전현대프리미엄아울렛 메가박스 등)용 추출기. 콜론 앞이 전부
+ * 노선처럼 생긴 줄만 뽑으므로(looksLikeRouteWord) "감삼네거리1 : ..."같은
+ * 정류장명은 안 걸린다(한글이 3자를 넘어가면 노선 모양이 아니라고 봄).
+ * extractUngroupedBusRoutes는 노선이 연달아 2개 이상 붙어 있어야만 잡는데,
+ * 이 패턴은 줄마다 노선이 1개뿐인 경우(511번: ... 처럼)가 많아 그 규칙으로는
+ * 아예 못 잡고 정보가 통째로 사라진다 — 그래서 콜론 구조를 직접 본다.
+ */
+function extractReversedRouteLines(raw: string): TransitItem[] | null {
+  const items: TransitItem[] = [];
+  for (const rawLine of raw.split('\n')) {
+    // "- 8, 66, ... : 태종대 종점"(Drive In 영도 CGV 등) 처럼 대시로 시작하는
+    // 줄은 대시를 떼야 콜론 앞이 순수 노선목록으로 보인다.
+    const line = rawLine.trim().replace(/^[-●•○★■ㆍ]\s*/, '');
+    const colonIdx = line.includes(':') ? line.indexOf(':') : line.indexOf('：');
+    if (colonIdx === -1 || colonIdx > 30) continue;
+    const beforeColon = line
+      .slice(0, colonIdx)
+      .split(/[,/]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (beforeColon.length === 0 || !beforeColon.every((p) => looksLikeRouteWord(p))) continue;
+    const routes = parseRoutes(line.slice(0, colonIdx));
+    if (!routes) continue;
+    const note = line.slice(colonIdx + 1).trim();
+    items.push({ routes, note: note || undefined });
+  }
+  return items.length > 0 ? items : null;
+}
+
 /** 카테고리 단어가 아예 없는 지점(고덕강일·수유 등)용 보조 추출기. 숫자 섞인
  * 짧은 토큰이 2개 이상 연달아 나오는 구간을 노선번호 목록으로 본다. 그런
  * 구간이 여러 곳이면(어디가 노선번호 목록인지 애매하면) null을 반환해 억지로
@@ -959,7 +1009,10 @@ function extractCategorizedBusRoutes(raw: string | null | undefined): { label: s
 function extractUngroupedBusRoutes(raw: string | null | undefined): string[] | null {
   if (!raw || !raw.includes('버스')) return null;
   const words = raw.replace(/[,/]/g, ' ').split(/\s+/).filter(Boolean);
-  const isRouteToken = (w: string) => w.length <= 8 && looksLikeRouteWord(w) && !NOT_ROUTE_SUFFIX_RE.test(w);
+  // looksLikeRouteWord 혼자만 쓰면 "GATE"처럼 숫자 없는 순수 알파벳 단어도
+  // 통과한다(순수 alnum 패턴엔 숫자 필수 조건이 없음) — 노선번호는 항상
+  // 숫자를 포함하므로 /\d/ 검사를 별도로 더한다.
+  const isRouteToken = (w: string) => w.length <= 8 && /\d/.test(w) && looksLikeRouteWord(w) && !NOT_ROUTE_SUFFIX_RE.test(w);
   const runs: string[][] = [];
   let cur: string[] = [];
   for (const w of words) {
@@ -992,6 +1045,15 @@ function stripToSubwayOnlyText(raw: string): string {
       if (headerOnlyRe.test(t)) return false;
       if (catLineRe.test(t) && /\d/.test(t)) return false;
       if (/^[0-9A-Za-z][0-9A-Za-z,\-\s]*$/.test(t) && /\d/.test(t)) return false;
+      // "514번/618번: 은어송 5단지 하차, 도보로 1분 소요"처럼 콜론 앞이
+      // 노선번호 목록인 반대 순서 줄(대전가오 CGV 등)도 버스 내용이니
+      // 걸러낸다 — toTransitItems의 반대 순서 처리와 같은 판단 기준
+      // (looksLikeRouteWord)을 쓴다.
+      const colonIdx = t.indexOf(':') !== -1 ? t.indexOf(':') : t.indexOf('：');
+      if (colonIdx !== -1 && colonIdx <= 30) {
+        const beforeColon = t.slice(0, colonIdx).split(/[,/]/).map((s) => s.trim()).filter(Boolean);
+        if (beforeColon.length > 0 && beforeColon.every((p) => looksLikeRouteWord(p))) return false;
+      }
       // 카테고리 단어 없이 "버스 100,107,..." 처럼 노선번호가 문장 중간에
       // 나열된 줄(수유 등)도 걸러낸다 — 안 그러면 이 줄이 지하철 카드에
       // 그대로 남고 같은 번호가 버스 칩 카드에도 또 떠서 중복된다. 숫자 섞인
@@ -1080,27 +1142,39 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   // 시도하고 지하철·버스 둘 다 못 찾으면 "■"로 다시 시도한다 — 마커 하나만 쓰면
   // 다른 쪽 형식을 쓰는 지점에서 버스 내용이 지하철 카드에 통째로 섞여 들어간다.
   const extractTransit = (raw: string) => {
+    // 마커로 실제 쪼개지긴 했는데(chunks.length>=2) 그 어떤 조각도 지하철/
+    // 버스가 아닌 방식을 하나라도 발견하면 기억해둔다(Drive In 영도 CGV의
+    // "■ 버스 이용 시"/"■ 안내" 등, "안내"는 주행 규칙 같은 무관한 공지) —
+    // 원문이 이미 구획돼 있는데 그 안에 "지하철" 조각이 없다면 정말 지하철
+    // 정보가 없다는 뜻이니, cgvFallbackSubwayText가 이 무관한 조각을 지하철
+    // 카드로 잘못 끌어오지 않게 이 사실을 넘겨준다. 다른 마커로 시도하면
+    // 실제로 subway/bus를 찾을 수도 있으니 곧장 반환하지 않고 계속 시도한다.
+    let sawStructured = false;
     for (const marker of ['#', '■']) {
       const chunks = splitByMarker(raw, marker);
       // marker가 실제로 원문에 없으면 통짜 한 덩어리(1개)로 돌아온다 — 그 경우
       // 첫 줄에 우연히 "지하철"이 들어있어도 오탐이니(버스 내용까지 한 덩어리에
       // 섞여있음) 마커가 진짜로 쪼갠 경우(2개 이상)만 유효하게 취급한다.
       if (chunks.length < 2) continue;
+      sawStructured = true;
       const subway = chunks.find((s) => s.title.includes('지하철'))?.body;
       const bus = chunks.find((s) => s.title.includes('버스'))?.body;
-      if (subway || bus) return { subway, bus };
+      if (subway || bus) return { subway, bus, structured: true };
     }
     // 일부 CGV 지점(백석 등)은 "#"·"■" 대신 "[버스]"·"(지하철)"처럼 대괄호·
     // 소괄호 한 줄짜리 헤더로 구간을 나눈다.
     const headerChunks = splitByHeaderLine(raw);
     if (headerChunks.length >= 2) {
+      sawStructured = true;
       const subway = headerChunks.find((s) => s.title.includes('지하철'))?.body;
       const bus = headerChunks.find((s) => s.title.includes('버스'))?.body;
-      if (subway || bus) return { subway, bus };
+      if (subway || bus) return { subway, bus, structured: true };
     }
-    return { subway: undefined, bus: undefined };
+    return { subway: undefined, bus: undefined, structured: sawStructured };
   };
-  const extracted = b.transit.raw ? extractTransit(b.transit.raw) : { subway: undefined, bus: undefined };
+  const extracted = b.transit.raw
+    ? extractTransit(b.transit.raw)
+    : { subway: undefined, bus: undefined, structured: false };
   const subway = b.transit.subway ?? extracted.subway ?? extractStrayParkingSubway(b);
   const bus = b.transit.bus ?? extracted.bus;
   // 구간 마커("#"·"■"·"[]")가 아예 없이 "지하철 : ...", "지선버스 : ..."처럼
@@ -1125,6 +1199,10 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   const cgvBusChips: TransitItem[] | null = (() => {
     const categorized = extractCategorizedBusRoutes(busSourceText);
     if (categorized) return categorized.map((c) => ({ label: c.label, routes: c.routes }));
+    // "511번: 가오주공아파트 하차, 도보로 5분 소요"처럼 줄마다 노선이 하나뿐인
+    // 반대 순서 패턴은 ungrouped(연속 2개 이상 규칙)로는 못 잡으므로 먼저 시도
+    const reversed = busSourceText ? extractReversedRouteLines(busSourceText) : null;
+    if (reversed) return reversed;
     const ungrouped = extractUngroupedBusRoutes(busSourceText);
     if (ungrouped) return [{ routes: ungrouped }];
     return null;
@@ -1132,9 +1210,17 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   // 마커가 없어 지하철·버스가 원문에 한 덩어리로 뭉쳐 있던 지점(대학로 등)은
   // 버스 칩을 뽑고 나면 나머지(지하철 안내)만 별도 카드로 보여준다. subway나
   // itemSplit이 이미 지하철을 따로 갖고 있으면(롯데·메가박스는 항상 그렇다)
-  // 그쪽을 우선하고 이건 안 쓴다.
+  // 그쪽을 우선하고 이건 안 쓴다. extracted.structured가 true면(마커·헤더로
+  // 이미 구획된 원문인데 그중 "지하철" 조각이 없었다는 뜻, Drive In 영도
+  // CGV 등) 지하철 정보가 정말 없는 것이니 이 폴백을 시도하지 않는다 — 안
+  // 그러면 "버스 이용 시"·"안내"(주행 규칙 등 무관한 공지) 같은 다른 구획
+  // 제목·본문이 지하철 카드로 잘못 새어 들어간다.
   const cgvFallbackSubwayText: string | null =
-    cgvBusChips && !subway && !(itemSplit && itemSplit.subwayItems.length > 0) && b.transit.raw
+    cgvBusChips &&
+    !subway &&
+    !(itemSplit && itemSplit.subwayItems.length > 0) &&
+    b.transit.raw &&
+    !extracted.structured
       ? stripToSubwayOnlyText(b.transit.raw) || null
       : null;
 
