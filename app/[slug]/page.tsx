@@ -799,22 +799,30 @@ const BUS_CATEGORY_RE = new RegExp(
     // "급행버스 이용 시: 1, 2..."(대구한일 등)처럼 카테고리와 구분자 사이에
     // "이용 시" 같은 군더더기 문구가 끼는 지점도 있어 선택적으로 건너뛴다.
     `(?:\\s*이용\\s*시)?` +
-    `(?:\\s*[:：\\-]\\s*(?=[0-9A-Za-z가-힣])|\\s+(?=[0-9A-Za-z]))`,
+    // 롯데·메가박스로 넓히며(2026-08-05 3차) "이음1(심야):횡단보도 총 2회
+    // 이용..."처럼 콜론 뒤가 노선번호가 아니라 그냥 안내 문장인 지점이
+    // 나왔다. 콜론 뒤 한글은 "은평02"처럼 한글 1~3자 + 숫자가 바로 붙는
+    // 노선명 모양일 때만 허용하고, 일반 문장은 걸러낸다.
+    `(?:\\s*[:：\\-]\\s*(?=[0-9A-Za-z]|[가-힣]{1,3}\\d)|\\s+(?=[0-9A-Za-z]))`,
   'g'
 );
-/** 카테고리 매칭 뒤 값 구간에서, 다음 줄이 순수 노선번호 나열(한글·괄호·콜론
- * 없음)일 때만 이어붙인다 — 그래야 "간선버스: 100,\n200" 같은 줄바꿈 목록은
- * 합치면서도, "지선버스: 4211\n압구정역 4번 출구 (정류장...)" 처럼 다음 줄이
- * 정류장 설명인 경우는 거기서 끊어 정류장명·출구번호가 노선칩으로 잘못
- * 섞여드는 걸 막는다. */
-const PURE_ROUTE_LINE_RE = /^[0-9A-Za-z][0-9A-Za-z,\-\s]*$/;
-/** 전국 CGV로 넓히면서(2026-08-05 2차) "광역- 5005 기흥역 하차 후 ... 도보
- * 13분"처럼 노선번호 뒤에 설명 문장이 콤마 없이 바로 붙는 지점(경기 다수)이
+/** 전국 CGV·롯데·메가박스로 넓히면서(2026-08-05) "광역- 5005 기흥역 하차 후
+ * ... 도보 13분"처럼 노선번호 뒤에 설명 문장이 콤마 없이 바로 붙는 지점이
  * 나타났다. "13분"·"도보5분"·"한성1차아파트"처럼 숫자가 섞였다는 이유만으로
  * 토큰 필터를 통과해 노선 칩으로 잘못 섞여 들어가던 걸, 이런 단위·조사로
  * 끝나는 토큰은 노선번호가 아니라고 보고 제외한다. "은평02"·"달서4-1"처럼
  * 한글이 접두어로만 오는 진짜 노선명은 이 접미어들로 끝나지 않아 영향 없다. */
-const NOT_ROUTE_SUFFIX_RE = /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|쪽|거리|이내|이상|하차|도보)$/;
+const NOT_ROUTE_SUFFIX_RE = /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|쪽|거리|이내|이상|하차|도보|개|호기|회)$|^\d+[mM]$/;
+/** 단어(콤마·공백으로 나눈 한 조각) 하나가 "노선번호처럼 생겼는지" 판단한다.
+ * 영문/숫자(대시 포함, 예: 21-B·5002B)거나, "은평02"·"강서04"처럼 한글
+ * 1~3자 접두어 + 숫자로 시작하는 모양이면 노선으로 본다. "기흥역"·"압구정역"
+ * 처럼 숫자 없는 순수 한글 단어, "(정류장" 같은 괄호 낀 단어는 걸러진다. */
+function looksLikeRouteWord(w: string): boolean {
+  const s = w.replace(/[.:：]$/, '').replace(/번$/, '');
+  if (/^[0-9A-Za-z](?:[0-9A-Za-z-]*[0-9A-Za-z])?$/.test(s)) return true;
+  if (/^[가-힣]{1,3}\d[0-9A-Za-z-]*$/.test(s)) return true;
+  return false;
+}
 
 function extractCategorizedBusRoutes(raw: string | null | undefined): { label: string; routes: string[] }[] | null {
   if (!raw) return null;
@@ -829,27 +837,32 @@ function extractCategorizedBusRoutes(raw: string | null | undefined): { label: s
     const start = (m.index ?? 0) + m[0].length;
     const end = i + 1 < matches.length ? (matches[i + 1].index ?? raw.length) : raw.length;
     const lines = raw.slice(start, end).split('\n');
-    const keptLines = [lines[0]];
-    for (let li = 1; li < lines.length; li++) {
+    // 노선목록 뒤에 정류장 설명·안내문이 콤마 없이 바로 붙는 경우(경기 CGV
+    // 다수, 고양스타필드 메가박스 등)와, 줄바꿈으로 다음 정류장 설명이 이어
+    // 지는 경우(압구정 CGV 등) 둘 다 같은 규칙으로 자른다: 단어(콤마·공백
+    // 구분) 단위로 "노선처럼 생겼는지" 보고, 아닌 단어를 만나면 그 줄에서
+    // 멈추고 이어지는 줄도 더 이상 보지 않는다.
+    const keptLines: string[] = [];
+    for (let li = 0; li < lines.length; li++) {
       const line = lines[li].trim();
-      if (!line) break;
-      if (PURE_ROUTE_LINE_RE.test(line)) {
-        keptLines.push(line);
-        continue;
+      if (li > 0 && !line) break;
+      const words = line.split(/[,\s/]+/).filter(Boolean);
+      const keptWords: string[] = [];
+      for (const w of words) {
+        if (!looksLikeRouteWord(w)) break;
+        keptWords.push(w);
       }
-      // 다음 줄이 순수 노선목록은 아니지만("21A, 21-B, ... 기흥구청 하차 후
-      // 도보 7분"처럼 카테고리 라벨 없이 이전 그룹에 바로 이어붙는 노선목록+
-      // 설명문 형태, 기흥 CGV 등) 앞부분만 노선목록이면 거기까지만 가져오고
-      // 멈춘다. 설명문까지 통째로 가져오면 예전처럼 지명이 섞여 들어간다.
-      const lead = line.match(/^([0-9A-Za-z][0-9A-Za-z,\-\s]*?)(?=\s+[가-힣]{2,})/);
-      if (lead && lead[1].trim()) keptLines.push(lead[1].trim());
-      break;
+      if (keptWords.length > 0) keptLines.push(keptWords.join(' '));
+      if (keptWords.length < words.length) break; // 이 줄에서 설명문을 만났으니 더 안 본다
     }
     const tokens = keptLines
       .join(' ')
       .split(/[,\s/]+/)
       .map((s) => s.trim())
       .filter(Boolean)
+      // "103."(마침표로 노선을 나열하는 지점, 인천터미널 롯데) · "6:"(콜론이
+      // 바로 뒤에 붙는 지점, 대구이시아 메가박스) 등 꼬리 구두점을 뗀다.
+      .map((t) => t.replace(/[.:：]$/, ''))
       .filter((t) => /\d/.test(t) && t.length <= 8 && !/[()]/.test(t) && !NOT_ROUTE_SUFFIX_RE.test(t))
       .map((t) => t.replace(/번$/, ''));
     if (tokens.length === 0) continue;
@@ -863,16 +876,20 @@ function extractCategorizedBusRoutes(raw: string | null | undefined): { label: s
 /** 카테고리 단어가 아예 없는 지점(고덕강일·수유 등)용 보조 추출기. 숫자 섞인
  * 짧은 토큰이 2개 이상 연달아 나오는 구간을 노선번호 목록으로 본다. 그런
  * 구간이 여러 곳이면(어디가 노선번호 목록인지 애매하면) null을 반환해 억지로
- * 만들지 않는다. */
+ * 만들지 않는다. 카테고리 단어 없이는 문맥을 알 수 없어 원문에 "버스"라는
+ * 말 자체가 없으면 시도하지 않는다 — 안 그러면 "E/V 1,2호기"처럼 버스와
+ * 무관한 숫자 나열(엘리베이터 안내 등, 롯데 진주혁신 등)까지 노선번호로
+ * 잘못 뽑힌다. */
 function extractUngroupedBusRoutes(raw: string | null | undefined): string[] | null {
-  if (!raw) return null;
+  if (!raw || !raw.includes('버스')) return null;
   const words = raw.replace(/[,/]/g, ' ').split(/\s+/).filter(Boolean);
-  const isRouteToken = (w: string) => /^[0-9A-Za-z가-힣]{1,8}$/.test(w) && /\d/.test(w) && !NOT_ROUTE_SUFFIX_RE.test(w);
+  const isRouteToken = (w: string) => w.length <= 8 && looksLikeRouteWord(w) && !NOT_ROUTE_SUFFIX_RE.test(w);
   const runs: string[][] = [];
   let cur: string[] = [];
   for (const w of words) {
-    if (isRouteToken(w)) cur.push(w);
-    else {
+    if (isRouteToken(w)) {
+      cur.push(w.replace(/[.:：]$/, '')); // "380."·"618번:" 등 꼬리 구두점 제거
+    } else {
       if (cur.length >= 2) runs.push(cur);
       cur = [];
     }
@@ -898,7 +915,7 @@ function stripToSubwayOnlyText(raw: string): string {
       if (!t) return false;
       if (headerOnlyRe.test(t)) return false;
       if (catLineRe.test(t) && /\d/.test(t)) return false;
-      if (PURE_ROUTE_LINE_RE.test(t) && /\d/.test(t)) return false;
+      if (/^[0-9A-Za-z][0-9A-Za-z,\-\s]*$/.test(t) && /\d/.test(t)) return false;
       // 카테고리 단어 없이 "버스 100,107,..." 처럼 노선번호가 문장 중간에
       // 나열된 줄(수유 등)도 걸러낸다 — 안 그러면 이 줄이 지하철 카드에
       // 그대로 남고 같은 번호가 버스 칩 카드에도 또 떠서 중복된다. 숫자 섞인
@@ -1022,24 +1039,24 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   // "버스안내"처럼 카드 제목과 똑같은 말만 하는 줄은 군더더기라 걷어낸다.
   const transitFallbackText = transitFallback?.replace(/^\s*(버스|지하철|교통)\s*안내\s*\n/, '') ?? null;
 
-  // CGV 전 지점 버스 칩 통일(2026-08-05, 1차 서울→2차 전국 확대). 원문 구조와
-  // 무관하게 카테고리별 칩으로 통일하고, 카테고리 단어가 없으면 라벨 없는 칩
-  // 목록으로 폴백한다. 둘 다 실패하면(왕십리처럼 정류장+코드만 있는 특이
-  // 형식) null로 두고 기존 렌더링을 그대로 쓴다 — 롯데·메가박스는 이번
-  // 범위가 아니라 손대지 않는다.
-  const cgvBusChips: TransitItem[] | null =
-    b.brand === 'cgv'
-      ? (() => {
-          const categorized = extractCategorizedBusRoutes(b.transit.raw);
-          if (categorized) return categorized.map((c) => ({ label: c.label, routes: c.routes }));
-          const ungrouped = extractUngroupedBusRoutes(b.transit.raw);
-          if (ungrouped) return [{ routes: ungrouped }];
-          return null;
-        })()
-      : null;
+  // 3사 전 지점 버스 칩 통일(2026-08-05, 서울 CGV→전국 CGV→롯데·메가박스로
+  // 확대). 원문 구조와 무관하게 카테고리별 칩으로 통일하고, 카테고리 단어가
+  // 없으면 라벨 없는 칩 목록으로 폴백한다. 둘 다 실패하면(왕십리처럼 정류장+
+  // 코드만 있는 특이 형식) null로 두고 기존 렌더링을 그대로 쓴다. CGV는 버스
+  // 텍스트가 raw 한 덩어리에 있고, 롯데·메가박스는 이미 bus 필드로 분리돼
+  // 있어(raw는 null) 소스를 raw ?? bus로 통일해서 넘긴다.
+  const busSourceText = b.transit.raw ?? b.transit.bus;
+  const cgvBusChips: TransitItem[] | null = (() => {
+    const categorized = extractCategorizedBusRoutes(busSourceText);
+    if (categorized) return categorized.map((c) => ({ label: c.label, routes: c.routes }));
+    const ungrouped = extractUngroupedBusRoutes(busSourceText);
+    if (ungrouped) return [{ routes: ungrouped }];
+    return null;
+  })();
   // 마커가 없어 지하철·버스가 원문에 한 덩어리로 뭉쳐 있던 지점(대학로 등)은
   // 버스 칩을 뽑고 나면 나머지(지하철 안내)만 별도 카드로 보여준다. subway나
-  // itemSplit이 이미 지하철을 따로 갖고 있으면 그쪽을 우선하고 이건 안 쓴다.
+  // itemSplit이 이미 지하철을 따로 갖고 있으면(롯데·메가박스는 항상 그렇다)
+  // 그쪽을 우선하고 이건 안 쓴다.
   const cgvFallbackSubwayText: string | null =
     cgvBusChips && !subway && !(itemSplit && itemSplit.subwayItems.length > 0) && b.transit.raw
       ? stripToSubwayOnlyText(b.transit.raw) || null
