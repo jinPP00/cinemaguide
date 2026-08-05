@@ -453,6 +453,66 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
 }
 
 /**
+ * 주차 카드 제목 통일(2026-08-05). CGV는 원문 "■" 제목을 그대로 쓰다 보니
+ * "주차 요금"·"주차요금"·"주차 확인(인증방법)"·"주차 확인(정산방법)" 등 지점마다
+ * 77종류로 갈라져 있었다. 제목 문구가 아니라 의미(안내/확인/요금)로 다시
+ * 묶어 "주차 안내"·"주차 확인"·"주차 요금" 세 제목으로 고정하고, 롯데·메가박스의
+ * guide/howTo/fee 필드도 같은 세 제목으로 맞춘다 — 3사 전부 같은 카드 제목·
+ * 순서(안내→확인→요금)로 통일하는 게 목적.
+ */
+function classifyParkingTitle(title: string): '주차 안내' | '주차 확인' | '주차 요금' {
+  if (/요금|비용/.test(title)) return '주차 요금';
+  if (/확인|인증|정산|등록/.test(title)) return '주차 확인';
+  return '주차 안내';
+}
+
+function buildParkingSections(b: Branch): { title: string; body: string }[] {
+  const raw: { title: string; body: string }[] = b.parking.raw
+    ? // "■"로 쪼개면 첫 "■" 이전 내용은 title이 원문 첫 줄이 되는데, 일부
+      // 지점(구미·인천계양 등)은 그 줄이 "●"·"'" 같은 기호 하나뿐이라 카드
+      // 제목이 의미 없는 글자로 나온다 — 한글·영문·숫자가 하나도 없으면 실제
+      // 안내문 제목으로 바꿔준다.
+      splitByMarker(b.parking.raw, '■')
+        .map((s) => ({
+          ...s,
+          title: /^[^가-힣a-zA-Z0-9]*$/.test(s.title) ? '주차 안내' : s.title,
+        }))
+        // "'■ 주차 안내" 처럼 첫 "■" 앞에 기호 한 글자만 있으면 본문 없는
+        // 빈 카드가 생긴다 — 걸러낸다.
+        .filter((s) => s.body)
+        // 원문 크롤링 경계 오류로 "■ 지하철" 같은 지하철 안내가 주차 필드에
+        // 통째로 섞여 들어온 지점(대전탄방 등)이 있다 — 주차 카드로는 안
+        // 보여주고, extractStrayParkingSubway()가 따로 지하철 카드로 옮긴다.
+        .filter((s) => s.title.trim() !== '지하철')
+    : [
+        b.parking.guide && { title: '주차 안내', body: b.parking.guide },
+        b.parking.howTo && { title: '주차 확인', body: b.parking.howTo },
+        b.parking.fee && { title: '주차 요금', body: b.parking.fee },
+      ].filter((x): x is { title: string; body: string } => Boolean(x));
+
+  const order: ('주차 안내' | '주차 확인' | '주차 요금')[] = ['주차 안내', '주차 확인', '주차 요금'];
+  const grouped = new Map<string, string[]>();
+  for (const s of raw) {
+    const canon = classifyParkingTitle(s.title);
+    if (!grouped.has(canon)) grouped.set(canon, []);
+    grouped.get(canon)!.push(s.body);
+  }
+  return order
+    .filter((title) => grouped.has(title))
+    .map((title) => ({ title, body: grouped.get(title)!.join('\n\n') }));
+}
+
+/** 원문 크롤링 경계 오류로 지하철 안내가 parking.raw 안에 "■ 지하철" 조각으로
+ * 섞여 들어온 지점(대전탄방 등)의 지하철 정보를 되찾아온다. 이런 지점은
+ * transit.subway/raw가 아예 비어 있어서(그 정보의 유일한 출처가 parking.raw
+ * 였음) buildParkingSections()에서 그냥 걸러내기만 하면 정보 자체가 통째로
+ * 사라진다 — 주차 카드로는 안 보여주되 지하철 카드로 옮겨 보여준다. */
+function extractStrayParkingSubway(b: Branch): string | undefined {
+  if (!b.parking.raw) return undefined;
+  return splitByMarker(b.parking.raw, '■').find((s) => s.title.trim() === '지하철')?.body;
+}
+
+/**
  * "[버스]" / "(지하철)"처럼 대괄호·소괄호 안에 제목만 있는 한 줄짜리 헤더로
  * 원문을 구간별로 쪼갠다. CGV 일부 지점(예: 백석)은 "#"·"■" 마커 대신 이
  * 형태를 쓴다 — 못 쪼개면 지하철·버스 구분 없이 원문 전체가 "교통 안내"
@@ -1025,7 +1085,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
     return { subway: undefined, bus: undefined };
   };
   const extracted = b.transit.raw ? extractTransit(b.transit.raw) : { subway: undefined, bus: undefined };
-  const subway = b.transit.subway ?? extracted.subway;
+  const subway = b.transit.subway ?? extracted.subway ?? extractStrayParkingSubway(b);
   const bus = b.transit.bus ?? extracted.bus;
   // 구간 마커("#"·"■"·"[]")가 아예 없이 "지하철 : ...", "지선버스 : ..."처럼
   // 항목별로만 라벨이 붙은 지점(의정부 CGV 등)은 그 라벨 기준으로 다시 나눈다.
@@ -1062,24 +1122,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       ? stripToSubwayOnlyText(b.transit.raw) || null
       : null;
 
-  const parkingSections = b.parking.raw
-    ? // "■"로 쪼개면 첫 "■" 이전 내용은 title이 원문 첫 줄이 되는데, 일부
-      // 지점(구미·인천계양 등)은 그 줄이 "●"·"'" 같은 기호 하나뿐이라 카드
-      // 제목이 의미 없는 글자로 나온다 — 한글·영문·숫자가 하나도 없으면 실제
-      // 안내문 제목으로 바꿔준다.
-      splitByMarker(b.parking.raw, '■')
-        .map((s) => ({
-          ...s,
-          title: /^[^가-힣a-zA-Z0-9]*$/.test(s.title) ? '주차 안내' : s.title,
-        }))
-        // "'■ 주차 안내" 처럼 첫 "■" 앞에 기호 한 글자만 있으면 본문 없는
-        // 빈 카드가 생긴다 — 걸러낸다.
-        .filter((s) => s.body)
-    : [
-        b.parking.guide && { title: '주차안내', body: b.parking.guide },
-        b.parking.howTo && { title: '주차확인', body: b.parking.howTo },
-        b.parking.fee && { title: '주차요금', body: b.parking.fee },
-      ].filter((x): x is { title: string; body: string } => Boolean(x));
+  const parkingSections = buildParkingSections(b);
 
   const parkingIcon = (title: string) =>
     title.includes('요금') ? <IconCoin /> : title.includes('확인') ? <IconTicket /> : <IconParking />;
