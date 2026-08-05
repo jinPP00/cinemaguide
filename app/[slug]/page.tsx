@@ -453,6 +453,33 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
 }
 
 /**
+ * "[버스]" / "(지하철)"처럼 대괄호·소괄호 안에 제목만 있는 한 줄짜리 헤더로
+ * 원문을 구간별로 쪼갠다. CGV 일부 지점(예: 백석)은 "#"·"■" 마커 대신 이
+ * 형태를 쓴다 — 못 쪼개면 지하철·버스 구분 없이 원문 전체가 "교통 안내"
+ * 카드 하나로 뭉뚱그려져 아이콘·칩 없이 밋밋하게 나온다.
+ */
+function splitByHeaderLine(raw: string): { title: string; body: string }[] {
+  const lines = raw.split('\n');
+  const chunks: { title: string; body: string[] }[] = [];
+  for (const line of lines) {
+    const m = line.trim().match(/^[[(]([^\])]+)[\])]$/);
+    if (m) {
+      chunks.push({ title: m[1].trim(), body: [] });
+    } else if (chunks.length > 0) {
+      chunks[chunks.length - 1].body.push(line);
+    } else {
+      chunks.push({ title: '', body: [line] });
+    }
+  }
+  return chunks
+    .map((c) => ({ title: c.title, body: c.body.join('\n').trim() }))
+    .filter((c) => c.body);
+}
+
+/** 원문 안에서 "직행)"·"마을)"처럼 여는 괄호 없이 유형명 뒤에 ")"만 붙는 표기를 통일한다. */
+const BUS_TYPE_WORDS = ['직행', '일반', '마을', '간선', '좌석', '광역', '급행', '순환', '심야'];
+
+/**
  * 원문을 읽기 쉬운 불릿 목록으로 바꾼다. 브랜드마다 원본 형식이 달라
  * 두 갈래로 처리한다:
  *
@@ -466,9 +493,14 @@ function splitByMarker(raw: string, marker: string): { title: string; body: stri
  * 번호 앞에서 끊어 각각을 별도 줄로 만든다.
  */
 function toBullets(raw: string): { text: string; note?: string }[] {
+  const busTypeRe = new RegExp(`(${BUS_TYPE_WORDS.join('|')})\\)\\s*`, 'g');
   const normalized = raw
-    // "심야)" 형태를 다른 항목들과 같은 "라벨 : 값" 형식으로 통일한다
-    .replace(/심야\)/g, '심야버스 :')
+    // "●"·"○"·"★"는 CGV 일부 지점(백석·구미 등)이 쓰는 불릿 기호다 — "-"와
+    // 똑같이 새 항목 표시로 취급해야 문단 하나로 뭉개지지 않는다.
+    .replace(/^[ \t]*[●•○★]\s*/gm, '- ')
+    // "직행)"·"마을)"·"심야)"처럼 여는 괄호 없이 유형명 뒤에 ")"만 붙는 표기를
+    // 다른 항목들과 같은 "직행버스 : 값" 형식으로 통일한다.
+    .replace(busTypeRe, (_m, word: string) => `\n${word}버스 : `)
     // "(1)" 같은 순번 앞에서 줄을 나눈다. "(총 1,058대)"·"(2층)"처럼 숫자
     // 뒤에 글자가 오는 괄호는 대상이 아니라 안전하다.
     .replace(/\((\d+)\)\s*/g, '\n($1) ');
@@ -540,6 +572,11 @@ function splitLabel(text: string): { label?: string; value: string } {
   return { value: text };
 }
 
+/** "직행"·"마을"처럼 유형명만 있는 라벨은 "직행버스"·"마을버스"로 통일한다. */
+function normalizeBusLabel(label: string): string {
+  return BUS_TYPE_WORDS.includes(label) ? `${label}버스` : label;
+}
+
 /**
  * "104번, 106번, 316번"처럼 노선번호만 쉼표로 나열된 값을 칩 배열로 만든다.
  * "801"처럼 한 줄에 하나만 있어도 칩으로 만든다 — 세종(조치원) 메가박스의
@@ -586,7 +623,8 @@ type TransitItem = {
 function toTransitItems(text: string): TransitItem[] {
   const items: TransitItem[] = [];
   for (const bullet of toBullets(text)) {
-    const { label, value } = splitLabel(bullet.text);
+    const { label: rawLabel, value } = splitLabel(bullet.text);
+    const label = rawLabel ? normalizeBusLabel(rawLabel) : rawLabel;
     const routes = parseRoutes(value);
     const steps = routes ? null : parseSteps(value);
 
@@ -737,6 +775,14 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       const bus = chunks.find((s) => s.title.includes('버스'))?.body;
       if (subway || bus) return { subway, bus };
     }
+    // 일부 CGV 지점(백석 등)은 "#"·"■" 대신 "[버스]"·"(지하철)"처럼 대괄호·
+    // 소괄호 한 줄짜리 헤더로 구간을 나눈다.
+    const headerChunks = splitByHeaderLine(raw);
+    if (headerChunks.length >= 2) {
+      const subway = headerChunks.find((s) => s.title.includes('지하철'))?.body;
+      const bus = headerChunks.find((s) => s.title.includes('버스'))?.body;
+      if (subway || bus) return { subway, bus };
+    }
     return { subway: undefined, bus: undefined };
   };
   const extracted = b.transit.raw ? extractTransit(b.transit.raw) : { subway: undefined, bus: undefined };
@@ -748,7 +794,13 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   const transitFallback = !subway && !bus ? b.transit.raw : null;
 
   const parkingSections = b.parking.raw
-    ? splitByMarker(b.parking.raw, '■')
+    ? // "■"로 쪼개면 첫 "■" 이전 내용은 title이 원문 첫 줄이 되는데, 일부
+      // 지점(구미 등)은 그 줄이 "●" 같은 불릿 기호 하나뿐이라 카드 제목이
+      // 의미 없는 기호로 나온다 — 실제 안내문 제목으로 바꿔준다.
+      splitByMarker(b.parking.raw, '■').map((s) => ({
+        ...s,
+        title: /^[●○★•]*$/.test(s.title) ? '주차 안내' : s.title,
+      }))
     : [
         b.parking.guide && { title: '주차안내', body: b.parking.guide },
         b.parking.howTo && { title: '주차확인', body: b.parking.howTo },
@@ -841,7 +893,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
                   <IconBus />
                   교통 안내
                 </div>
-                <p className="tb-raw">{transitFallback}</p>
+                <BulletList text={transitFallback} />
               </div>
             )}
             {bus && (
