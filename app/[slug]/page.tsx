@@ -784,6 +784,120 @@ function BulletList({ text }: { text: string }) {
   return <TransitItemsList items={toTransitItems(text)} />;
 }
 
+/**
+ * 서울 CGV 버스 안내 전용 카테고리 칩 추출기(2026-08-05 통일 작업).
+ * 기존 toTransitItems는 원문 구조(마커·정류장 반복 등)를 그대로 따라가다 보니
+ * 지점마다 결과 모양이 달랐다(정류장별 텍스트 vs 칩). 이 함수는 원문 전체에서
+ * "간선/지선/광역/..." 같은 카테고리 단어를 직접 찾아 값을 모으는 방식이라
+ * 원문 구조(마커 유무, 콜론/대시, 정류장 반복)에 관계없이 같은 모양(카테고리별
+ * 칩 그룹)으로 통일된다. 원본에 카테고리 단어가 아예 없는 지점(왕십리 등)은
+ * null을 반환해 기존 렌더링으로 폴백한다.
+ */
+const BUS_CATEGORY_WORDS = ['간선', '지선', '급행', '좌석', '광역', '마을', '일반', '공항', '순환', '심야', '도시형', '직행'];
+const BUS_CATEGORY_RE = new RegExp(
+  `(?<![가-힣])(${BUS_CATEGORY_WORDS.join('|')})(?:\\s?버스)?(\\s*\\([^()]{1,12}\\))?(?:\\])?(?:\\))?` +
+    `(?:\\s*[:：\\-]\\s*(?=[0-9A-Za-z가-힣])|\\s+(?=[0-9A-Za-z]))`,
+  'g'
+);
+/** 카테고리 매칭 뒤 값 구간에서, 다음 줄이 순수 노선번호 나열(한글·괄호·콜론
+ * 없음)일 때만 이어붙인다 — 그래야 "간선버스: 100,\n200" 같은 줄바꿈 목록은
+ * 합치면서도, "지선버스: 4211\n압구정역 4번 출구 (정류장...)" 처럼 다음 줄이
+ * 정류장 설명인 경우는 거기서 끊어 정류장명·출구번호가 노선칩으로 잘못
+ * 섞여드는 걸 막는다. */
+const PURE_ROUTE_LINE_RE = /^[0-9A-Za-z][0-9A-Za-z,\-\s]*$/;
+
+function extractCategorizedBusRoutes(raw: string | null | undefined): { label: string; routes: string[] }[] | null {
+  if (!raw) return null;
+  const matches = [...raw.matchAll(BUS_CATEGORY_RE)];
+  if (matches.length === 0) return null;
+  const result = new Map<string, Set<string>>();
+  for (let i = 0; i < matches.length; i++) {
+    const m = matches[i];
+    const word = m[1];
+    const color = m[2] ? m[2].trim() : '';
+    const label = `${word}버스${color}`;
+    const start = (m.index ?? 0) + m[0].length;
+    const end = i + 1 < matches.length ? (matches[i + 1].index ?? raw.length) : raw.length;
+    const lines = raw.slice(start, end).split('\n');
+    const keptLines = [lines[0]];
+    for (let li = 1; li < lines.length; li++) {
+      const line = lines[li].trim();
+      if (line && PURE_ROUTE_LINE_RE.test(line)) keptLines.push(line);
+      else break;
+    }
+    const tokens = keptLines
+      .join(' ')
+      .split(/[,\s/]+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .filter((t) => /\d/.test(t) && t.length <= 8 && !/[()]/.test(t))
+      .map((t) => t.replace(/번$/, ''));
+    if (tokens.length === 0) continue;
+    if (!result.has(label)) result.set(label, new Set());
+    for (const t of tokens) result.get(label)!.add(t);
+  }
+  if (result.size === 0) return null;
+  return [...result.entries()].map(([label, set]) => ({ label, routes: [...set] }));
+}
+
+/** 카테고리 단어가 아예 없는 지점(고덕강일·수유 등)용 보조 추출기. 숫자 섞인
+ * 짧은 토큰이 2개 이상 연달아 나오는 구간을 노선번호 목록으로 본다. 그런
+ * 구간이 여러 곳이면(어디가 노선번호 목록인지 애매하면) null을 반환해 억지로
+ * 만들지 않는다. */
+function extractUngroupedBusRoutes(raw: string | null | undefined): string[] | null {
+  if (!raw) return null;
+  const words = raw.replace(/[,/]/g, ' ').split(/\s+/).filter(Boolean);
+  const isRouteToken = (w: string) => /^[0-9A-Za-z가-힣]{1,8}$/.test(w) && /\d/.test(w);
+  const runs: string[][] = [];
+  let cur: string[] = [];
+  for (const w of words) {
+    if (isRouteToken(w)) cur.push(w);
+    else {
+      if (cur.length >= 2) runs.push(cur);
+      cur = [];
+    }
+  }
+  if (cur.length >= 2) runs.push(cur);
+  if (runs.length !== 1) return null;
+  return runs[0].map((t) => t.replace(/번$/, ''));
+}
+
+/** seoulCgvBusChips가 원문에서 버스 카테고리 줄을 뽑아간 뒤, 남은 줄(지하철
+ * 안내 등)만 골라 지하철 카드용 텍스트로 돌려준다. subway/itemSplit이 이미
+ * 지하철을 따로 뽑아둔 지점(강남 등, "#"/"■" 마커 있음)에서는 안 쓰인다 —
+ * 마커가 없어 지하철·버스가 원문 한 덩어리로 뭉쳐 있던 지점(대학로·방학 등)
+ * 전용 보조 함수. 안 그러면 버스 칩과 "교통 안내" 원문 카드에 같은 버스
+ * 내용이 중복으로 뜬다. */
+function stripToSubwayOnlyText(raw: string): string {
+  const catLineRe = new RegExp(`(?<![가-힣])(${BUS_CATEGORY_WORDS.join('|')})(?:\\s?버스)?`);
+  const headerOnlyRe = /^(버스|지하철)\s*(안내|이용\s*시)?\s*[:：]?$/;
+  return raw
+    .split('\n')
+    .filter((line) => {
+      const t = line.trim();
+      if (!t) return false;
+      if (headerOnlyRe.test(t)) return false;
+      if (catLineRe.test(t) && /\d/.test(t)) return false;
+      if (PURE_ROUTE_LINE_RE.test(t) && /\d/.test(t)) return false;
+      // 카테고리 단어 없이 "버스 100,107,..." 처럼 노선번호가 문장 중간에
+      // 나열된 줄(수유 등)도 걸러낸다 — 안 그러면 이 줄이 지하철 카드에
+      // 그대로 남고 같은 번호가 버스 칩 카드에도 또 떠서 중복된다. 숫자 섞인
+      // 짧은 토큰이 3개 연속 나올 때만 "노선번호 나열"로 보고, 1~2개는 그냥
+      // 문장 속 숫자(출구 번호 등)일 수 있어 건드리지 않는다.
+      const words = t.replace(/[,/]/g, ' ').split(/\s+/);
+      let run = 0;
+      for (const w of words) {
+        if (/^[0-9A-Za-z가-힣]{1,8}$/.test(w) && /\d/.test(w)) {
+          run++;
+          if (run >= 3) return false;
+        } else run = 0;
+      }
+      return true;
+    })
+    .join('\n')
+    .trim();
+}
+
 /** 요금 행을 상영관(label)별로 묶고, 그 안에서 시간대별 평일·주말 한 행으로 합친다 */
 function pivotPrices(rows: PriceRow[]) {
   const byLabel = new Map<string, Map<string, { wkday?: PriceRow; wkend?: PriceRow }>>();
@@ -888,6 +1002,28 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
   // "버스안내"처럼 카드 제목과 똑같은 말만 하는 줄은 군더더기라 걷어낸다.
   const transitFallbackText = transitFallback?.replace(/^\s*(버스|지하철|교통)\s*안내\s*\n/, '') ?? null;
 
+  // 서울 CGV 한정 버스 칩 통일(2026-08-05). 원문 구조와 무관하게 카테고리별
+  // 칩으로 통일하고, 카테고리 단어가 없으면 라벨 없는 칩 목록으로 폴백한다.
+  // 둘 다 실패하면(왕십리 등 정류장+코드만 있는 특이 형식) null로 두고 기존
+  // 렌더링을 그대로 쓴다 — 다른 브랜드·지역은 이번 범위가 아니라 손대지 않는다.
+  const seoulCgvBusChips: TransitItem[] | null =
+    b.brand === 'cgv' && b.sido === '서울'
+      ? (() => {
+          const categorized = extractCategorizedBusRoutes(b.transit.raw);
+          if (categorized) return categorized.map((c) => ({ label: c.label, routes: c.routes }));
+          const ungrouped = extractUngroupedBusRoutes(b.transit.raw);
+          if (ungrouped) return [{ routes: ungrouped }];
+          return null;
+        })()
+      : null;
+  // 마커가 없어 지하철·버스가 원문에 한 덩어리로 뭉쳐 있던 지점(대학로 등)은
+  // 버스 칩을 뽑고 나면 나머지(지하철 안내)만 별도 카드로 보여준다. subway나
+  // itemSplit이 이미 지하철을 따로 갖고 있으면 그쪽을 우선하고 이건 안 쓴다.
+  const seoulCgvFallbackSubwayText: string | null =
+    seoulCgvBusChips && !subway && !(itemSplit && itemSplit.subwayItems.length > 0) && b.transit.raw
+      ? stripToSubwayOnlyText(b.transit.raw) || null
+      : null;
+
   const parkingSections = b.parking.raw
     ? // "■"로 쪼개면 첫 "■" 이전 내용은 title이 원문 첫 줄이 되는데, 일부
       // 지점(구미·인천계양 등)은 그 줄이 "●"·"'" 같은 기호 하나뿐이라 카드
@@ -964,30 +1100,48 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
       {scheduleBar}
 
-      {!subway && !bus && !itemSplit && !transitFallback && (
-        <section className="section" aria-labelledby="transit">
-          <h2 id="transit">대중교통 이용 방법</h2>
-          <div className="note" style={{ marginTop: 12 }}>
-            이 지점의 대중교통 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
-            확인해주세요.
-          </div>
-        </section>
-      )}
+      {!subway &&
+        !bus &&
+        !(itemSplit && itemSplit.subwayItems.length > 0) &&
+        !transitFallback &&
+        !seoulCgvBusChips &&
+        !seoulCgvFallbackSubwayText && (
+          <section className="section" aria-labelledby="transit">
+            <h2 id="transit">대중교통 이용 방법</h2>
+            <div className="note" style={{ marginTop: 12 }}>
+              이 지점의 대중교통 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
+              확인해주세요.
+            </div>
+          </section>
+        )}
 
-      {(subway || bus || itemSplit || transitFallback) && (
+      {(subway ||
+        bus ||
+        (itemSplit && (itemSplit.subwayItems.length > 0 || itemSplit.busItems.length > 0)) ||
+        transitFallback ||
+        seoulCgvBusChips ||
+        seoulCgvFallbackSubwayText) && (
         <section className="section" aria-labelledby="transit">
           <h2 id="transit">대중교통 이용 방법</h2>
           <div className="transit-grid">
-            {(subway || itemSplit) && (
+            {(subway || (itemSplit && itemSplit.subwayItems.length > 0) || seoulCgvFallbackSubwayText) && (
               <div className="transit-card">
                 <div className="transit-card-head">
                   <IconSubway />
                   지하철
                 </div>
-                {subway ? <BulletList text={subway} /> : <TransitItemsList items={itemSplit!.subwayItems} />}
+                {subway ? (
+                  <BulletList text={subway} />
+                ) : itemSplit && itemSplit.subwayItems.length > 0 ? (
+                  <TransitItemsList items={itemSplit.subwayItems} />
+                ) : (
+                  <BulletList text={seoulCgvFallbackSubwayText!} />
+                )}
               </div>
             )}
-            {transitFallback && (
+            {/* seoulCgvBusChips가 원문에서 버스 카테고리를 이미 뽑아갔으니, 같은
+                내용이 "교통 안내" 원문 카드에 또 뜨지 않도록 그때만 숨긴다. */}
+            {transitFallback && !seoulCgvBusChips && (
               <div className="transit-card">
                 <div className="transit-card-head">
                   <IconBus />
@@ -996,14 +1150,24 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
                 <BulletList text={transitFallbackText!} />
               </div>
             )}
-            {(bus || itemSplit) && (
+            {seoulCgvBusChips ? (
               <div className="transit-card">
                 <div className="transit-card-head">
                   <IconBus />
                   버스
                 </div>
-                {bus ? <BulletList text={bus} /> : <TransitItemsList items={itemSplit!.busItems} />}
+                <TransitItemsList items={seoulCgvBusChips} />
               </div>
+            ) : (
+              (bus || (itemSplit && itemSplit.busItems.length > 0)) && (
+                <div className="transit-card">
+                  <div className="transit-card-head">
+                    <IconBus />
+                    버스
+                  </div>
+                  {bus ? <BulletList text={bus} /> : <TransitItemsList items={itemSplit!.busItems} />}
+                </div>
+              )
             )}
           </div>
         </section>
