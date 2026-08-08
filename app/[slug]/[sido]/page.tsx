@@ -12,6 +12,7 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
+import { breadcrumbJsonLd, jsonLdScript } from '@/lib/jsonld';
 import { brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 
@@ -67,8 +68,19 @@ export default async function SidoPage({
   const nearby = sidosOfBrand(key).filter((s) => s !== sido);
   const themeVars = brandThemeVars(key) as CSSProperties;
 
+  // 화면의 빵부스러기와 같은 순서·같은 이름으로 구조화 데이터를 만든다.
+  const crumbs = [
+    { name: '홈', path: '/' },
+    { name: info.name, path: brandPath(info.segment) },
+    { name: sido, path: sidoPath(info.segment, sido) },
+  ];
+
   return (
     <div className="wrap page brand-themed" style={themeVars}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

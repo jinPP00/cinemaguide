@@ -18,12 +18,18 @@ import {
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { SITE } from '@/lib/site';
+import { breadcrumbJsonLd, faqJsonLd, jsonLdScript } from '@/lib/jsonld';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
 import { IconClapper } from '../icons';
-import type { Branch, PriceRow } from '@/lib/types';
+import type { Branch, BoxOffice, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import BoxOfficeSection from './BoxOfficeSection';
+// 빌드 시점에 읽어 정적 HTML에 그대로 굽는다. 브라우저 fetch로 두면 JS를 실행하지
+// 않는 LLM 크롤러에게 이 섹션이 통째로 비어 보인다. (BoxOfficeSection 주석 참고)
+import boxofficeData from '../../public/boxoffice.json';
+
+const boxoffice = boxofficeData as BoxOffice;
 
 /**
  * 이 라우트 하나가 두 가지 페이지를 모두 담당한다: 브랜드 허브(/cgv/)와 지점 상세
@@ -94,8 +100,18 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
   const others = meta.brands.filter((b) => b.key !== brandKey);
   const themeVars = brandThemeVars(brandKey) as CSSProperties;
 
+  // 화면의 빵부스러기와 같은 순서·같은 이름으로 구조화 데이터를 만든다.
+  const crumbs = [
+    { name: '홈', path: '/' },
+    { name: info.name, path: brandPath(info.segment) },
+  ];
+
   return (
     <div className="wrap page brand-themed" style={themeVars}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>
@@ -321,6 +337,17 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
     </div>
   );
 
+  // 지점 데이터로 자주 묻는 질문을 만든다. 값이 없는 항목은 아예 넣지 않는다 —
+  // "확인 필요" 같은 빈 답을 FAQ로 내보내면 검색·AI 답변에 쓸모없는 내용이 실린다.
+  const faqs = buildBranchFaqs(b, info.name);
+
+  const crumbs = [
+    { name: '홈', path: '/' },
+    { name: info.name, path: brandPath(info.segment) },
+    { name: b.sido, path: sidoPath(info.segment, b.sido) },
+    { name: b.name, path: branchPath(b) },
+  ];
+
   const theaterJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'MovieTheater',
@@ -340,7 +367,11 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
     <div className="wrap page brand-themed" style={themeVars}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(theaterJsonLd) }}
+        dangerouslySetInnerHTML={jsonLdScript(
+          theaterJsonLd,
+          breadcrumbJsonLd(crumbs),
+          ...(faqs.length > 0 ? [faqJsonLd(faqs)] : []),
+        )}
       />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
@@ -467,6 +498,23 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           </section>
           {scheduleBar}
         </>
+      )}
+
+      {/* FAQ는 화면에 반드시 보여야 한다 — 구글은 페이지에 없는 Q&A를 스키마로만
+          넣는 것을 정책 위반으로 본다. 위 본문에 흩어져 있는 사실을 질문 형태로
+          다시 모아, 음성검색·AI 답변이 그대로 인용할 수 있는 형태로 제공한다. */}
+      {faqs.length > 0 && (
+        <section className="section" aria-labelledby="faq">
+          <h2 id="faq">자주 묻는 질문</h2>
+          <dl className="faq-list">
+            {faqs.map((item) => (
+              <div className="faq-item" key={item.q}>
+                <dt>{item.q}</dt>
+                <dd>{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       )}
 
       {siblings.length > 0 && (
@@ -1292,7 +1340,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
   return (
     <>
-      <BoxOfficeSection />
+      <BoxOfficeSection data={boxoffice} />
 
       {priceGroups.length === 0 && (
         <section className="section" aria-labelledby="prices">
@@ -1445,6 +1493,81 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       )}
     </>
   );
+}
+
+/**
+ * 지점 페이지의 자주 묻는 질문을 실제 데이터에서 만든다.
+ *
+ * 원칙: 데이터가 없으면 그 질문 자체를 넣지 않는다. "확인이 필요합니다" 같은
+ * 빈 답변을 FAQ로 내보내면 음성검색·AI가 그 문장을 그대로 인용해버려서, 없느니만
+ * 못한 결과가 된다. 답변 문장은 본문에 이미 있는 사실만 다시 쓴다(새 주장 금지).
+ */
+function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }[] {
+  const faqs: { q: string; a: string }[] = [];
+  const full = `${b.name} ${brandName}`;
+
+  if (b.address) {
+    const tel = b.tel ? ` 전화번호는 ${formatTel(b.tel)}입니다.` : '';
+    faqs.push({
+      q: `${full}${subjectParticle(full)} 어디에 있나요?`,
+      a: `주소는 ${b.address}입니다.${tel}`,
+    });
+  }
+
+  // 관람료는 "일반(2D) + 일반 시간대 + 성인" 기준으로만 답한다 — 상영관·시간대별
+  // 요금이 수십 줄이라 전부 나열하면 답변으로 못 쓴다. 3사 모두 timeSlot '일반'을
+  // 표준 회차로 쓰는 것을 데이터에서 확인했다.
+  const rows = pricesOf(b.id);
+  const standard = rows.filter((r) => r.timeSlot === '일반' && r.adult != null);
+  const baseLabel = standard[0]?.label;
+  const wk = standard.find((r) => r.label === baseLabel && r.dayType === '평일');
+  const we = standard.find((r) => r.label === baseLabel && r.dayType === '주말');
+  if (wk?.adult != null || we?.adult != null) {
+    const parts = [
+      wk?.adult != null ? `평일 ${wk.adult.toLocaleString()}원` : null,
+      we?.adult != null ? `주말 ${we.adult.toLocaleString()}원` : null,
+    ].filter(Boolean);
+    faqs.push({
+      q: `${full} 관람료는 얼마인가요?`,
+      a: `${baseLabel} 성인 기준 ${parts.join(', ')}입니다. 상영관 종류와 시간대(모닝·브런치 등)에 따라 요금이 달라집니다.`,
+    });
+  }
+
+  // 주차는 "주차 요금" 카드 본문의 앞부분만 쓴다. 원문이 길고 예외 조항이 많아
+  // 통째로 넣으면 답변이 문단이 되어버린다.
+  const fee = buildParkingSections(b).find((s) => s.title === '주차 요금')?.body;
+  if (fee) {
+    const summary = fee
+      .split('\n')
+      .map((l) => l.replace(/^[-●•○★■ㆍ]\s*/, '').trim())
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(' ');
+    if (summary) {
+      faqs.push({
+        q: `${full} 주차 요금은 어떻게 되나요?`,
+        a: `${summary} 자세한 조건과 인증 방법은 위 주차 안내를 확인해주세요.`,
+      });
+    }
+  }
+
+  faqs.push({
+    q: `${full} 상영시간표는 어디서 확인하나요?`,
+    a: `실시간 상영시간표와 예매는 ${brandName} 공식 사이트에서 제공됩니다. 이 페이지의 '${full} 상영시간표 확인' 버튼을 누르면 해당 지점의 공식 시간표로 바로 이동합니다.`,
+  });
+
+  return faqs;
+}
+
+/**
+ * 앞 단어의 받침 유무에 따라 주격 조사 은/는을 고른다.
+ * 지점명+브랜드명이 통째로 들어오므로 마지막 글자만 본다. 영문으로 끝나는
+ * 경우(CGV=씨지비)는 3사 브랜드명 모두 모음으로 읽혀서 '는'이 맞다.
+ */
+function subjectParticle(word: string): '은' | '는' {
+  const code = word.charCodeAt(word.length - 1);
+  if (code >= 0xac00 && code <= 0xd7a3) return (code - 0xac00) % 28 === 0 ? '는' : '은';
+  return '는';
 }
 
 /** 0212345678 → 02-1234-5678 형태로 보기 좋게 */

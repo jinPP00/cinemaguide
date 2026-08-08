@@ -1340,3 +1340,33 @@ a.card:hover .brand-icon {
     animation: none !important;
   }
 }
+
+/* 지점 페이지 자주 묻는 질문 — 구조화 데이터(FAQPage)와 짝을 이루는 화면 표시.
+   스키마만 넣고 화면에 없으면 구글 정책 위반이라 반드시 함께 렌더링한다. */
+.faq-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faq-item {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.faq-item dt {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.faq-item dd {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
