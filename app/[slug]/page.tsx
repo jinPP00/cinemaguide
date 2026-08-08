@@ -116,49 +116,20 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
         <span className="badge badge-brand">특별관 운영 {specialCount}곳</span>
       </div>
 
-      {/* 제목에 "상영시간표"를 넣은 만큼 본문도 그 검색 의도를 실제로 해결해야 한다.
-          실시간 시간표는 공식 사이트가 제공한다는 점을 숨기지 않고 먼저 밝히고,
-          대신 이 사이트가 보태는 것(방문 전 교통·주차·요금 확인)을 흐름으로 안내한다. */}
-      <section className="section" aria-labelledby="how-schedule">
-        <h2 id="how-schedule">{info.name} 상영시간표 확인 방법</h2>
-        <p className="lead" style={{ marginTop: 12 }}>
-          실시간 상영시간표와 예매는 {info.name} 공식 사이트에서 제공됩니다. 이 사이트에서는
-          방문할 지점을 먼저 정하고, 가는 길과 주차 조건, 관람료를 미리 확인한 뒤 공식
-          상영시간표로 바로 이동할 수 있습니다.
-        </p>
-        <ol className="how-steps">
-          <li>
-            <span className="how-num">1</span>
-            <div>
-              <div className="how-title">방문할 지점을 고르세요</div>
-              <p className="how-desc">
-                아래 지역별 목록에서 전국 {info.count}개 {info.name} 지점 중 가까운 곳을 찾을 수
-                있습니다.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span className="how-num">2</span>
-            <div>
-              <div className="how-title">가는 길과 요금을 미리 확인하세요</div>
-              <p className="how-desc">
-                지점 페이지에서 지하철·버스 노선, 주차 무료 시간과 초과 요금, 상영관별 관람료를
-                한 화면에서 볼 수 있습니다.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span className="how-num">3</span>
-            <div>
-              <div className="how-title">공식 상영시간표로 이동하세요</div>
-              <p className="how-desc">
-                각 지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 해당 지점의 공식
-                시간표 페이지로 바로 연결됩니다.
-              </p>
-            </div>
-          </li>
-        </ol>
-      </section>
+      {/* 시도 바로가기 — 지점 목록이 지역 순서라 먼 지역 사용자는 한참 스크롤해야 했다.
+          첫 화면에서 한 번에 원하는 시도로 넘어가게 하는 퀵링크 겸, 시도 페이지로 가는
+          내부 링크를 늘리는 역할도 한다. */}
+      <nav className="sido-quicklinks" aria-label={`${info.name} 시도별 바로가기`}>
+        <ul className="chip-list">
+          {sidos.map((sido) => (
+            <li key={sido}>
+              <Link className="chip" href={sidoPath(info.segment, sido)}>
+                {sido}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <section className="section" aria-labelledby="branch-list">
         <h2 id="branch-list">전국 {info.name} 영화관 지역별 안내</h2>
@@ -205,6 +176,52 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
             );
           })}
         </div>
+      </section>
+
+      {/* 제목에 "상영시간표"를 넣은 만큼 본문도 그 검색 의도를 실제로 해결해야 한다.
+          실시간 시간표는 공식 사이트가 제공한다는 점을 숨기지 않고 밝히고, 대신 이
+          사이트가 보태는 것(방문 전 교통·주차·요금 확인)을 흐름으로 안내한다.
+          위치는 지점 목록 "아래" — 위에 두면 목록이 첫 화면 밖으로 밀려나고,
+          1단계 내용이 "목록에서 지점을 고르세요"라 목록을 본 뒤 읽는 게 순서에 맞다. */}
+      <section className="section" aria-labelledby="how-schedule">
+        <h2 id="how-schedule">{info.name} 상영시간표 확인 방법</h2>
+        <p className="lead" style={{ marginTop: 12 }}>
+          실시간 상영시간표와 예매는 {info.name} 공식 사이트에서 제공됩니다. 이 사이트에서는
+          방문할 지점을 먼저 정하고, 가는 길과 주차 조건, 관람료를 미리 확인한 뒤 공식
+          상영시간표로 바로 이동할 수 있습니다.
+        </p>
+        <ol className="how-steps">
+          <li>
+            <span className="how-num">1</span>
+            <div>
+              <div className="how-title">방문할 지점을 고르세요</div>
+              <p className="how-desc">
+                위 지역별 목록에서 전국 {info.count}개 {info.name} 지점 중 가까운 곳을 찾을 수
+                있습니다.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span className="how-num">2</span>
+            <div>
+              <div className="how-title">가는 길과 요금을 미리 확인하세요</div>
+              <p className="how-desc">
+                지점 페이지에서 지하철·버스 노선, 주차 무료 시간과 초과 요금, 상영관별 관람료를
+                한 화면에서 볼 수 있습니다.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span className="how-num">3</span>
+            <div>
+              <div className="how-title">공식 상영시간표로 이동하세요</div>
+              <p className="how-desc">
+                각 지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 해당 지점의 공식
+                시간표 페이지로 바로 연결됩니다.
+              </p>
+            </div>
+          </li>
+        </ol>
       </section>
 
       {/* 브랜드 설명 — 긴 문단 대신 3개 요약 카드로 (가이드 3.1, 스캔하기 쉽게) */}
