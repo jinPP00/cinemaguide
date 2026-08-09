@@ -18,7 +18,8 @@ import {
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { SITE } from '@/lib/site';
-import { breadcrumbJsonLd, faqJsonLd, jsonLdScript } from '@/lib/jsonld';
+import { breadcrumbJsonLd, faqJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt, branchLastModified } from '@/lib/dates';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
 import { IconClapper } from '../icons';
@@ -110,7 +111,10 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
     <div className="wrap page brand-themed" style={themeVars}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd(crumbs),
+          webPageJsonLd(brandPath(info.segment), dataGeneratedAt.toISOString()),
+        )}
       />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
@@ -370,6 +374,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         dangerouslySetInnerHTML={jsonLdScript(
           theaterJsonLd,
           breadcrumbJsonLd(crumbs),
+          webPageJsonLd(branchPath(b), branchLastModified(b.checkedAt).toISOString()),
           ...(faqs.length > 0 ? [faqJsonLd(faqs)] : []),
         )}
       />

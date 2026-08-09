@@ -41,6 +41,24 @@ export function faqJsonLd(qa: { q: string; a: string }[]) {
   };
 }
 
+/**
+ * WebPage 구조화 데이터 — dateModified 신호 전용.
+ *
+ * MovieTheater(schema.org LocalBusiness 계열)에는 dateModified가 표준 속성으로
+ * 없어서, "이 URL이 실제로 언제 바뀌었는지"를 별도 WebPage 객체로 붙인다.
+ * sitemap.xml의 lastmod와 반드시 같은 값을 넘겨써야 신호가 일관된다
+ * (lib/data.ts나 각 page.tsx에서 sitemap과 동일한 날짜 계산을 재사용할 것).
+ */
+export function webPageJsonLd(path: string, dateModified: string) {
+  const base = SITE.url.replace(/\/$/, '');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    url: `${base}${path}`,
+    dateModified,
+  };
+}
+
 /** 여러 JSON-LD 객체를 <script> 하나에 배열로 담아 출력할 때 쓴다. */
 export function jsonLdScript(...objects: object[]) {
   return { __html: JSON.stringify(objects.length === 1 ? objects[0] : objects) };

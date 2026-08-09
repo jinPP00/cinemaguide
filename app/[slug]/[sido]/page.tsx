@@ -12,7 +12,8 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
-import { breadcrumbJsonLd, jsonLdScript } from '@/lib/jsonld';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import { brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 
@@ -79,7 +80,10 @@ export default async function SidoPage({
     <div className="wrap page brand-themed" style={themeVars}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd(crumbs),
+          webPageJsonLd(sidoPath(info.segment, sido), dataGeneratedAt.toISOString()),
+        )}
       />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
