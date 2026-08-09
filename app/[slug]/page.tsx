@@ -100,6 +100,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
   const specialCount = all.filter((b) => b.specialScreens.length > 0).length;
   const others = meta.brands.filter((b) => b.key !== brandKey);
   const themeVars = brandThemeVars(brandKey) as CSSProperties;
+  const faqs = buildBrandFaqs(brandKey, info.name, info.count, sidos.length, specialCount);
 
   // 화면의 빵부스러기와 같은 순서·같은 이름으로 구조화 데이터를 만든다.
   const crumbs = [
@@ -114,6 +115,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
         dangerouslySetInnerHTML={jsonLdScript(
           breadcrumbJsonLd(crumbs),
           webPageJsonLd(brandPath(info.segment), dataGeneratedAt.toISOString()),
+          ...(faqs.length > 0 ? [faqJsonLd(faqs)] : []),
         )}
       />
       <nav className="crumbs" aria-label="현재 위치">
@@ -243,6 +245,25 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
           </li>
         </ol>
       </section>
+
+      {/* 브랜드 단위 FAQ. "{브랜드} 상영시간표" 같은 헤드 키워드는 공식 사이트가
+          사실상 독점하지만, "관람료는 얼마"·"특별관 뭐 있나"·"몇 개 지점" 같은
+          조합형 질문은 공식 사이트가 한 페이지로 정리해두지 않아 우리가 답할 수
+          있다. 음성검색·AI 답변이 인용하기 좋은 형태이기도 하다.
+          답변은 전부 보유 데이터에서 집계한 사실만 쓴다(추정·전언 금지). */}
+      {faqs.length > 0 && (
+        <section className="section" aria-labelledby="brand-faq">
+          <h2 id="brand-faq">{info.name} 자주 묻는 질문</h2>
+          <dl className="faq-list">
+            {faqs.map((item) => (
+              <div className="faq-item" key={item.q}>
+                <dt>{item.q}</dt>
+                <dd>{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       {/* 브랜드 설명 — 긴 문단 대신 3개 요약 카드로 (가이드 3.1, 스캔하기 쉽게) */}
       <section className="section" aria-labelledby="brand-guide">
@@ -1498,6 +1519,82 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       )}
     </>
   );
+}
+
+/** 브랜드별 "표준 일반 2D" 요금표 라벨. 이 라벨의 '일반' 회차 성인 요금이
+ *  각 브랜드의 기본 관람료다(특별관·리클라이너 등을 섞으면 대표값이 왜곡된다). */
+const STANDARD_PRICE_LABEL: Record<string, string> = {
+  cgv: '일반(2D)',
+  lotte: '2D 일반석',
+  megabox: '일반 2D',
+};
+
+/** 배열에서 가장 많이 등장한 값(최빈값). 평균은 소수 극단값(프리미엄관 5만원 등)에
+ *  끌려가므로 "대부분의 지점이 얼마인가"를 답할 때는 최빈값이 맞다. */
+function mode(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const counts = new Map<number, number>();
+  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+/**
+ * 브랜드 허브의 자주 묻는 질문을 보유 데이터에서 집계해 만든다.
+ * 지점 FAQ와 같은 원칙 — 데이터로 답할 수 없는 질문은 만들지 않는다.
+ */
+function buildBrandFaqs(
+  brandKey: Parameters<typeof brandMeta>[0],
+  brandName: string,
+  branchCount: number,
+  sidoCount: number,
+  specialCount: number,
+): { q: string; a: string }[] {
+  const faqs: { q: string; a: string }[] = [];
+  const list = branchesOfBrand(brandKey);
+
+  faqs.push({
+    q: `${brandName} 상영시간표는 어디서 확인하나요?`,
+    a: `실시간 상영시간표와 예매는 ${brandName} 공식 사이트에서 제공됩니다. 이 사이트에서 방문할 지점을 고르면, 해당 지점 페이지의 '상영시간표 확인' 버튼으로 그 지점의 공식 시간표 페이지로 바로 이동할 수 있습니다.`,
+  });
+
+  faqs.push({
+    q: `${brandName}는 전국에 몇 개 지점이 있나요?`,
+    a: `${sidoCount}개 시도에 걸쳐 전국 ${branchCount}개 지점이 있습니다. 이 중 ${specialCount}곳이 특별관을 운영합니다.`,
+  });
+
+  // 관람료 — 표준 2D·일반 회차·성인 기준 최빈값으로 답한다.
+  const label = STANDARD_PRICE_LABEL[brandKey];
+  const weekday: number[] = [];
+  const weekend: number[] = [];
+  for (const b of list) {
+    for (const r of pricesOf(b.id)) {
+      if (r.label !== label || r.timeSlot !== '일반' || r.adult == null) continue;
+      (r.dayType === '평일' ? weekday : weekend).push(r.adult);
+    }
+  }
+  const wk = mode(weekday);
+  const we = mode(weekend);
+  if (wk != null && we != null) {
+    faqs.push({
+      q: `${brandName} 관람료는 얼마인가요?`,
+      a: `일반 2D 성인 기준 대부분의 지점이 평일 ${wk.toLocaleString()}원, 주말 ${we.toLocaleString()}원입니다. 지점과 상영관 종류, 시간대(모닝·조조 등)에 따라 달라지므로 각 지점 페이지의 관람료 표를 확인해주세요.`,
+    });
+  }
+
+  // 특별관 — 보유 지점이 많은 순으로 상위 4종.
+  const screens = new Map<string, number>();
+  for (const b of list) {
+    for (const s of b.specialScreens) screens.set(s, (screens.get(s) ?? 0) + 1);
+  }
+  const top = [...screens.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
+  if (top.length > 0) {
+    faqs.push({
+      q: `${brandName} 특별관은 어떤 것이 있나요?`,
+      a: `${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등을 운영합니다. 특별관은 일반관보다 관람료가 높고 지점마다 보유 여부가 달라, 방문 전 지점 페이지에서 확인하는 것이 좋습니다.`,
+    });
+  }
+
+  return faqs;
 }
 
 /**
