@@ -26,12 +26,36 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Organization은 "이 사이트를 누가 운영하는가"를 기계가 읽게 하는 신호다.
+ * 검색엔진의 리치결과보다도 AI 검색(GEO)에서 더 중요하다 — LLM이 답변에
+ * 이 사이트를 인용할 때 "출처가 명확한 정보원인가"를 판단하는 근거가 된다.
+ * SITE.operator/email은 이미 about·contact·privacy·terms 페이지에 공개돼
+ * 있는 값이라 여기서 새로 노출되는 정보는 없다.
+ */
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${SITE.url}/#organization`,
+  name: SITE.operator,
+  url: SITE.url,
+  description: SITE.description,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: SITE.email,
+    contactType: 'customer support',
+  },
+};
+
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: SITE.name,
   url: SITE.url,
   description: SITE.description,
+  // Organization을 별 객체로 참조만 한다(@id) — 이름 문자열을 중복해서 넣으면
+  // 두 개체를 같은 실체로 인식 못 할 수 있다.
+  publisher: { '@id': `${SITE.url}/#organization` },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -54,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             각 지점 상세 페이지에서 따로 넣는다. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, organizationJsonLd]) }}
         />
       </head>
       <body>
