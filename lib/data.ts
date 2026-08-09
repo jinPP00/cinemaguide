@@ -75,15 +75,7 @@ export function hasFilledContent(_branch: Branch): boolean {
  * 한글이 들어가므로 링크는 항상 이 함수로만 만든다.
  * 직접 문자열을 조합하면 인코딩 형태가 섞여 중복 URL이 생길 수 있다. (기획서 6.2)
  * ------------------------------------------------------------------ */
-export function brandPath(segment: string): string {
-  return `/${encodeURIComponent(segment)}/`;
-}
-
-export function sidoPath(segment: string, sido: string): string {
-  return `/${encodeURIComponent(segment)}/${encodeURIComponent(sido)}/`;
-}
-
-/** 지점 상세 페이지는 사이트 최상위에 평탄화된 URL을 쓴다: /{시도}{지점명}-{브랜드}/ */
-export function branchPath(branch: Branch): string {
-  return `/${encodeURIComponent(branch.pageSlug)}/`;
-}
+// 경로 헬퍼는 lib/paths.ts로 분리했다(클라이언트 번들에 데이터가 딸려가는 것을
+// 막기 위해서 — 이유는 그 파일 주석 참고). 서버 쪽 기존 import가 깨지지 않도록
+// 여기서 그대로 재export 한다.
+export { brandPath, sidoPath, branchPath } from './paths';

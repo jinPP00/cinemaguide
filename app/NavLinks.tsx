@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { brandPath } from '@/lib/data';
+// 클라이언트 컴포넌트이므로 '@/lib/data'가 아니라 '@/lib/paths'에서 가져온다 —
+// data.ts를 import하면 branches.json·prices.json 전체가 클라이언트 번들에
+// 딸려 들어간다(lib/paths.ts 주석 참고).
+import { brandPath } from '@/lib/paths';
 import { brandThemeVars } from '@/lib/colors';
 import type { BrandKey } from '@/lib/types';
 import type { CSSProperties } from 'react';
