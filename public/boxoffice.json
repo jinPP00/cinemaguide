@@ -1,15 +1,45 @@
 {
-  "targetDate": "20260803",
-  "fetchedAt": "2026-08-04T16:35:04.710Z",
+  "targetDate": "20260809",
+  "fetchedAt": "2026-08-10T01:50:27.296Z",
   "movies": [
     {
       "rank": 1,
+      "movieCd": "20250654",
+      "name": "오디세이",
+      "openDate": "2026-08-05",
+      "audienceToday": 497581,
+      "audienceTotal": 1874863,
+      "salesShare": 44.9,
+      "directors": [
+        "크리스토퍼 놀란"
+      ],
+      "actors": [
+        "맷 데이먼",
+        "톰 홀랜드",
+        "앤 해서웨이",
+        "로버트 패틴슨",
+        "젠데이아 콜먼"
+      ],
+      "genres": [
+        "액션",
+        "드라마",
+        "어드벤처"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 172,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033591.jpg"
+    },
+    {
+      "rank": 2,
       "movieCd": "20262770",
       "name": "스파이더맨: 브랜드 뉴 데이",
       "openDate": "2026-07-29",
-      "audienceToday": 401785,
-      "audienceTotal": 3785903,
-      "salesShare": 80.5,
+      "audienceToday": 463933,
+      "audienceTotal": 5916427,
+      "salesShare": 39.6,
       "directors": [
         "데스틴 다니엘 크리튼"
       ],
@@ -33,13 +63,35 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPF033548.jpg"
     },
     {
-      "rank": 2,
+      "rank": 3,
+      "movieCd": "20262381",
+      "name": "사랑의 하츄핑: 고래보석의 전설",
+      "openDate": "2026-08-05",
+      "audienceToday": 123565,
+      "audienceTotal": 433808,
+      "salesShare": 9.7,
+      "directors": [
+        "김수훈"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 105,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPK026057.jpg"
+    },
+    {
+      "rank": 4,
       "movieCd": "20233219",
       "name": "호프",
       "openDate": "2026-07-15",
-      "audienceToday": 63927,
-      "audienceTotal": 4174472,
-      "salesShare": 11.9,
+      "audienceToday": 32227,
+      "audienceTotal": 4393885,
+      "salesShare": 2.8,
       "directors": [
         "나홍진"
       ],
@@ -63,109 +115,12 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/43/tn_DPK025867.jpg"
     },
     {
-      "rank": 3,
-      "movieCd": "20261784",
-      "name": "미니언즈 & 몬스터즈",
-      "openDate": "2026-07-15",
-      "audienceToday": 12454,
-      "audienceTotal": 726394,
-      "salesShare": 2.2,
-      "directors": [
-        "피에르 꼬팽"
-      ],
-      "actors": [],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 89,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPF033536.jpg"
-    },
-    {
-      "rank": 4,
-      "movieCd": "20259781",
-      "name": "토이 스토리 5",
-      "openDate": "2026-06-17",
-      "audienceToday": 7454,
-      "audienceTotal": 2919664,
-      "salesShare": 1.4,
-      "directors": [
-        "앤드류 스탠튼"
-      ],
-      "actors": [
-        "톰 행크스",
-        "팀 알렌",
-        "조앤 쿠삭",
-        "그레타 리"
-      ],
-      "genres": [
-        "애니메이션",
-        "어드벤처",
-        "코미디"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 101,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/37/tn_DPF033060.jpg"
-    },
-    {
       "rank": 5,
-      "movieCd": "20259946",
-      "name": "모아나",
-      "openDate": "2026-07-08",
-      "audienceToday": 6986,
-      "audienceTotal": 1006933,
-      "salesShare": 1.3,
-      "directors": [
-        "토마스 케일"
-      ],
-      "actors": [
-        "드웨인 존슨",
-        "캐서린 라가이아"
-      ],
-      "genres": [
-        "어드벤처",
-        "액션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 115,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/33/tn_DPF032800.jpg"
-    },
-    {
-      "rank": 6,
-      "movieCd": "20264148",
-      "name": "어떻게 해야 했을까?",
-      "openDate": "2026-07-29",
-      "audienceToday": 3147,
-      "audienceTotal": 27155,
-      "salesShare": 0.6,
-      "directors": [],
-      "actors": [],
-      "genres": [
-        "다큐멘터리"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 101,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPB001979.jpg"
-    },
-    {
-      "rank": 7,
       "movieCd": "20262902",
       "name": "다윗",
       "openDate": "2026-07-10",
-      "audienceToday": 3085,
-      "audienceTotal": 266434,
+      "audienceToday": 8343,
+      "audienceTotal": 289351,
       "salesShare": 0.6,
       "directors": [
         "필 커닝햄",
@@ -190,84 +145,123 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPF033233.jpg"
     },
     {
-      "rank": 8,
-      "movieCd": "20242402",
-      "name": "눈동자",
-      "openDate": "2026-06-24",
-      "audienceToday": 1489,
-      "audienceTotal": 1538864,
-      "salesShare": 0.3,
+      "rank": 6,
+      "movieCd": "20261784",
+      "name": "미니언즈 & 몬스터즈",
+      "openDate": "2026-07-15",
+      "audienceToday": 5014,
+      "audienceTotal": 763307,
+      "salesShare": 0.4,
       "directors": [
-        "염지호"
-      ],
-      "actors": [
-        "신민아",
-        "김남희",
-        "이승룡",
-        "김영아",
-        "박경진"
-      ],
-      "genres": [
-        "스릴러"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 105,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPK025634.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20264665",
-      "name": "드림 애니멀즈: 더무비",
-      "openDate": "2026-07-24",
-      "audienceToday": 845,
-      "audienceTotal": 42841,
-      "salesShare": 0.1,
-      "directors": [
-        "타케키요 히토시"
+        "피에르 꼬팽"
       ],
       "actors": [],
       "genres": [
         "애니메이션"
       ],
       "watchGrade": "전체관람가",
-      "runtime": 90,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/46/tn_DPF033413.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20250654",
-      "name": "오디세이",
-      "openDate": "2026-08-05",
-      "audienceToday": 678,
-      "audienceTotal": 1302,
-      "salesShare": 0.1,
-      "directors": [
-        "크리스토퍼 놀란"
-      ],
-      "actors": [
-        "맷 데이먼",
-        "톰 홀랜드",
-        "앤 해서웨이",
-        "로버트 패틴슨",
-        "젠데이아 콜먼"
-      ],
-      "genres": [
-        "액션",
-        "드라마",
-        "어드벤처"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 172,
+      "runtime": 89,
       "nations": [
         "미국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033591.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPF033536.jpg"
+    },
+    {
+      "rank": 7,
+      "movieCd": "20264635",
+      "name": "명탐정 코난: 하이웨이의 타천사",
+      "openDate": "2026-08-12",
+      "audienceToday": 4473,
+      "audienceTotal": 8828,
+      "salesShare": 0.5,
+      "directors": [],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 109,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033598.jpg"
+    },
+    {
+      "rank": 8,
+      "movieCd": "20264148",
+      "name": "어떻게 해야 했을까?",
+      "openDate": "2026-07-29",
+      "audienceToday": 3978,
+      "audienceTotal": 49728,
+      "salesShare": 0.3,
+      "directors": [],
+      "actors": [],
+      "genres": [
+        "다큐멘터리"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 101,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPB001979.jpg"
+    },
+    {
+      "rank": 9,
+      "movieCd": "20255484",
+      "name": "오케이 마담2",
+      "openDate": "2026-08-12",
+      "audienceToday": 2382,
+      "audienceTotal": 11783,
+      "salesShare": 0.2,
+      "directors": [
+        "이철하"
+      ],
+      "actors": [
+        "엄정화",
+        "박성웅",
+        "이상윤",
+        "배정남",
+        "박진주"
+      ],
+      "genres": [
+        "코미디"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 108,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPK026153.jpg"
+    },
+    {
+      "rank": 10,
+      "movieCd": "20259781",
+      "name": "토이 스토리 5",
+      "openDate": "2026-06-17",
+      "audienceToday": 1907,
+      "audienceTotal": 2939376,
+      "salesShare": 0.2,
+      "directors": [
+        "앤드류 스탠튼"
+      ],
+      "actors": [
+        "톰 행크스",
+        "팀 알렌",
+        "조앤 쿠삭",
+        "그레타 리"
+      ],
+      "genres": [
+        "애니메이션",
+        "어드벤처",
+        "코미디"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 101,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/37/tn_DPF033060.jpg"
     }
   ]
 }
