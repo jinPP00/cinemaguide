@@ -504,6 +504,7 @@ function main() {
         facility: src.facility ?? null,
         mapLink: src.mapLink ?? null,
         status: isClosed ? '휴관' : '운영중',
+        closingNotice: null,
         hasPrices: priceRows.length > 0,
         officialUrl: src.officialUrl,
         scheduleUrl: src.scheduleUrl,
@@ -549,6 +550,18 @@ function main() {
     },
     warnings,
   };
+
+  /* 수동 보정 -------------------------------------------------------- *
+   * 폐점 공지처럼 원본 크롤링에 없는 시급한 정보를 지점 id로 병합한다.
+   * data/manual-overrides.json은 이 스크립트가 덮어쓰지 않으므로 npm run data를
+   * 다시 돌려도 유지된다. */
+  const overridesPath = join(OUT_DIR, 'manual-overrides.json');
+  if (existsSync(overridesPath)) {
+    const overrides = JSON.parse(readFileSync(overridesPath, 'utf-8'));
+    for (const b of branches) {
+      if (overrides[b.id]) Object.assign(b, overrides[b.id]);
+    }
+  }
 
   writeFileSync(join(OUT_DIR, 'branches.json'), JSON.stringify(branches, null, 2), 'utf-8');
   writeFileSync(join(OUT_DIR, 'prices.json'), JSON.stringify(pricesById, null, 2), 'utf-8');

@@ -431,6 +431,12 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </p>
       )}
 
+      {b.closingNotice && (
+        <p className="notice-closed">
+          <strong>영업 종료 안내</strong> — {b.closingNotice}
+        </p>
+      )}
+
       <section className="section" aria-labelledby="basic">
         <h2 id="basic">기본 정보</h2>
         <dl className="info-list">

@@ -51,6 +51,8 @@ export interface Branch {
   facility: Facility | null;
   mapLink: string | null;
   status: '운영중' | '휴관';
+  /** 폐점 예정 등 시급한 수동 공지. 크롤링 데이터에 없어 data/manual-overrides.json으로만 채워진다. */
+  closingNotice: string | null;
   hasPrices: boolean;
   officialUrl: string;
   /** 상영시간표 CTA 목적지 (기획서 3.1) */
