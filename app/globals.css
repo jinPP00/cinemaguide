@@ -1369,3 +1369,26 @@ a.card:hover .brand-icon {
   color: var(--ink-soft);
   line-height: 1.65;
 }
+
+/* 모바일에서는 보조 정보도 축약하지 않고 충분한 글자와 터치 높이를 확보한다. */
+@media (max-width: 640px) {
+  body { font-size: 17px; line-height: 1.7; }
+  .wrap { padding-inline: 18px; }
+  .chip,
+  .cta-button,
+  .map-button,
+  .schedule-button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.94rem; }
+  .nav a { display: inline-flex; min-height: 44px; align-items: center; }
+  .crumbs { font-size: 0.9rem; }
+  .crumbs a,
+  .sido-head h4 a { display: inline-flex; min-height: 44px; align-items: center; }
+  .chip { padding: 0 14px; }
+  .card .card-sub,
+  .how-desc,
+  .bh-desc,
+  .faq-item dd { font-size: 0.94rem; }
+  .card .card-more { font-size: 0.92rem; }
+  .footer-links a { display: inline-flex; min-height: 44px; align-items: center; font-size: 0.92rem; }
+  .disclaimer { font-size: 0.92rem; line-height: 1.75; }
+  .footer-copyright { font-size: 0.9rem; }
+}
