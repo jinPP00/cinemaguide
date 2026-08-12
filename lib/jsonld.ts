@@ -22,26 +22,6 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
 }
 
 /**
- * FAQPage 구조화 데이터.
- *
- * 주의: 구글은 "페이지에 실제로 보이는 Q&A"만 허용한다. 화면에 없는 내용을
- * 스키마로만 넣으면 정책 위반이므로, 반드시 화면에 렌더링하는 FAQ와 같은
- * 배열을 넘겨야 한다. (구글 리치결과 노출 자체는 2023년부터 공공·의료 사이트로
- * 제한됐지만, 네이버·Bing·음성검색·LLM 파싱에는 여전히 유효하다.)
- */
-export function faqJsonLd(qa: { q: string; a: string }[]) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: qa.map((item) => ({
-      '@type': 'Question',
-      name: item.q,
-      acceptedAnswer: { '@type': 'Answer', text: item.a },
-    })),
-  };
-}
-
-/**
  * WebPage 구조화 데이터 — dateModified 신호 전용.
  *
  * MovieTheater(schema.org LocalBusiness 계열)에는 dateModified가 표준 속성으로

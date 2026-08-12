@@ -1341,8 +1341,7 @@ a.card:hover .brand-icon {
   }
 }
 
-/* 지점 페이지 자주 묻는 질문 — 구조화 데이터(FAQPage)와 짝을 이루는 화면 표시.
-   스키마만 넣고 화면에 없으면 구글 정책 위반이라 반드시 함께 렌더링한다. */
+/* 지점 페이지 자주 묻는 질문 화면 표시. */
 .faq-list {
   margin-top: 16px;
   display: flex;
