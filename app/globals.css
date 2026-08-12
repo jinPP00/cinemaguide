@@ -1385,8 +1385,11 @@ a.card:hover .brand-icon {
   .chip { padding: 0 14px; }
   .card .card-sub,
   .how-desc,
-  .bh-desc,
+  .brand-highlights .bh-desc,
   .faq-item dd { font-size: 0.94rem; }
+  .bo-detail-empty,
+  .bo-detail-rows > div { font-size: 0.9rem; }
+  .bo-credit { font-size: 0.88rem; }
   .card .card-more { font-size: 0.92rem; }
   .footer-links a { display: inline-flex; min-height: 44px; align-items: center; font-size: 0.92rem; }
   .disclaimer { font-size: 0.92rem; line-height: 1.75; }
