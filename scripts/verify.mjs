@@ -129,7 +129,11 @@ check(
 const cgvWithTel = branches.filter((b) => b.brand === 'cgv' && b.tel).length;
 check('CGV 전화번호 보유', cgvWithTel > 0, `${cgvWithTel}건`);
 
-const shortTel = branches.filter((b) => b.tel && b.tel.replace(/\D/g, '').length < 9);
+// "1544-1122"처럼 앞자리가 15로 시작하는 8자리는 지역번호 없는 전국대표번호
+// 형식이라 정상이다 — 지역번호만 남은 결함(예: "031")과는 다르다.
+const shortTel = branches.filter(
+  (b) => b.tel && b.tel.replace(/\D/g, '').length < 9 && !/^15\d{2}-?\d{4}$/.test(b.tel),
+);
 check(
   '전화번호가 지역번호만 있는 경우 없음(9자리 미만)',
   shortTel.length === 0,
