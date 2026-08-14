@@ -3,8 +3,9 @@ name: 박스오피스 순위 갱신
 # 매주 KOBIS 일별 박스오피스를 조회해 public/boxoffice.json을 갱신한다.
 # 순위(영화 구성·순서)가 저장된 값과 같으면 fetch-boxoffice.mjs가 파일을 건드리지
 # 않으므로, 이 워크플로도 실제로 바뀐 게 있을 때만 커밋·푸시한다.
-# main에 푸시되면 Cloudflare가 저장소 연동을 통해 자동으로 재빌드·배포한다 —
-# 여기서 Cloudflare API를 직접 호출하지 않는 이유.
+# main에 푸시되면 deploy-cloudflare.yml이 이어서 빌드·배포한다(2026-08-14 확인:
+# Cloudflare git 연동 자동배포는 없음 — 이 프로젝트는 wrangler deploy로만 배포됨).
+# 그래서 아래 커밋에 [skip ci]를 쓰면 안 된다 — 배포 워크플로까지 같이 건너뛴다.
 #
 # 러너에서 KOBIS 연결이 자주 타임아웃된다. 스크립트가 지수 백오프로 5회
 # 재시도하고, 그래도 안 되면 기존 데이터를 유지한 채 exit 0으로 끝난다
@@ -44,6 +45,6 @@ jobs:
             echo "순위 변동 없음 — 커밋 생략"
           else
             git add public/boxoffice.json
-            git commit -m "박스오피스 순위 자동 갱신 [skip ci]"
+            git commit -m "박스오피스 순위 자동 갱신"
             git push
           fi
