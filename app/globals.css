@@ -1407,4 +1407,8 @@ a.card:hover .brand-icon {
   /* 브랜드 허브·지역목록 상단 뱃지("전국 177개 지점" 등) — 0.76rem(12.2px)로
      이 페이지들에서 가장 작은 텍스트였다. */
   .badge { font-size: 0.85rem; padding: 3px 10px; }
+
+  /* 박스오피스 순위의 누적 관객수 — 0.77rem(12.3px)로 425개 지점 페이지
+     전수 재점검 중 가장 작은 텍스트였다. */
+  .bo-audience { font-size: 0.86rem; }
 }
