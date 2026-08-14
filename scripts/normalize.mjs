@@ -492,7 +492,11 @@ function main() {
         sido,
         sigungu,
         address,
-        tel: src.tel,
+        // CGV 공식 사이트는 더 이상 지점별 전화번호를 노출하지 않는다(2026-08-14
+        // 확인, 여러 지점 실측). 크롤링된 개별 번호는 구버전 사이트에서 긁어온
+        // 낡은 값이라 담당자 내선번호가 섞여 실제 업무 혼선 민원이 들어온 사례가
+        // 있어(광주금남로) 전 지점을 CGV 전국 대표번호로 통일한다.
+        tel: brand === 'cgv' ? '1544-1122' : src.tel,
         lat: src.lat,
         lng: src.lng,
         specialScreens,
