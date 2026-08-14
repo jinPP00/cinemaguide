@@ -1394,4 +1394,13 @@ a.card:hover .brand-icon {
   .footer-links a { display: inline-flex; min-height: 44px; align-items: center; font-size: 0.92rem; }
   .disclaimer { font-size: 0.92rem; line-height: 1.75; }
   .footer-copyright { font-size: 0.9rem; }
+
+  /* 관람료 표 — 실측 결과 모바일에서 0.74~0.82rem(11.8~13.1px)까지 떨어져
+     425개 지점 페이지의 핵심 정보인데도 가장 읽기 어려운 부분이었다. */
+  .price-mini { font-size: 0.92rem; }
+  .price-mini th, .price-mini td { padding: 7px 4px; }
+  .price-mini thead th { font-size: 0.85rem; }
+  .price-youth { font-size: 0.86rem; }
+  .price-card-title { font-size: 0.98rem; }
+  .tb-route { font-size: 0.86rem; }
 }
