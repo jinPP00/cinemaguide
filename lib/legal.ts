@@ -9,11 +9,11 @@ export const LEGAL = {
   /** 정책 시행일 */
   effectiveDate: '2026-07-26',
   /** 마지막 개정일 */
-  updatedDate: '2026-07-26',
+  updatedDate: '2026-08-14',
 
   /** 현재 실제로 사용 중인 도구 — 도입 시 true로 바꾼다 */
   usesAnalytics: false,
-  usesAds: false,
+  usesAds: true,
   usesContactForm: false,
 
   /** 호스팅 (개인정보 국외 이전 고지에 필요) */
@@ -29,9 +29,17 @@ export const LEGAL = {
     country: '미국',
     role: '문의 이메일 수신·보관',
   },
+
+  /** 광고 (Google AdSense) */
+  adsProvider: {
+    name: 'Google LLC (AdSense)',
+    country: '미국',
+    role: '광고 게재 및 맞춤 광고 제공',
+  },
 } as const;
 
 /** 정책 문서 개정 이력 — 변경할 때마다 위에 추가한다 */
 export const REVISIONS = [
   { date: '2026-07-26', note: '최초 시행' },
+  { date: '2026-08-14', note: 'Google AdSense 광고 도입' },
 ];

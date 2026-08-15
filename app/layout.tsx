@@ -80,6 +80,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, organizationJsonLd]) }}
         />
+        {/* Google AdSense 사이트 연결 코드. public/_headers의 CSP에 관련 도메인을
+            같이 허용해뒀다 — CSP 갱신 없이 이 스크립트만 추가하면 브라우저가 막는다.
+            실제 광고 게재 시작 시 lib/legal.ts의 usesAds가 true인 상태를 유지할 것
+            (개인정보처리방침 내용이 이 플래그로 갈리므로 실제와 반드시 일치시킨다). */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4378510721922617"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <a className="skip" href="#main">

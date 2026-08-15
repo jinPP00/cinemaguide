@@ -144,6 +144,14 @@ export default function PrivacyPage() {
                 <td>이메일 주소, 문의 내용</td>
                 <td>{LEGAL.emailProvider.country}</td>
               </tr>
+              {LEGAL.usesAds && (
+                <tr>
+                  <td>{LEGAL.adsProvider.name}</td>
+                  <td>{LEGAL.adsProvider.role}</td>
+                  <td>쿠키 식별자, IP 주소, 광고 상호작용 정보</td>
+                  <td>{LEGAL.adsProvider.country}</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
