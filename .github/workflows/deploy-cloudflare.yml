@@ -32,6 +32,9 @@ jobs:
       - name: Audit all branch detail pages
         run: node scripts/audit-detail-pages.mjs
 
+      - name: Audit whole static site
+        run: node scripts/audit-site-pages.mjs
+
       - name: Deploy
         run: npx wrangler deploy
         env:
