@@ -43,7 +43,10 @@ function hasFinalConsonant(word: string): boolean {
   }
   if (DIGITS_WITH_FINAL.has(last)) return true;
   if (/[0-9]/.test(last)) return false;
-  if (/[a-zA-Z]/.test(last)) return !/[aeiouyAEIOUY]/.test(last);
+  // 로마자로 끝나면 받침 없음으로 본다. 이 데이터에 나오는 로마자 표기는
+  // 한국어로 읽을 때 대부분 모음으로 끝나기 때문이다 — CGV는 씨지비,
+  // DOLBY ATMOS는 애트모스, SCREENX는 스크린엑스. page.tsx의
+  // subjectParticle()이 같은 근거로 이미 그렇게 정해두었으니 규칙을 맞춘다.
   return false;
 }
 

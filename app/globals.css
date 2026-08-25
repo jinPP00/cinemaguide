@@ -1623,3 +1623,10 @@ a.card:hover .brand-icon {
   color: #1c6b45;
   font-weight: 700;
 }
+
+/* 요금표 아래 "이 금액이 어느 정도인지" 한 줄 */
+.fare-standing {
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}

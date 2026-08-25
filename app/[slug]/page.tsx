@@ -27,6 +27,12 @@ import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import NearbySection from './NearbySection';
 import SpecialScreenSection from './SpecialScreenSection';
+import FareStandingNote from './FareStandingNote';
+import CheapestNote from './CheapestNote';
+import NoSpecialScreenSection from './NoSpecialScreenSection';
+import { baseFare, specialFares, won as wonLabel } from '@/lib/fares';
+import { nearbyBranches, formatDistance } from '@/lib/geo';
+import { screenKind } from '@/lib/screens';
 import { GUIDES } from '@/lib/paths';
 import BoxOfficeGuide, { boxOfficeMetadata } from './guides/BoxOfficeGuide';
 import FareComparison, { fareComparisonMetadata } from './guides/FareComparison';
@@ -549,6 +555,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           공식 사이트는 구조상 자사 지점만 다루므로 이 두 섹션은 그쪽에
           존재할 수 없다 — 이 사이트가 따로 있을 이유이기도 하다. */}
       <SpecialScreenSection branch={b} />
+      <NoSpecialScreenSection branch={b} />
       <NearbySection branch={b} />
 
       {/* FAQ는 화면에 반드시 보여야 한다 — 구글은 페이지에 없는 Q&A를 스키마로만
@@ -1472,6 +1479,8 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
               </div>
             ))}
           </div>
+          <FareStandingNote branch={b} />
+          <CheapestNote branch={b} />
         </section>
       )}
 
@@ -1710,6 +1719,51 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
         a: `${summary} 자세한 조건과 인증 방법은 위 주차 안내를 확인해주세요.`,
       });
     }
+  }
+
+  // 여기부터는 위 본문을 되풀이하지 않고 계산해야만 나오는 답들이다.
+  // 3사 데이터를 가로질러야 하므로 각 브랜드 공식 사이트에는 있을 수 없다.
+  const mine = baseFare(b);
+  if (mine) {
+    const cheaper = nearbyBranches(b)
+      .map(({ branch: other, km }) => ({ other, km, fare: baseFare(other) }))
+      .filter((x) => x.fare != null && !x.fare!.isFallback && !mine.isFallback)
+      .filter((x) => x.fare!.weekdayAdult < mine.weekdayAdult)
+      .sort((x, y) => x.fare!.weekdayAdult - y.fare!.weekdayAdult);
+
+    faqs.push({
+      q: `${full} 근처에 더 싼 영화관이 있나요?`,
+      a:
+        cheaper.length > 0
+          ? `평일 일반 시간대 성인 기준으로 ${cheaper.length}곳이 더 쌉니다. 가장 싼 곳은 ${cheaper[0].other.name} ${cheaper[0].other.brandName}로 ${wonLabel(cheaper[0].fare!.weekdayAdult)}이며 직선거리 ${formatDistance(cheaper[0].km)} 떨어져 있습니다.`
+          : `평일 일반 시간대 기준으로 근처에 더 싼 곳은 없습니다. 이 지점 요금은 ${wonLabel(mine.weekdayAdult)}입니다.`,
+    });
+
+    if (mine.morningAdult != null && mine.morningAdult < mine.weekdayAdult) {
+      faqs.push({
+        q: `${full} ${mine.morningSlot} 요금은 얼마인가요?`,
+        a: `${mine.morningSlot} 시간대는 성인 ${wonLabel(mine.morningAdult)}으로, 평일 일반 시간대 ${wonLabel(mine.weekdayAdult)}보다 ${wonLabel(mine.weekdayAdult - mine.morningAdult)} 쌉니다.`,
+      });
+    }
+  }
+
+  if (b.specialScreens.length > 0) {
+    // 이 지점이 "특별관"으로 내건 관에 한해서만 추가요금을 말한다. specialFares는
+    // 기본관이 아닌 요금 줄을 전부 돌려주기 때문에 그냥 쓰면 SWEETBOX·TEMPUR처럼
+    // 특별관 목록에 없는 좌석 등급이 답에 끼어든다(여의도 CGV에서 실제로 그랬다).
+    const declared = specialFares(b).filter((f) =>
+      b.specialScreens.some((name) => screenKind(name)?.farePattern?.test(f.label)),
+    );
+    const priciest = declared.find((f) => f.extra > 0);
+    const names = b.specialScreens.join(', ');
+    faqs.push({
+      q: `${full}에 특별관이 있나요?`,
+      a:
+        `운영하는 특별관은 ${names}입니다.` +
+        (priciest
+          ? ` 요금표 기준 추가요금은 ${priciest.label} ${wonLabel(priciest.extra)}입니다.`
+          : ''),
+    });
   }
 
   faqs.push({

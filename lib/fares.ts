@@ -366,3 +366,100 @@ export function brandProfiles(): BrandProfile[] {
     };
   });
 }
+
+export interface FareStanding {
+  /** 이 지점의 평일 기준 성인가 */
+  adult: number;
+  label: string;
+  /** 같은 브랜드·같은 시도 안에서 싼 순서(1부터) */
+  sidoRank: number;
+  sidoCount: number;
+  sidoLow: number;
+  sidoHigh: number;
+  /** 전국 같은 브랜드 범위 */
+  nationalLow: number;
+  nationalHigh: number;
+  /** 같은 시도·같은 브랜드에서 이 값과 같은 요금을 받는 지점 수(자기 포함) */
+  sameCount: number;
+}
+
+/**
+ * 이 지점 요금이 어느 정도 위치인지.
+ *
+ * 요금표만 보면 "14,000원"이라는 숫자 하나뿐이라 비싼지 싼지 알 수 없다.
+ * 같은 브랜드 같은 지역 안에서 몇 번째인지, 전국 범위 어디쯤인지를 함께
+ * 보여주려고 계산한다. 지점마다 값이 달라지므로 페이지마다 다른 문장이 된다.
+ */
+export function fareStanding(branch: Branch): FareStanding | null {
+  const mine = baseFare(branch);
+  if (!mine) return null;
+
+  const sameBrand = branches.filter((b) => b.brand === branch.brand);
+  const sidoFares = sameBrand
+    .filter((b) => b.sido === branch.sido)
+    .map((b) => baseFare(b)?.weekdayAdult)
+    .filter((v): v is number => v != null);
+  const nationalFares = sameBrand
+    .map((b) => baseFare(b)?.weekdayAdult)
+    .filter((v): v is number => v != null);
+  if (sidoFares.length === 0 || nationalFares.length === 0) return null;
+
+  const sorted = [...sidoFares].sort((a, b) => a - b);
+  return {
+    adult: mine.weekdayAdult,
+    label: mine.label,
+    // 같은 금액이 여러 곳이면 그중 가장 앞 순번을 쓴다 — "N번째로 싸다"는 말이
+    // 같은 값끼리 서로 다른 등수를 갖는 것보다 자연스럽다.
+    sidoRank: sorted.indexOf(mine.weekdayAdult) + 1,
+    sidoCount: sidoFares.length,
+    sidoLow: sorted[0],
+    sidoHigh: sorted[sorted.length - 1],
+    nationalLow: Math.min(...nationalFares),
+    nationalHigh: Math.max(...nationalFares),
+    sameCount: sidoFares.filter((v) => v === mine.weekdayAdult).length,
+  };
+}
+
+export interface FareChoice {
+  label: string;
+  timeSlot: string | null;
+  dayType: '평일' | '주말';
+  adult: number;
+}
+
+export interface FareSpread {
+  cheapest: FareChoice;
+  priciest: FareChoice;
+  /** 기준관 평일 일반 시간대 — "평소 내는 값" 기준점 */
+  base: number;
+  /** 기준가 대비 가장 싼 조합으로 아낄 수 있는 금액 */
+  saving: number;
+}
+
+/**
+ * 같은 지점 안에서 언제·어느 관을 고르느냐로 요금이 얼마나 달라지는지.
+ *
+ * 요금표는 지점당 수십 줄이라 눈으로 훑어서는 "제일 싸게 보려면 어떻게 하나"가
+ * 안 보인다. 그 한 줄을 찾아주는 계산이다. 최고가 쪽은 로얄석·프라이빗박스처럼
+ * 일반 관람과 성격이 다른 줄이 잡히기도 하는데(인천영종 메가박스 100,000원),
+ * 지어낸 값이 아니라 요금표에 실제로 있는 줄이므로 라벨을 함께 밝혀서 그대로 쓴다.
+ */
+export function fareSpread(branch: Branch): FareSpread | null {
+  const rows = pricesOf(branch.id).filter((r) => r.adult != null);
+  if (rows.length < 2) return null;
+
+  const pick = (r: PriceRow): FareChoice => ({
+    label: r.label,
+    timeSlot: r.timeSlot,
+    dayType: r.dayType,
+    adult: r.adult!,
+  });
+  const lo = rows.reduce((m, r) => (r.adult! < m.adult! ? r : m));
+  const hi = rows.reduce((m, r) => (r.adult! > m.adult! ? r : m));
+  if (lo.adult === hi.adult) return null;
+
+  const base = baseFare(branch)?.weekdayAdult ?? null;
+  if (base == null) return null;
+
+  return { cheapest: pick(lo), priciest: pick(hi), base, saving: base - lo.adult! };
+}
