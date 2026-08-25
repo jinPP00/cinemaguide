@@ -13,7 +13,7 @@ import {
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
 import { guidePath, GUIDES } from '@/lib/paths';
-import { brandFareSummaries, baseFare, fareSpread, won } from '@/lib/fares';
+import { brandFareSummaries, won } from '@/lib/fares';
 import { screensInBranches } from '@/lib/screens';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
@@ -70,7 +70,6 @@ export default async function SidoPage({
   // 이 지역 요금·특별관 — 지점 목록만으로는 알 수 없는 내용을 채운다
   const summaries = brandFareSummaries(sido);
   const fare = summaries.find((s) => s.brand === key) ?? null;
-  const rivals = summaries.filter((s) => s.brand !== key);
   const screens = screensInBranches(list);
 
   // 시·군·구로 묶는다. 경기 CGV는 52곳이 27개 시군구에 흩어져 있어서 한 줄로
@@ -83,25 +82,6 @@ export default async function SidoPage({
   }
   const cities = [...byCity.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
   const groupByCity = cities.length >= 3;
-
-  // 이 지역에서 가장 싸게 보는 조합. 지점 페이지가 자기 지점 안에서 찾는 것을
-  // 지역 전체로 넓힌 값이라, 어느 지점으로 갈지 정하는 데 쓸 수 있다.
-  const cheapestPlay = list
-    .map((b) => ({ branch: b, spread: fareSpread(b) }))
-    .filter((x): x is { branch: (typeof list)[number]; spread: NonNullable<typeof x.spread> } =>
-      x.spread != null,
-    )
-    .sort((a, b) => a.spread.cheapest.adult - b.spread.cheapest.adult)[0] ?? null;
-
-  const withFare = list
-    .map((b) => ({ branch: b, fare: baseFare(b) }))
-    .filter((x): x is { branch: (typeof list)[number]; fare: NonNullable<typeof x.fare> } =>
-      x.fare != null,
-    )
-    .map((x) => ({ branch: x.branch, adult: x.fare.weekdayAdult }))
-    .sort((a, b) => a.adult - b.adult);
-  const cheapest = withFare[0] ?? null;
-  const priciest = withFare[withFare.length - 1] ?? null;
 
   // 지점이 적은 지역은 인접 지역을 크게 노출해 빈약한 페이지가 되지 않게 한다 (기획서 5.3)
   const isSmall = list.length <= 2;
@@ -215,7 +195,7 @@ export default async function SidoPage({
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row">가장 흔한 금액</th>
+                  <th scope="row">대표 요금</th>
                   <td>{won(fare.weekdayCommon)}</td>
                   <td>{won(fare.weekendCommon)}</td>
                 </tr>
@@ -227,70 +207,15 @@ export default async function SidoPage({
                     </td>
                   </tr>
                 )}
-                {fare.morningLow != null && (
-                  <tr>
-                    <th scope="row">가장 싼 조조</th>
-                    <td colSpan={2}>{won(fare.morningLow)}</td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
           <p style={{ marginTop: 14, color: 'var(--ink-soft)' }}>
-            {/* 지점이 하나뿐인 지역에서 "지점끼리 같다"고 말하면 비교 대상이 없어
-                이상해진다 — 두 곳 이상일 때만 지점 간 차이를 언급한다. */}
-            {withFare.length > 1 &&
-              (cheapest!.adult !== priciest!.adult ? (
-                <>
-                  같은 {sido} 안에서도{' '}
-                  <Link href={branchPath(cheapest!.branch)}>{cheapest!.branch.name}</Link>{' '}
-                  {won(cheapest!.adult)}부터{' '}
-                  <Link href={branchPath(priciest!.branch)}>{priciest!.branch.name}</Link>{' '}
-                  {won(priciest!.adult)}까지 차이가 납니다.{' '}
-                </>
-              ) : (
-                <>
-                  {sido} 지역 {info.name} 지점은 {withFare.length}곳 모두 기준 요금이 같습니다.{' '}
-                </>
-              ))}
-            {rivals.length > 0 && (
-              <>
-                같은 지역 다른 브랜드는{' '}
-                {rivals.map((r, i) => (
-                  <span key={r.brand}>
-                    {i > 0 && ', '}
-                    {r.brandName} {won(r.weekdayCommon)}
-                  </span>
-                ))}
-                입니다. 자세한 비교는{' '}
-                <Link href={guidePath(GUIDES.fares)}>관람료 비교</Link>를 참고하세요.
-              </>
-            )}
+            지점별 실제 관람료는 상영관과 시간대에 따라 달라질 수 있습니다. 각 지점의 상세 요금은
+            지점 페이지에서 확인하고, 브랜드 간 비교는{' '}
+            <Link href={guidePath(GUIDES.fares)}>관람료 비교</Link>를 참고하세요.
           </p>
         </section>
-      )}
-
-      {cheapestPlay && (
-        <p className="fare-standing" style={{ marginTop: 18 }}>
-          {sido} {info.name} 가운데 가장 싼 조합은{' '}
-          <Link href={branchPath(cheapestPlay.branch)}>{cheapestPlay.branch.name}</Link> 지점의{' '}
-          <strong>
-            {cheapestPlay.spread.cheapest.dayType}{' '}
-            {cheapestPlay.spread.cheapest.timeSlot === '일반'
-              ? ''
-              : `${cheapestPlay.spread.cheapest.timeSlot} `}
-            {cheapestPlay.spread.cheapest.label} {won(cheapestPlay.spread.cheapest.adult)}
-          </strong>
-          입니다
-          {fare && cheapestPlay.spread.cheapest.adult < fare.weekdayCommon && (
-            <>
-              {' '}
-              — 이 지역에서 가장 흔한 평일 요금({won(fare.weekdayCommon)})보다{' '}
-              {won(fare.weekdayCommon - cheapestPlay.spread.cheapest.adult)} 쌉니다
-            </>
-          )}
-          .
-        </p>
       )}
 
       {screens.length > 0 && (
