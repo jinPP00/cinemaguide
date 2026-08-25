@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { meta, sidosOfBrand, brandPath, sidoPath, branches, branchPath, hasFilledContent } from '@/lib/data';
+import { guidePath, GUIDES } from '@/lib/paths';
 import { SITE } from '@/lib/site';
 import { dataGeneratedAt, branchLastModified } from '@/lib/dates';
 
@@ -22,6 +23,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [
     { url: `${base}/`, lastModified, changeFrequency: 'weekly', priority: 1 },
   ];
+
+  // 안내 페이지 — 3사 데이터를 가로질러 만든 콘텐츠라 지점·브랜드 페이지보다
+  // 우선순위를 높게 잡는다. 박스오피스는 주 1회 갱신되므로 changeFrequency도 다르다.
+  for (const [path, changeFrequency] of [
+    [guidePath(GUIDES.fares), 'monthly'],
+    [guidePath(GUIDES.screens), 'monthly'],
+    [guidePath(GUIDES.boxoffice), 'weekly'],
+  ] as const) {
+    entries.push({ url: `${base}${path}`, lastModified, changeFrequency, priority: 0.7 });
+  }
 
   // 소개·문의·정책 페이지 (가이드 5.8 — 일반적으로 색인 가능)
   for (const path of [

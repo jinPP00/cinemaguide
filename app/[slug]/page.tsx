@@ -23,24 +23,45 @@ import { dataGeneratedAt, branchLastModified } from '@/lib/dates';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import { REGION_GROUPS } from '@/lib/regions';
 import { IconClapper } from '../icons';
-import type { Branch, BoxOffice, PriceRow } from '@/lib/types';
+import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
-import BoxOfficeSection from './BoxOfficeSection';
-// 빌드 시점에 읽어 정적 HTML에 그대로 굽는다. 브라우저 fetch로 두면 JS를 실행하지
-// 않는 LLM 크롤러에게 이 섹션이 통째로 비어 보인다. (BoxOfficeSection 주석 참고)
-import boxofficeData from '../../public/boxoffice.json';
-
-const boxoffice = boxofficeData as BoxOffice;
+import NearbySection from './NearbySection';
+import SpecialScreenSection from './SpecialScreenSection';
+import { GUIDES } from '@/lib/paths';
+import BoxOfficeGuide, { boxOfficeMetadata } from './guides/BoxOfficeGuide';
+import FareComparison, { fareComparisonMetadata } from './guides/FareComparison';
+import SpecialScreens, { specialScreensMetadata } from './guides/SpecialScreens';
 
 /**
  * 이 라우트 하나가 두 가지 페이지를 모두 담당한다: 브랜드 허브(/cgv/)와 지점 상세
  * (/서울강남-cgv/). 둘 다 사이트 최상위 한 단계 경로라 Next.js에서 같은 동적 세그먼트를
  * 써야 하므로 여기서 값을 보고 분기한다.
  */
+/**
+ * 안내 페이지(박스오피스·관람료비교·특별관)도 이 라우트가 함께 맡는다.
+ *
+ * app/박스오피스/page.tsx처럼 한글 폴더로 정적 라우트를 만들면 next build의
+ * export 단계가 InvalidCharacterError로 죽는다(Next 16.2 확인). 반면 이
+ * 동적 세그먼트는 /롯데시네마/·/서울강남-cgv/ 같은 한글 경로를 이미 정상
+ * 처리하고 있으므로, 한글 URL을 유지하려면 여기에 얹는 쪽이 맞다.
+ * 페이지 본문은 guides/ 아래 각 파일에 그대로 있고 여기서는 연결만 한다.
+ */
+const GUIDE_PAGES = {
+  [GUIDES.boxoffice]: { Page: BoxOfficeGuide, metadata: boxOfficeMetadata },
+  [GUIDES.fares]: { Page: FareComparison, metadata: fareComparisonMetadata },
+  [GUIDES.screens]: { Page: SpecialScreens, metadata: specialScreensMetadata },
+} as const;
+
+type GuideSlug = keyof typeof GUIDE_PAGES;
+
+const guideBySlug = (slug: string) =>
+  Object.hasOwn(GUIDE_PAGES, slug) ? GUIDE_PAGES[slug as GuideSlug] : null;
+
 export function generateStaticParams() {
+  const guideParams = Object.keys(GUIDE_PAGES).map((slug) => ({ slug }));
   const brandParams = meta.brands.map((b) => ({ slug: b.segment }));
   const branchParams = branches.map((b) => ({ slug: b.pageSlug }));
-  return [...brandParams, ...branchParams];
+  return [...guideParams, ...brandParams, ...branchParams];
 }
 
 export async function generateMetadata({
@@ -50,6 +71,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const decoded = decodeURIComponent(slug);
+
+  const guide = guideBySlug(decoded);
+  if (guide) return guide.metadata;
 
   const brandKey = brandBySegment(decoded);
   if (brandKey) {
@@ -79,6 +103,9 @@ export async function generateMetadata({
 export default async function SlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const decoded = decodeURIComponent(slug);
+
+  const guide = guideBySlug(decoded);
+  if (guide) return <guide.Page />;
 
   const brandKey = brandBySegment(decoded);
   if (brandKey) return <BrandHub brandKey={brandKey} />;
@@ -529,6 +556,12 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           {scheduleBar}
         </>
       )}
+
+      {/* 여기부터는 3사 데이터를 가로질러야만 나오는 내용이다. 각 브랜드
+          공식 사이트는 구조상 자사 지점만 다루므로 이 두 섹션은 그쪽에
+          존재할 수 없다 — 이 사이트가 따로 있을 이유이기도 하다. */}
+      <SpecialScreenSection branch={b} />
+      <NearbySection branch={b} />
 
       {/* FAQ는 화면에 반드시 보여야 한다 — 구글은 페이지에 없는 Q&A를 스키마로만
           넣는 것을 정책 위반으로 본다. 위 본문에 흩어져 있는 사실을 질문 형태로
@@ -1370,8 +1403,6 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
 
   return (
     <>
-      <BoxOfficeSection data={boxoffice} />
-
       {priceGroups.length === 0 && (
         <section className="section" aria-labelledby="prices">
           <h2 id="prices">관람료</h2>

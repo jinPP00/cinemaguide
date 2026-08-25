@@ -23,3 +23,19 @@ export function sidoPath(segment: string, sido: string): string {
 export function branchPath(branch: { pageSlug: string }): string {
   return `/${encodeURIComponent(branch.pageSlug)}/`;
 }
+
+/**
+ * 브랜드·지점이 아닌 안내 페이지(박스오피스·관람료비교·특별관)의 경로.
+ * 이 경로들도 한글이라 브랜드 경로와 같은 규칙을 따라야 한다 — 어떤 링크는
+ * 인코딩되고 어떤 링크는 안 된 상태로 섞이면 같은 페이지가 다른 URL로
+ * 취급된다. (기획서 6.2)
+ */
+export const GUIDES = {
+  boxoffice: '박스오피스',
+  fares: '관람료비교',
+  screens: '특별관',
+} as const;
+
+export function guidePath(segment: (typeof GUIDES)[keyof typeof GUIDES]): string {
+  return `/${encodeURIComponent(segment)}/`;
+}

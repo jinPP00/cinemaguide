@@ -1412,3 +1412,214 @@ a.card:hover .brand-icon {
      전수 재점검 중 가장 작은 텍스트였다. */
   .bo-audience { font-size: 0.86rem; }
 }
+
+/* 요금 비교 표 — 관람료비교·특별관 페이지와 지점 상세의 특별관 요금에서 공용.
+   .price-mini는 지점 요금표(2열 고정) 전용이라 열 수가 다른 이 표에는 못 쓴다. */
+.fare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.fare-table th,
+.fare-table td {
+  padding: 11px 14px;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.fare-table thead th {
+  background: var(--surface);
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.fare-table thead th:first-child,
+.fare-table tbody th {
+  text-align: left;
+}
+
+.fare-table tbody th {
+  font-weight: 700;
+  /* 상영관 라벨은 "SCREENX(2D, 리클라이너)"처럼 길다 — 여기만 줄바꿈을 허용한다 */
+  white-space: normal;
+}
+
+.fare-table tbody tr + tr {
+  border-top: 1px solid var(--hairline);
+}
+
+.fare-extra {
+  color: #a2402c;
+  font-weight: 700;
+}
+
+.fare-same,
+.fare-range {
+  color: var(--ink-faint);
+}
+
+.fare-note {
+  color: var(--ink-faint);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+
+/* 특별관 상영 방식 설명 — 요금표 아래 각주처럼 붙는다 */
+.screen-notes {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.screen-notes div {
+  padding-left: 12px;
+  border-left: 2px solid var(--hairline-strong);
+}
+
+.screen-notes dt {
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+.screen-notes dd {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+/* 근처 다른 영화관 — 거리를 왼쪽에 고정폭으로 두어 세로로 눈이 흐르게 한다 */
+.nearby-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.nearby-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.nearby-item:hover {
+  text-decoration: none;
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
+  box-shadow: 0 12px 26px -14px rgba(22, 32, 44, 0.28);
+  transform: translateY(-2px);
+}
+
+.nearby-dist {
+  flex: 0 0 auto;
+  /* 가장 긴 표기("100m 이내")를 담을 폭으로 고정한다 — 폭이 내용마다 달라지면
+     행끼리 지점 이름 시작 위치가 어긋난다. */
+  min-width: 80px;
+  text-align: center;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--brand-bg, var(--accent-soft));
+  color: var(--brand-fg, var(--accent));
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.nearby-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nearby-name {
+  font-weight: 700;
+  font-size: 0.94rem;
+}
+
+.nearby-meta {
+  color: var(--ink-soft);
+  font-size: 0.83rem;
+}
+
+.nearby-cheaper {
+  color: #1c6b45;
+  font-weight: 700;
+}
+
+.nearby-pricier {
+  color: #a2402c;
+  font-weight: 700;
+}
+
+/* 특별관 종류 카드 */
+.screen-cards {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.screen-card {
+  padding: 16px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+}
+
+.screen-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.screen-card-extra {
+  flex: 0 0 auto;
+  font-size: 0.83rem;
+  font-weight: 800;
+  color: #a2402c;
+}
+
+.screen-card-meta {
+  margin: 4px 0 0;
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+}
+
+.screen-card-desc {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.screen-card .chip-list {
+  margin-top: 12px;
+}
+
+/* 링크가 아닌 칩 — "외 N곳"처럼 누를 데가 없는 표시에 쓴다 */
+.chip-plain {
+  color: var(--ink-faint);
+  border-style: dashed;
+  cursor: default;
+}
+
+/* 지점 이름 옆에 기준 상영관 라벨을 덧붙이면 셀이 지나치게 넓어진다 —
+   표 안에서는 라벨을 아랫줄로 내린다. */
+.fare-table td .fare-note {
+  display: block;
+  line-height: 1.4;
+}
+
+/* 기준관보다 싼 특별관 — 추가요금(.fare-extra)과 반대 방향이라 색도 반대로 */
+.fare-cheaper {
+  color: #1c6b45;
+  font-weight: 700;
+}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import './globals.css';
 import { SITE, DISCLAIMER } from '@/lib/site';
 import { meta } from '@/lib/data';
+import { guidePath, GUIDES } from '@/lib/paths';
 import NavLinks from './NavLinks';
 
 export const metadata: Metadata = {
@@ -108,6 +109,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <footer className="site-footer">
           <div className="wrap">
+            {/* 안내 페이지는 전 페이지에서 닿아야 한다 — 지점 페이지에서 들어온
+                사람이 다시 홈으로 돌아가지 않고도 3사 비교로 넘어갈 수 있게. */}
+            <ul className="footer-links">
+              <li>
+                <Link href={guidePath(GUIDES.fares)}>관람료 비교</Link>
+              </li>
+              <li>
+                <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>
+              </li>
+              <li>
+                <Link href={guidePath(GUIDES.boxoffice)}>박스오피스 순위</Link>
+              </li>
+            </ul>
+
             {/* 꼭 필요한 것만 노출한다. 사이트 소개·면책 고지·광고제휴 고지는
                 /about/ 페이지 안의 "관련 정책" 목록에서 연결한다. */}
             <ul className="footer-links">

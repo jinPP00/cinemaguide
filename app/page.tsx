@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { meta, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
+import { meta, branches, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
+import { guidePath, GUIDES } from '@/lib/paths';
 import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
@@ -13,6 +14,7 @@ export const metadata = {
 
 export default function HomePage() {
   const total = meta.totalBranches;
+  const specialBranches = branches.filter((b) => b.specialScreens.length > 0).length;
 
   return (
     <div className="wrap page">
@@ -63,6 +65,42 @@ export default function HomePage() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      {/* 3사를 가로지르는 페이지 — 브랜드를 이미 정한 사람은 공식 사이트로 가면 되고,
+          "어디가 싼지"·"어느 관이 뭐가 다른지"를 정하려는 사람에게 이 사이트가 필요하다.
+          숫자는 전부 data/*.json에서 계산해 넣는다(문구에 직접 박지 않는다). */}
+      <section className="section" aria-labelledby="compare">
+        <h2 id="compare">3사를 한자리에 놓고 보기</h2>
+        <p className="card-sub" style={{ marginTop: 6 }}>
+          브랜드마다 요금표와 상영관 이름이 달라서 공식 사이트를 오가며 비교하기 어렵습니다.
+          전국 {total}개 지점 데이터를 같은 기준으로 맞춰 정리했습니다.
+        </p>
+        <div className="card-grid cols-3" style={{ marginTop: 16 }}>
+          <Link href={guidePath(GUIDES.fares)} className="card">
+            <div className="card-title">관람료 비교</div>
+            <div className="card-sub">
+              브랜드를 바꿔도 요금은 거의 같습니다. 실제로 금액을 좌우하는 것이 무엇인지
+              지점별 요금표로 확인합니다.
+            </div>
+            <div className="card-more">비교 보기 →</div>
+          </Link>
+          <Link href={guidePath(GUIDES.screens)} className="card">
+            <div className="card-title">특별관 안내</div>
+            <div className="card-sub">
+              아이맥스·4DX·돌비시네마 등 {specialBranches}곳의 특별관을 종류별로 묶고, 기본관보다
+              얼마나 비싼지 계산했습니다.
+            </div>
+            <div className="card-more">종류별로 보기 →</div>
+          </Link>
+          <Link href={guidePath(GUIDES.boxoffice)} className="card">
+            <div className="card-title">박스오피스 순위</div>
+            <div className="card-sub">
+              영화진흥위원회 집계 기준 순위와 감독·출연·러닝타임입니다. 매주 월요일 갱신합니다.
+            </div>
+            <div className="card-more">순위 보기 →</div>
+          </Link>
         </div>
       </section>
 
