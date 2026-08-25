@@ -11,7 +11,8 @@
     "data": "npm run normalize && npm run verify",
     "check-links": "node scripts/check-links.mjs",
     "check": "npm run build && npm run check-links",
-    "boxoffice": "node --env-file=.env.local scripts/fetch-boxoffice.mjs"
+    "boxoffice": "node --env-file=.env.local scripts/fetch-boxoffice.mjs",
+    "audit": "node scripts/audit-content.mjs"
   },
   "dependencies": {
     "next": "^16.2.12",

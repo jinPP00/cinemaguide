@@ -1650,3 +1650,73 @@ a.card:hover .brand-icon {
   font-size: 0.82rem;
   font-weight: 500;
 }
+
+/* 주차 핵심 요약 — 원문 카드 위에 "무료시간·초과요금·인증방법"만 먼저 보여준다 */
+.parking-facts {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.parking-facts > div {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--canvas);
+}
+
+.parking-facts dt {
+  flex: 0 0 84px;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.parking-facts dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* 정보 안내 — 확인일·출처 */
+.source-list {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.source-list > div {
+  display: flex;
+  gap: 12px;
+}
+
+.source-list dt {
+  flex: 0 0 84px;
+  color: var(--ink-faint);
+  font-size: 0.86rem;
+}
+
+.source-list dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.source-flag {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #fdf1e7;
+  color: #9a5215;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.source-caution {
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}

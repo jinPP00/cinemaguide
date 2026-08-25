@@ -28,6 +28,9 @@ import type { CSSProperties, ReactNode } from 'react';
 import NearbySection from './NearbySection';
 import SpecialScreenSection from './SpecialScreenSection';
 import FareStandingNote from './FareStandingNote';
+import ParkingFacts from './ParkingFacts';
+import SourceNote from './SourceNote';
+import { branchTitle, branchHeading, branchDescription } from '@/lib/meta-branch';
 import CheapestNote from './CheapestNote';
 import NoSpecialScreenSection from './NoSpecialScreenSection';
 import { baseFare, specialFares, won as wonLabel } from '@/lib/fares';
@@ -94,8 +97,8 @@ export async function generateMetadata({
   const branch = findBranchByPageSlug(decoded);
   if (branch) {
     return {
-      title: `${branch.name} ${branch.brandName} 상영시간표·주차·관람료 안내`,
-      description: `${branch.name} ${branch.brandName}의 위치와 가는 길, 주차 조건, 관람료 정보입니다. 공식 상영시간표로 바로 이동할 수 있습니다.`,
+      title: branchTitle(branch),
+      description: branchDescription(branch),
       alternates: { canonical: branchPath(branch) },
       // 교통·주차·요금 중 하나라도 원본에 없어 "확인하지 못했습니다" 안내가
       // 나가는 지점은 색인하지 않는다. 판단 기준은 lib/data.ts의 isIndexable 참고.
@@ -442,9 +445,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </ol>
       </nav>
 
-      <h1>
-        {b.name} {info.name} 상영시간표·주차·관람료 안내
-      </h1>
+      <h1>{branchHeading(b)}</h1>
 
       {b.intro && (
         <p className="lead" style={{ marginTop: 12 }}>
@@ -574,6 +575,8 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           </dl>
         </section>
       )}
+
+      <SourceNote branch={b} />
 
       {siblings.length > 0 && (
         <section className="section" aria-labelledby="siblings">
@@ -1572,6 +1575,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       {parkingSections.length > 0 && (
         <section className="section" aria-labelledby="parking">
           <h2 id="parking">주차 안내</h2>
+          <ParkingFacts branch={b} />
           <div className="transit-grid">
             {parkingSections.map((s) => (
               <div className="transit-card" key={s.title}>
