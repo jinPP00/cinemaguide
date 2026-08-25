@@ -123,9 +123,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </li>
             </ul>
 
-            {/* 꼭 필요한 것만 노출한다. 사이트 소개·면책 고지·광고제휴 고지는
-                /about/ 페이지 안의 "관련 정책" 목록에서 연결한다. */}
+            {/* 사이트 소개는 푸터에 직접 둔다. 지점 페이지가 425개인 사이트라
+                "누가 어떤 기준으로 이 데이터를 정리했는지"에 어느 페이지에서든
+                바로 닿을 수 있어야 한다. 면책·광고제휴 고지는 /about/ 안의
+                "관련 정책" 목록에서 계속 연결한다. */}
             <ul className="footer-links">
+              <li>
+                <Link href="/about/">사이트 소개</Link>
+              </li>
               <li>
                 <Link href="/privacy/">개인정보처리방침</Link>
               </li>

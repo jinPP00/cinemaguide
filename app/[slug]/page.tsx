@@ -28,8 +28,8 @@ import type { CSSProperties, ReactNode } from 'react';
 import NearbySection from './NearbySection';
 import SpecialScreenSection from './SpecialScreenSection';
 import FareStandingNote from './FareStandingNote';
-import ParkingFacts from './ParkingFacts';
 import SourceNote from './SourceNote';
+import { parkingGroups as buildParkingGroups } from '@/lib/parking';
 import { branchTitle, branchHeading, branchDescription } from '@/lib/meta-branch';
 import CheapestNote from './CheapestNote';
 import NoSpecialScreenSection from './NoSpecialScreenSection';
@@ -1430,7 +1430,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       ? stripToSubwayOnlyText(b.transit.raw) || null
       : null;
 
-  const parkingSections = buildParkingSections(b);
+  const parkingGroups = buildParkingGroups(b);
 
   const parkingIcon = (title: string) =>
     title.includes('요금') ? <IconCoin /> : title.includes('확인') ? <IconTicket /> : <IconParking />;
@@ -1562,7 +1562,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
         </section>
       )}
 
-      {parkingSections.length === 0 && (
+      {parkingGroups.length === 0 && (
         <section className="section" aria-labelledby="parking">
           <h2 id="parking">주차 안내</h2>
           <div className="note" style={{ marginTop: 12 }}>
@@ -1572,21 +1572,28 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
         </section>
       )}
 
-      {parkingSections.length > 0 && (
+      {/* 공식 사이트의 "■ 주차안내 / ■ 주차확인 / ■ 주차요금" 세 덩어리를 그대로
+          옮기던 자리다. 그 안에 위치·요금·인증·예외가 뒤섞여 있어 필요한 줄을
+          직접 찾아야 했고, 공식 문장을 통째로 싣는 모양이기도 했다. 지금은 줄
+          단위로 무엇을 말하는 문장인지 분류해 항목별로 다시 세운다(lib/parking.ts).
+          문장을 새로 쓰지는 않는다 — 원문 줄은 그대로 두고 항목만 붙인다. */}
+      {parkingGroups.length > 0 && (
         <section className="section" aria-labelledby="parking">
           <h2 id="parking">주차 안내</h2>
-          <ParkingFacts branch={b} />
-          <div className="transit-grid">
-            {parkingSections.map((s) => (
-              <div className="transit-card" key={s.title}>
-                <div className="transit-card-head">
-                  {parkingIcon(s.title)}
-                  {s.title}
-                </div>
-                <BulletList text={s.body} />
+          <dl className="parking-groups">
+            {parkingGroups.map((g) => (
+              <div key={g.label}>
+                <dt>{g.label}</dt>
+                <dd>
+                  <ul>
+                    {g.items.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
         </section>
       )}
     </>

@@ -104,3 +104,138 @@ export function parkingSummary(branch: Branch): ParkingSummary | null {
 
   return Object.keys(summary).length > 0 ? summary : null;
 }
+
+/**
+ * 요약이 이미 담은 줄을 원문에서 걷어낸다.
+ *
+ * 요약을 카드 위에 얹으면서 같은 사실이 페이지에 두 번 나오게 됐다 — "3시간
+ * 무료, 10분당 1,500원"이 요약에도 있고 바로 아래 원문 카드에도 있다. 중복은
+ * 읽는 사람에게 군더더기이고, 공식 사이트 문장을 그대로 싣는 분량만 늘린다.
+ *
+ * 줄 단위로만 지운다. "2편 이상 관람 시에도 최대 3시간", "타매장 합산 5시간"
+ * 처럼 요약에 담기지 않은 예외 조항은 원문에서만 볼 수 있으므로 남겨야 한다.
+ */
+export function dropSummarizedLines(body: string, summary: ParkingSummary | null): string {
+  if (!summary) return body;
+
+  const values = [summary.free, summary.flat, summary.overage].filter(
+    (v): v is string => Boolean(v),
+  );
+  if (values.length === 0) return body;
+
+  // "10분당 1,500원" → "10분", "1,500원" 처럼 원문 표기 흔들림을 견디게 쪼갠다
+  const needles = values.map((v) => v.split(/\s+/).filter(Boolean));
+
+  return body
+    .split(NEWLINE)
+    .filter((line) => {
+      const bare = line.replace(/\s/g, '');
+      // 요약값의 조각이 모두 들어 있고, 그 줄에 요약 밖 정보(최대·합산 등 예외)가
+      // 없을 때만 중복으로 본다
+      const isDuplicate = needles.some((parts) =>
+        parts.every((p) => bare.includes(p.replace(/\s/g, ''))),
+      );
+      return !isDuplicate || /(최대|합산|추가|이상|미관람|이외|단,|※)/.test(line);
+    })
+    .join(NEWLINE)
+    .trim();
+}
+
+export interface ParkingGroup {
+  label: string;
+  items: string[];
+}
+
+/** 원문 한 줄이 어떤 사실을 말하는지 — 앞에 오는 규칙이 이긴다 */
+const LINE_CATEGORIES: [string, RegExp][] = [
+  ['다른 매장 합산', /합산|타\s*매장|타매장|제휴|백화점|아울렛|마트/],
+  ['주차 인증', /인증|정산|티켓\s*제시|판매기|키오스크|앱|APP|어플|바코드|주차권/i],
+  ['초과 요금', /초과|분\s*당|분당/],
+  ['무료 주차', /무료|원\b|[\d,]+\s*원/],
+  ['주의사항', /협소|권장|부탁|불가|제한|변경|주의|만차|혼잡|※/],
+  ['주차 위치', /주차장|층|건물|진입|이동|입구|엘리베이터|E\/V|위치|지하|지상/],
+];
+
+const GROUP_ORDER = [
+  '주차 위치',
+  '무료 주차',
+  '초과 요금',
+  '주차 인증',
+  '다른 매장 합산',
+  '주의사항',
+  '그 밖의 안내',
+];
+
+/**
+ * 주차 원문을 사실 항목별로 다시 묶는다.
+ *
+ * 공식 사이트의 주차 안내는 "■ 주차안내 / ■ 주차확인 / ■ 주차요금" 세 덩어리로
+ * 오는데, 그 안에 위치·요금·인증·예외가 뒤섞여 있다. 그대로 옮기면 공식 문장을
+ * 통째로 싣는 셈이고, 읽는 쪽에서도 필요한 줄을 직접 찾아야 한다.
+ *
+ * 그래서 줄 단위로 무엇을 말하는 문장인지 분류해 항목별로 다시 세운다.
+ * ⚠️ 문장을 새로 쓰지 않는다 — 원문 줄을 그대로 두되 어느 항목에 속하는지만
+ * 붙인다. 지어낸 문장이 섞이면 확인되지 않은 정보를 사실처럼 내보내게 된다.
+ *
+ * 정규화된 값(무료시간·초과요금·인증수단)은 parkingSummary가 뽑아둔 것을 각
+ * 항목의 첫 줄로 올려, 긴 원문을 읽지 않아도 답이 먼저 보이게 한다.
+ */
+export function parkingGroups(branch: Branch): ParkingGroup[] {
+  const p = branch.parking;
+  const sources = [p.raw, p.guide, p.howTo, p.fee].filter(Boolean) as string[];
+  if (sources.length === 0) return [];
+
+  const raw = sources
+    .join(NEWLINE)
+    .split(NEWLINE)
+    .map((l) => l.replace(/^[\s■\-●•○★ㆍ:]+/, '').trim())
+    // "■ 주차 확인(인증 방법)" 같은 구간 제목은 이제 우리가 붙이는 항목명이
+    // 대신하므로 항목으로 들어가면 안 된다. 뒤에 괄호 설명만 붙은 형태까지 잡는다.
+    .filter((l) => l.length > 1 && !/^주차\s*(안내|확인|요금|위치)\s*[(（]?[^)）]*[)）]?$/.test(l));
+
+  // 원문이 한 문장을 여러 줄로 흘려 쓴 곳이 있다("… 제한될 수 있으며," / "… 변경될
+  // 수 있습니다.)"). 괄호가 안 닫혔거나 쉼표로 끝나면 다음 줄과 이어 붙인다.
+  const lines: string[] = [];
+  for (const line of raw) {
+    const prev = lines[lines.length - 1];
+    const open = prev ? (prev.match(/[(（]/g) ?? []).length - (prev.match(/[)）]/g) ?? []).length : 0;
+    if (prev && (open > 0 || /[,·]$/.test(prev))) lines[lines.length - 1] = `${prev} ${line}`;
+    else lines.push(line);
+  }
+
+  const buckets = new Map<string, string[]>();
+  const push = (label: string, value: string) => {
+    const list = buckets.get(label) ?? [];
+    // 같은 사실이 여러 필드에 중복으로 들어온 지점이 있다
+    if (!list.some((v) => v.replace(/\s/g, '') === value.replace(/\s/g, ''))) list.push(value);
+    buckets.set(label, list);
+  };
+
+  const summary = parkingSummary(branch);
+  if (summary?.free) push('무료 주차', `영화 관람 시 ${summary.free} 무료`);
+  if (summary?.flat) push('무료 주차', `영화 관람 시 ${summary.flat}`);
+  if (summary?.overage) push('초과 요금', summary.overage);
+  if (summary?.verify) push('주차 인증', summary.verify);
+
+  // 정규화된 값이 이미 말한 사실을 원문으로 한 번 더 싣지 않는다. 다만 원문
+  // 줄에 값 말고 다른 정보가 함께 있으면(예외 조항 등) 남긴다.
+  const normalized = [summary?.free, summary?.flat, summary?.overage]
+    .filter((v): v is string => Boolean(v))
+    .map((v) => v.split(/\s+/).filter(Boolean).map((t) => t.replace(/\s/g, '')));
+
+  for (const line of lines) {
+    const bare = line.replace(/\s/g, '');
+    const isEcho =
+      normalized.some((parts) => parts.every((t) => bare.includes(t))) &&
+      !/(최대|합산|추가|이상|미관람|이외|단,|※|\()/.test(line);
+    if (isEcho) continue;
+
+    const hit = LINE_CATEGORIES.find(([, re]) => re.test(line));
+    push(hit ? hit[0] : '그 밖의 안내', line);
+  }
+
+  return GROUP_ORDER.filter((label) => buckets.get(label)?.length).map((label) => ({
+    label,
+    items: buckets.get(label)!,
+  }));
+}

@@ -1720,3 +1720,48 @@ a.card:hover .brand-icon {
   color: var(--ink-soft);
   font-size: 0.88rem;
 }
+
+/* 주차 안내 — 원문을 사실 항목별로 다시 세운 목록 */
+.parking-groups {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 14px;
+}
+
+.parking-groups > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding-left: 12px;
+  border-left: 2px solid var(--hairline-strong);
+}
+
+.parking-groups dt {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.parking-groups dd {
+  margin: 0;
+}
+
+.parking-groups ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 3px;
+}
+
+.parking-groups li {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+@media (min-width: 640px) {
+  .parking-groups > div {
+    grid-template-columns: 110px 1fr;
+    align-items: baseline;
+    gap: 10px;
+  }
+}
