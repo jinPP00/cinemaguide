@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
+import './detail-unified.css';
 import { SITE, DISCLAIMER } from '@/lib/site';
 import { meta } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
