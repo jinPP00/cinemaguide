@@ -59,11 +59,6 @@ function listItems(html) {
   return listItemHtml(html).map(plain).filter(Boolean);
 }
 
-/**
- * 교통 li에서 노선 칩(.tb-route)만 제거하고 나머지 실제 사용자 문장을 읽는다.
- * 이전 감사기는 span 정규식이 중첩 태그를 잘못 끊어 정상 노선 칩까지 원문으로
- * 오인했다. 이제 항목 단위로 보고 노선 칩 텍스트만 명시적으로 제외한다.
- */
 function transitNarratives(html) {
   return listItemHtml(html)
     .map((item) =>
@@ -108,6 +103,22 @@ for (const file of files) {
 const issues = [];
 const add = (url, kind, detail) => issues.push({ url, kind, detail });
 
+const PRICE_JUDGMENT_PATTERNS = [
+  /가장 싼 조합/,
+  /가장 비싼 줄/,
+  /가장 싼 금액/,
+  /가장 비싼 금액/,
+  /더 싼 영화관/,
+  /더 싼 곳/,
+  /가장 싼 곳/,
+  /\d[\d,]*원\s*저렴/,
+  /\d[\d,]*원\s*비쌈/,
+  /보다\s*[\d,]+원\s*쌉니다/,
+  /보다\s*[\d,]+원\s*비쌉니다/,
+  /중 가장 싼/,
+  /중 가장 비싼/,
+];
+
 for (const page of branchPages) {
   const { url, html } = page;
   const parkingHtml = section(html, 'parking');
@@ -118,6 +129,16 @@ for (const page of branchPages) {
     add(url, '상세 박스오피스 잔존', '지점 상세에 공통 박스오피스 문구가 있음');
   }
   if (/\bundefined\b|\bnull\b/.test(pageText)) add(url, '깨진 값 노출', 'undefined/null 문자열 노출');
+
+  const priceJudgment = PRICE_JUDGMENT_PATTERNS.find((re) => re.test(pageText));
+  if (priceJudgment) {
+    const match = pageText.match(priceJudgment);
+    add(url, '가격 평가 문구 잔존', match?.[0] ?? String(priceJudgment));
+  }
+
+  if (/가까운 특별관/.test(pageText)) {
+    add(url, '주변 섹션 중복 잔존', '가까운 특별관 섹션이 별도로 남아 있음');
+  }
 
   if (parkingHtml) {
     const parkingText = plain(parkingHtml);
@@ -162,15 +183,12 @@ for (const page of branchPages) {
       add(url, '교통 긴 문장', `${long.length}개 · 최장 ${Math.max(...long.map((t) => t.length))}자 · ${long[0].slice(0, 90)}`);
     }
 
-    // 노선 칩을 제거한 뒤에도 버스번호 6개 이상이 쉼표로 남아 있을 때만 실제 원문 잔존이다.
     const routeBlob = narratives.find((t) => /(?:[A-Za-z가-힣]*\d[\w-]*(?:\([^)]{1,18}\))?[,，]\s*){5,}[A-Za-z가-힣]*\d[\w-]*/.test(t));
     if (routeBlob) add(url, '교통 노선 원문 잔존', routeBlob.slice(0, 140));
 
     const artifact = narratives.find((t) => /&nbsp;|(?:^|\s)_[^_]|■|(?<!\w)#\s*(?:지하철|버스)/.test(t));
     if (artifact) add(url, '교통 원자료 기호', artifact.slice(0, 120));
 
-    // '도보', '(심야)', 운영시간 같은 짧은 라벨은 서로 다른 항목에서 반복돼도 정상이다.
-    // 실제 가독성 문제인 긴 동일 안내문이 두 번 나온 경우만 중복으로 본다.
     const duplicates = duplicateValues(narratives, 55);
     if (duplicates.length) add(url, '교통 중복 문장', duplicates.slice(0, 2).join(' / '));
   }
