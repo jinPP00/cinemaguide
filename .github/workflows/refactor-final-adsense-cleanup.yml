@@ -1,0 +1,72 @@
+name: One-time final content cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refactor-final-adsense-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clean branch and brand FAQ copy
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'app/[slug]/page.tsx';
+          let s = fs.readFileSync(path, 'utf8');
+
+          const oldSpecial = "a: `${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등을 운영합니다. 특별관은 일반관보다 관람료가 높고 지점마다 보유 여부가 달라, 방문 전 지점 페이지에서 확인하는 것이 좋습니다.`,";
+          const newSpecial = "a: `${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등을 운영합니다. 특별관 종류와 운영 지점, 관람료는 지점마다 다르므로 각 지점 페이지의 요금표를 확인해주세요.`,";
+          if (!s.includes(oldSpecial)) throw new Error('brand special-screen FAQ copy not found');
+          s = s.replace(oldSpecial, newSpecial);
+
+          const startMarker = '  // 주차는 "주차 요금" 카드 본문의 앞부분만 쓴다. 원문이 길고 예외 조항이 많아';
+          const start = s.indexOf(startMarker);
+          const end = s.indexOf('\n\n  if (b.specialScreens.length > 0) {', start);
+          if (start < 0 || end < 0) throw new Error('branch parking FAQ block not found');
+
+          const replacement = `  // FAQ도 화면과 동일한 구조화 주차 데이터를 사용한다. 공식 원문 앞부분을\n  // 다시 잘라 쓰면 긴 안내문이 FAQ에 재노출될 수 있으므로, 무료 주차·초과 요금처럼\n  // 이미 검증해 분류한 사실만 최대 두 항목까지 요약한다.\n  const parkingFaqGroups = buildParkingGroups(b);\n  const parkingSummary = ['무료 주차', '초과 요금']\n    .flatMap((label) => parkingFaqGroups.find((g) => g.label === label)?.items ?? [])\n    .slice(0, 2);\n  if (parkingSummary.length > 0) {\n    faqs.push({\n      q: \`${'${full}'} 주차 요금은 어떻게 되나요?\`,\n      a: \`${'${parkingSummary.join(\' · \')}'} . 자세한 인증 방법과 예외 조건은 위 주차 안내를 확인해주세요.\`.replace(' .', '.'),\n    });\n  }`;
+
+          s = s.slice(0, start) + replacement + s.slice(end);
+          fs.writeFileSync(path, s);
+          NODE
+
+      - name: Make branch audit block deploys on issues
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'scripts/audit-detail-pages.mjs';
+          let s = fs.readFileSync(path, 'utf8');
+          const old = 'process.exit(0);';
+          const replacement = `if (issues.length > 0) {\n  console.error('\\n감사 실패: 위 문제를 수정한 뒤 다시 배포하세요.');\n  process.exit(1);\n}\n\nprocess.exit(0);`;
+          if (!s.includes(old)) throw new Error('audit exit anchor not found');
+          s = s.replace(old, replacement);
+          fs.writeFileSync(path, s);
+          NODE
+
+      - name: Verify source cleanup
+        run: |
+          if grep -nE '특별관은 일반관보다 관람료가 높고|const fee = buildParkingSections\(b\)' 'app/[slug]/page.tsx'; then
+            echo 'old FAQ copy still remains' >&2
+            exit 1
+          fi
+          grep -n 'parkingFaqGroups = buildParkingGroups' 'app/[slug]/page.tsx'
+          grep -n '감사 실패' scripts/audit-detail-pages.mjs
+
+      - name: Commit source cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'app/[slug]/page.tsx' scripts/audit-detail-pages.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m 'Use structured facts in FAQs and enforce branch audit'
+          git push origin HEAD:main
