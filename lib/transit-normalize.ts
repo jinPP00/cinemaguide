@@ -25,7 +25,6 @@ const ROUTE_PREFIX = new RegExp(`^((?:${ROUTE}\\s*,\\s*)*${ROUTE})([가-힣].+)$
 const ROUTE_SEQUENCE = new RegExp(`(${ROUTE_WITH_NOTE}(?:\\s*,\\s*${ROUTE_WITH_NOTE}){4,})`);
 const ROUTE_GROUP_WORDS = ['급행', '간선', '지선', '광역', '마을', '좌석', '일반', '공항', '순환', '심야', '직행', '도시형', '노선'];
 const ROUTE_GROUP_ALT = ROUTE_GROUP_WORDS.join('|');
-
 const ROUTE_BAD_SUFFIX = /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|거리|이내|이상|하차|도보|개|호기|회|대|명|석|원|m)$/i;
 
 function cleanEdge(text: string): string {
@@ -77,8 +76,14 @@ function normalizeMissingRouteCommas(line: string): string {
   return out.replace(/\s*,\s*/g, ', ');
 }
 
+function normalizeRouteLineLabels(line: string): string {
+  const stationRoutes = line.match(/^(.{1,65}?(?:정류장|오거리|역)[^\n]{0,18}?하차)\s+(?:버스\s*)?노선\s*:?[ ]*(.+)$/);
+  if (stationRoutes) return `[${stationRoutes[1].trim()}] ${stationRoutes[2].trim()}`;
+  return line.replace(/^버스\s*노선\s*:?[ ]*/i, '[버스 노선] ');
+}
+
 function splitRouteSequence(input: string): string[] {
-  const line = normalizeMissingRouteCommas(input);
+  const line = normalizeMissingRouteCommas(normalizeRouteLineLabels(input));
   const match = line.match(ROUTE_SEQUENCE);
   if (!match || match.index == null) return [line];
 
@@ -133,7 +138,6 @@ function splitLongSteps(line: string): string[] {
   return groups.length > 1 ? groups : [line];
 }
 
-/** `- 방향` 다음 줄부터 이어지는 긴 노선 번호 묶음을 하나의 라벨 항목으로 복원한다. */
 function joinWrappedRouteBlocks(lines: string[]): string[] {
   const out: string[] = [];
   for (let i = 0; i < lines.length; i++) {
@@ -151,7 +155,6 @@ function joinWrappedRouteBlocks(lines: string[]): string[] {
       if (/^[-•·]\s*[가-힣].*(?:방향|하차)\s*$/.test(next) || /^#\s+/.test(next)) break;
       const cleaned = next.replace(/^:\s*/, '').trim();
       if (!cleaned) continue;
-      // 노선 묶음으로 보이는 줄만 합친다. 안내문까지 삼키지 않는다.
       if (!/\d/.test(cleaned) || ((cleaned.match(/,/g) ?? []).length < 1 && !/^\w*\d/.test(cleaned))) break;
       chunks.push(cleaned);
     }
@@ -163,7 +166,6 @@ function joinWrappedRouteBlocks(lines: string[]): string[] {
   return out;
 }
 
-/** 괄호 안에 `A역 : 노선 / B역 : 노선`이 같이 들어간 형식을 두 항목으로 나눈다. */
 function splitPairedRouteGroups(line: string): string[] {
   const m = line.match(/^([\s\S]*?)\(([^:()]{1,40})\s*:\s*([^/()]+)\/\s*([^:()]{1,40})\s*:\s*([^()]+)\)\s*$/);
   if (!m) return [line];
@@ -175,13 +177,11 @@ function splitPairedRouteGroups(line: string): string[] {
   return result;
 }
 
-/** raw의 다양한 제목 표기를 # 지하철 / # 버스 형식으로 통일한다. */
 function normalizeRawMarkers(input: string[]): string[] {
   const expanded: string[] = [];
   for (let i = 0; i < input.length; i++) {
     const trimmed = input[i].trim();
 
-    // `■` 한 줄 뒤에 `버스 이용시`가 오는 수집 형태.
     if (/^[#■]$/.test(trimmed) && i + 1 < input.length) {
       const next = input[i + 1].trim().match(/^(지하철|버스)\s*(?:이용\s*시|안내)?\s*$/);
       if (next) {
@@ -209,7 +209,7 @@ function normalizeRawMarkers(input: string[]): string[] {
       continue;
     }
 
-    const anyHeader = trimmed.match(/^[#■]\s*([^#■]+?)\s*$/);
+    const anyHeader = trimmed.match(/^[#■]\s*([^#■]+?)\s*[#■]?\s*$/);
     if (anyHeader && anyHeader[1].length <= 30) {
       const title = anyHeader[1].replace(/\s*(?:이용\s*시|안내)\s*$/, '').trim();
       expanded.push(`# ${title || anyHeader[1].trim()}`);
@@ -219,7 +219,9 @@ function normalizeRawMarkers(input: string[]): string[] {
   }
 
   const markerCount = expanded.filter((line) => /^#\s+/.test(line)).length;
-  if (markerCount <= 1) return expanded.filter((line) => !/^#\s*(?:지하철|버스|교통)$/.test(line));
+  if (markerCount <= 1) {
+    return expanded.filter((line) => !/^#\s*(?:지하철|버스|교통|인근역에서의 교통)$/.test(line));
+  }
   return expanded;
 }
 
@@ -241,10 +243,13 @@ function dedupeLines(lines: string[]): string[] {
 export function normalizeTransitText(value: string | null | undefined, kind: 'raw' | 'field' = 'field'): string | null {
   if (!value) return value ?? null;
 
-  const normalized = normalizeBracketGroups(splitGluedSubway(decodeEntities(value)))
+  const decoded = splitGluedSubway(decodeEntities(value))
+    // 본문 한가운데 끼어든 "# 버스 #" 같은 구획표시를 실제 줄 경계로 복원한다.
+    .replace(/([^\n])\s*#\s*(지하철|버스)\s*#?\s*/g, '$1\n# $2\n');
+
+  const normalized = normalizeBracketGroups(decoded)
     .replace(/_+/g, '\n')
     .replace(/<br\s*\/?\s*>/gi, '\n')
-    // 같은 줄에 `도보 : ... 버스 : ...`가 붙어 있으면 방법별로 분리한다.
     .replace(/\s+(?=(?:도보|버스)\s*:)/g, '\n')
     .replace(/[ \t]+/g, ' ')
     .replace(/ *\n */g, '\n')
@@ -254,13 +259,16 @@ export function normalizeTransitText(value: string | null | undefined, kind: 'ra
   if (kind === 'raw') lines = normalizeRawMarkers(lines);
   lines = joinWrappedRouteBlocks(lines).flatMap(splitPairedRouteGroups);
 
-  // 뒤쪽에 두 번째 노선군이 있는 줄도 다시 처리하도록 두 번 통과시킨다.
   lines = lines
     .flatMap((line) => (/^#\s+/.test(line) ? [line] : splitRouteSequence(line)))
     .flatMap((line) => (/^#\s+/.test(line) ? [line] : splitRouteSequence(line)))
     .flatMap(splitLongSteps)
     .map(separateRoutePrefix)
-    .map((line) => line.replace(/^[·•]\s*/, '').trim())
+    // E/V 운행시간은 건물 이용 안내이지 대중교통 정보가 아니다.
+    .filter((line) => !/^※?\s*E\/V\b/i.test(line))
+    // 이 단계부터는 모든 줄이 의미 단위로 이미 분리돼 있다. 원본 '-'를 남겨두면
+    // 화면 파서가 다음 줄을 앞 항목의 note로 합쳐 긴 문단을 다시 만들므로 제거한다.
+    .map((line) => /^#\s+/.test(line) ? line : line.replace(/^[-·•]\s*/, '').replace(/^:\s*/, '').trim())
     .filter(Boolean);
 
   return dedupeLines(lines).join('\n');
@@ -269,7 +277,6 @@ export function normalizeTransitText(value: string | null | undefined, kind: 'ra
 function rawLooksBusOnly(raw: string): boolean {
   const decoded = decodeEntities(raw);
   if (/지하철|\d+\s*호선/.test(decoded)) return false;
-  // Drive In 영도처럼 버스 구획 뒤에 예매/관람 규칙 `■ 안내`가 이어지는 원문은 제외.
   if (/[#■]\s*(?:안내|자가용|주차|입차)/.test(decoded)) return false;
   const routeHeavy = /(?:[A-Za-z가-힣]*\d[\w-]*\s*,\s*){4,}/.test(decoded);
   return /버스|BRT/.test(decoded) || (routeHeavy && /하차|정류장/.test(decoded));
@@ -285,8 +292,6 @@ function stripBusOnlyHeading(text: string): string {
 export function normalizeBranchTransit(branch: Branch): Branch {
   const originalRaw = branch.transit.raw;
 
-  // raw 한 덩어리가 사실상 버스 정보뿐인 지점은 bus 필드로 승격한다.
-  // 그러면 페이지의 복잡한 raw 폴백을 거치지 않고 동일한 버스 카드 파서를 탄다.
   if (originalRaw && !branch.transit.bus && !branch.transit.subway && rawLooksBusOnly(originalRaw)) {
     return {
       ...branch,
