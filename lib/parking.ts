@@ -1,39 +1,38 @@
 import type { Branch } from './types';
 
 /**
- * 주차 원문에서 "결국 얼마 내고 어떻게 인증하나"만 뽑아낸다.
+ * 공식 영화관 주차 안내를 화면용 사실 데이터로 바꾼다.
  *
- * 각 브랜드 공식 사이트의 주차 안내는 층별 진입 동선·예외 조항까지 한 덩어리
- * 문장으로 되어 있어서, 그대로 옮기면 정작 알고 싶은 무료시간과 초과요금이
- * 문단 속에 묻힌다. 용산아이파크몰 CGV는 주차 안내가 열 줄이 넘는데 "3시간
- * 무료, 이후 10분당 1,500원"이라는 핵심은 그 안에 흩어져 있다.
+ * 원문은 출처 확인용 데이터에만 남겨두고 화면에는 그대로 출력하지 않는다.
+ * 위치·운영시간·주차대수·무료시간·초과요금·인증·합산·주의사항처럼
+ * 패턴으로 확인할 수 있는 사실만 표준 표현으로 다시 만든다.
  *
- * ⚠️ 원문에 문자 그대로 있는 값만 뽑는다. 추정하거나 계산해서 채우지 않고,
- * 못 찾은 항목은 그 줄을 아예 만들지 않는다. 주차 요금은 틀리면 사용자가 돈을
- * 더 내는 정보라서 비어 있는 편이 그럴듯한 오답보다 낫다.
+ * 원칙
+ * - 숫자·장소·조건을 새로 추정하지 않는다.
+ * - 원문을 그대로 화면에 내보내지 않는다.
+ * - 확실하게 재구성하지 못한 줄은 표시하지 않는다.
  */
 
 export interface ParkingSummary {
-  /** "3시간" — 무료로 대는 시간 */
   free?: string;
-  /** "3시간 5,000원" — 무료가 아니라 할인 정액인 지점(강남 CGV 등) */
   flat?: string;
-  /** "10분당 1,500원" — 무료·정액 시간을 넘겼을 때 */
   overage?: string;
-  /** "티켓판매기 · 매표소" — 주차 인증 수단 */
   verify?: string;
+}
+
+export interface ParkingGroup {
+  label: string;
+  items: string[];
 }
 
 const NEWLINE = '\n';
 
-/** "■ 주차 요금 …" 같은 구간을 제목으로 골라 본문만 돌려준다 */
 function sectionByTitle(raw: string | null, test: RegExp): string | null {
   if (!raw) return null;
   const chunks = raw
     .split('■')
     .map((c) => c.trim())
     .filter(Boolean);
-  // "■"가 없으면 통째로 한 덩어리라 구간을 특정할 수 없다
   if (chunks.length < 2) return null;
   const hit = chunks.find((c) => test.test(c.split(NEWLINE)[0]));
   if (!hit) return null;
@@ -45,40 +44,26 @@ const VERIFY_LABELS: [RegExp, string][] = [
   [/키오스크/, '키오스크'],
   [/매표소|매점/, '매표소'],
   [/\bAPP\b|앱|어플/i, '모바일 앱'],
-  [/(영화|관람)?\s*티켓\s*(제시|인증)/, '영화 티켓 제시'],
+  [/(영화|관람)?\s*티켓\s*(제시|인증|확인)/, '영화 티켓'],
   [/주차안내요원|안내요원|현장\s*정산/, '현장 직원'],
-  [/무인정산|자동정산|정산기/, '무인정산기'],
+  [/무인정산|자동정산|정산기/, '주차 정산기'],
 ];
 
-/** 시간·요금 조합 앞에 붙으면 "기본값이 아니라 조건부 혜택"이라는 뜻 */
 const CONDITIONAL = /(최대|합산|추가|구매|이후|이전)\s*$/;
 
+/** 화면 상단 요약용. 섹션 제목이 불규칙한 지점 때문에 전체 원문도 보조로 본다. */
 export function parkingSummary(branch: Branch): ParkingSummary | null {
   const p = branch.parking;
-  // CGV는 raw 한 덩어리, 롯데·메가박스는 항목별 필드로 들어온다
-  const feeText = p.fee ?? sectionByTitle(p.raw, /요금|비용/) ?? '';
-  const verifyText = p.howTo ?? sectionByTitle(p.raw, /확인|인증|정산|등록/) ?? '';
-
+  const allText = [p.raw, p.guide, p.howTo, p.fee].filter(Boolean).join(NEWLINE);
+  const feeText = p.fee ?? sectionByTitle(p.raw, /요금|비용|적용/) ?? allText;
+  const verifyText = p.howTo ?? sectionByTitle(p.raw, /확인|인증|정산|등록|적용/) ?? allText;
   const summary: ParkingSummary = {};
 
-  /*
-   * 한 지점 안에 시간·요금 조합이 여럿 적힌 경우가 있고, 성격이 두 가지다.
-   *
-   *  (1) 조건부 추가 혜택 — 용산아이파크몰 "3시간 무료" + "타매장 합산 최대 5시간".
-   *      기본값이 분명하므로 조건부 쪽만 걷어내면 된다.
-   *  (2) 조건마다 값이 다름 — 코엑스 메가박스 "22시 이전 종료 4시간 4,800원 /
-   *      22시 이후 입차 4시간 무료". 하나만 뽑으면 나머지 조건의 손님이 틀린
-   *      안내를 받으므로 요금 요약을 아예 만들지 않는다.
-   */
   const combos = [
     ...feeText.matchAll(/(\d+)\s*시간\s*(\d+\s*분\s*)?(?:이내\s*)?(무료|[\d,]+\s*원)/g),
   ].filter((m) => {
     const at = m.index ?? 0;
     if (CONDITIONAL.test(feeText.slice(Math.max(0, at - 14), at))) return false;
-    // "10분 초과 시 1,500원 부과(1시간 9,000원)"의 괄호 안 값은 초과요금을
-    // 시간당으로 환산한 표기지 기본요금이 아니다. 다만 "3시간 30분 무료주차
-    // :초과 시 10분당 1,000원"처럼 기본과 초과가 한 줄에 오는 지점이 있어서
-    // 줄 전체를 버리면 기본요금까지 잃는다 — 매칭보다 앞쪽만 본다.
     const lineStart = feeText.lastIndexOf(NEWLINE, at) + 1;
     return !/(초과|부과)/.test(feeText.slice(lineStart, at));
   });
@@ -93,45 +78,30 @@ export function parkingSummary(branch: Branch): ParkingSummary | null {
     else summary.flat = `${hours} ${m[3].replace(/\s/g, '')}`;
   }
 
-  // "10분 당 1,000원" / "10분당 500원" — 띄어쓰기가 지점마다 다르다
   const over =
     feeText.match(/(\d+)\s*분\s*당\s*([\d,]+)\s*원/) ??
-    feeText.match(/(\d+)\s*분\s*초과[^\d]{0,12}([\d,]+)\s*원/);
+    feeText.match(/(\d+)\s*분\s*초과[^\d]{0,12}([\d,]+)\s*원/) ??
+    feeText.match(/초과\s*요금[^\d]*(\d+)\s*분\s*[-:：]?\s*([\d,]+)\s*원/);
   if (over) summary.overage = `${over[1]}분당 ${over[2]}원`;
 
-  const methods = VERIFY_LABELS.filter(([re]) => re.test(verifyText)).map(([, label]) => label);
+  const methods = [...new Set(VERIFY_LABELS.filter(([re]) => re.test(verifyText)).map(([, label]) => label))];
   if (methods.length > 0) summary.verify = methods.join(' · ');
 
   return Object.keys(summary).length > 0 ? summary : null;
 }
 
-/**
- * 요약이 이미 담은 줄을 원문에서 걷어낸다.
- *
- * 요약을 카드 위에 얹으면서 같은 사실이 페이지에 두 번 나오게 됐다 — "3시간
- * 무료, 10분당 1,500원"이 요약에도 있고 바로 아래 원문 카드에도 있다. 중복은
- * 읽는 사람에게 군더더기이고, 공식 사이트 문장을 그대로 싣는 분량만 늘린다.
- *
- * 줄 단위로만 지운다. "2편 이상 관람 시에도 최대 3시간", "타매장 합산 5시간"
- * 처럼 요약에 담기지 않은 예외 조항은 원문에서만 볼 수 있으므로 남겨야 한다.
- */
+/** 이전 코드와의 호환용. 이제 화면에서는 원문 자체를 렌더링하지 않는다. */
 export function dropSummarizedLines(body: string, summary: ParkingSummary | null): string {
   if (!summary) return body;
-
   const values = [summary.free, summary.flat, summary.overage].filter(
     (v): v is string => Boolean(v),
   );
   if (values.length === 0) return body;
-
-  // "10분당 1,500원" → "10분", "1,500원" 처럼 원문 표기 흔들림을 견디게 쪼갠다
   const needles = values.map((v) => v.split(/\s+/).filter(Boolean));
-
   return body
     .split(NEWLINE)
     .filter((line) => {
       const bare = line.replace(/\s/g, '');
-      // 요약값의 조각이 모두 들어 있고, 그 줄에 요약 밖 정보(최대·합산 등 예외)가
-      // 없을 때만 중복으로 본다
       const isDuplicate = needles.some((parts) =>
         parts.every((p) => bare.includes(p.replace(/\s/g, ''))),
       );
@@ -141,62 +111,245 @@ export function dropSummarizedLines(body: string, summary: ParkingSummary | null
     .trim();
 }
 
-export interface ParkingGroup {
-  label: string;
-  items: string[];
-}
-
-/** 원문 한 줄이 어떤 사실을 말하는지 — 앞에 오는 규칙이 이긴다 */
-const LINE_CATEGORIES: [string, RegExp][] = [
-  ['다른 매장 합산', /합산|타\s*매장|타매장|제휴|백화점|아울렛|마트/],
-  ['주차 인증', /인증|정산|티켓\s*제시|판매기|키오스크|앱|APP|어플|바코드|주차권/i],
-  ['초과 요금', /초과|분\s*당|분당/],
-  ['무료 주차', /무료|원\b|[\d,]+\s*원/],
-  ['주의사항', /협소|권장|부탁|불가|제한|변경|주의|만차|혼잡|※/],
-  ['주차 위치', /주차장|층|건물|진입|이동|입구|엘리베이터|E\/V|위치|지하|지상/],
-];
-
 const GROUP_ORDER = [
   '주차 위치',
+  '운영 시간',
+  '주차 규모',
   '무료 주차',
   '초과 요금',
   '주차 인증',
   '다른 매장 합산',
   '주의사항',
-  '그 밖의 안내',
 ];
 
+const clean = (s: string) => s.replace(/\s+/g, '').replace(/[.,·:：()\[\]{}'"※]/g, '');
+
+function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function clock(hour: number, minute = 0, period?: '오전' | '오후' | '새벽'): string {
+  let h = hour;
+  if (period === '오후' && h < 12) h += 12;
+  if (period === '오전' && h === 12) h = 0;
+  return `${pad2(h)}:${pad2(minute)}`;
+}
+
+/** 오전 5시 / 오후 9시 / 새벽2시 같은 표현을 05:00 / 21:00 / 02:00으로 통일한다. */
+function normalizeTimes(text: string): string {
+  let out = text;
+  out = out.replace(/(오전|오후|새벽)\s*(\d{1,2})\s*시\s*(\d{1,2})?\s*분?/g, (_m, p, h, min) =>
+    clock(Number(h), min ? Number(min) : 0, p),
+  );
+  out = out.replace(/(?<!\d)(\d{1,2})\s*시\s*(\d{1,2})\s*분/g, (_m, h, min) =>
+    clock(Number(h), Number(min)),
+  );
+  return out
+    .replace(/\s*~\s*/g, '~')
+    .replace(/\s*까지/g, '까지')
+    .replace(/주말\s*[:：]\s*/g, '주말 ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** 층 표기를 B2 / 4F처럼 짧게 통일한다. */
+function normalizeFloors(text: string): string {
+  return text
+    .replace(/지하\s*(\d+)\s*층/g, 'B$1')
+    .replace(/지상\s*(\d+)\s*층/g, '$1F')
+    .replace(/(B\d+)\s*~\s*(B\d+)/g, '$1~$2')
+    .replace(/(\d+F)\s*~\s*(\d+F)/g, '$1~$2');
+}
+
+function stripDecorations(text: string): string {
+  return text
+    .replace(/^[\s■\-●•○★ㆍ:]+/, '')
+    .replace(/^\d{1,2}\.\s*/, '')
+    .replace(/^\(([^)]+)\)\s*/, '$1 ')
+    .trim();
+}
+
+function normalizeMoneySpacing(text: string): string {
+  return text
+    .replace(/([\d,]+)\s*원/g, '$1원')
+    .replace(/(\d+)\s*분\s*당/g, '$1분당')
+    .replace(/(\d+)\s*시간\s*무료\s*주차/g, '$1시간 무료')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
- * 주차 원문을 사실 항목별로 다시 묶는다.
- *
- * 공식 사이트의 주차 안내는 "■ 주차안내 / ■ 주차확인 / ■ 주차요금" 세 덩어리로
- * 오는데, 그 안에 위치·요금·인증·예외가 뒤섞여 있다. 그대로 옮기면 공식 문장을
- * 통째로 싣는 셈이고, 읽는 쪽에서도 필요한 줄을 직접 찾아야 한다.
- *
- * 그래서 줄 단위로 무엇을 말하는 문장인지 분류해 항목별로 다시 세운다.
- * ⚠️ 문장을 새로 쓰지 않는다 — 원문 줄을 그대로 두되 어느 항목에 속하는지만
- * 붙인다. 지어낸 문장이 섞이면 확인되지 않은 정보를 사실처럼 내보내게 된다.
- *
- * 정규화된 값(무료시간·초과요금·인증수단)은 parkingSummary가 뽑아둔 것을 각
- * 항목의 첫 줄로 올려, 긴 원문을 읽지 않아도 답이 먼저 보이게 한다.
+ * 공식 안내문 문체를 화면용 짧은 사실 표현으로 바꾼다.
+ * 아래 치환은 의미를 추가하지 않고 같은 사실의 표현만 통일한다.
  */
+function rewriteCommon(text: string): string {
+  let out = normalizeFloors(normalizeTimes(normalizeMoneySpacing(stripDecorations(text))));
+  out = out
+    .replace(/주차가능\s*[:：]?\s*/g, '')
+    .replace(/입차\s*가능\s*시간\s*[:：]?\s*/g, '입차 ')
+    .replace(/이용\s*가능\s*시간\s*[:：]?\s*/g, '이용 ')
+    .replace(/운영\s*시간\s*[:：]?\s*/g, '')
+    .replace(/주차장\s*이용\s*문의\s*및\s*불편사항은\s*/g, '')
+    .replace(/연락\s*바랍니다\.?/g, '문의')
+    .replace(/이용해\s*주시기\s*바랍니다\.?/g, '이용 권장')
+    .replace(/이용\s*부탁드립니다\.?/g, '이용 권장')
+    .replace(/권장합니다\.?/g, '권장')
+    .replace(/가능합니다\.?/g, '가능')
+    .replace(/가능합니다/g, '가능')
+    .replace(/불가합니다\.?/g, '불가')
+    .replace(/필수입니다\.?/g, '필수')
+    .replace(/필요합니다\.?/g, '필요')
+    .replace(/제시해\s*주세요\.?/g, '제시')
+    .replace(/변경될\s*수\s*있습니다\.?/g, '운영 상황에 따라 변경 가능')
+    .replace(/제한될\s*수\s*있으며?/g, '제한될 수 있음')
+    .replace(/카드결제만\s*가능/g, '카드 결제만 가능')
+    .replace(/재입차\s*시/g, '재입차 시')
+    .replace(/재입차시/g, '재입차 시')
+    .replace(/타매장/g, '다른 매장')
+    .replace(/타\s*매장/g, '다른 매장')
+    .replace(/셀프\s*할인등록/g, '할인 등록')
+    .replace(/할인등록/g, '할인 등록')
+    .replace(/무인정산기/g, '무인 정산기')
+    .replace(/자동정산기/g, '자동 정산기')
+    .replace(/주차정산기/g, '주차 정산기')
+    .replace(/영화티켓/g, '영화 티켓')
+    .replace(/당일\s*티켓/g, '당일 영화 티켓')
+    .replace(/무료주차/g, '무료 주차')
+    .replace(/주차요금/g, '주차 요금')
+    .replace(/\s*\/\s*/g, ' · ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return out.replace(/[.]$/, '');
+}
+
+function inferLabel(original: string, rewritten: string): string | null {
+  const text = `${original} ${rewritten}`;
+  if (/합산|다른 매장|제휴|백화점|아울렛|마트.*(구매|이용)/.test(text)) return '다른 매장 합산';
+  if (/재입차|협소|혼잡|만차|불가|제한|주의|권장|변경|미등록|정상\s*요금|1일\s*1회|하루\s*1회/.test(text)) return '주의사항';
+  if (/인증|정산|티켓\s*(제시|확인)|판매기|키오스크|앱|APP|바코드|주차권|할인\s*등록/i.test(text)) return '주차 인증';
+  if (/초과|분당|분\s*[-:：]\s*[\d,]+원|시간\s*[-:：]\s*[\d,]+원/.test(text)) return '초과 요금';
+  if (/무료|영화\s*관람.*[\d,]+원|\d+시간\s*[\d,]+원/.test(text)) return '무료 주차';
+  if (/입차|운영\s*시간|이용\s*시간|24시간|오전|오후|새벽|\d{2}:\d{2}/.test(text)) return '운영 시간';
+  if (/\d[\d,]*\s*여?대|주차\s*규모/.test(text)) return '주차 규모';
+  if (/주차장|B\d|\dF|건물|진입|입구|엘리베이터|E\/V|위치|사이|지하|지상/.test(text)) return '주차 위치';
+  return null;
+}
+
+function standardizeFact(originalLine: string): { label: string; value: string } | null {
+  const original = stripDecorations(originalLine);
+  if (!original) return null;
+
+  // 원문 구간 제목은 화면의 고정 라벨이 대신한다.
+  if (/^주차\s*(안내|장\s*안내|확인|요금|위치|적용\s*안내)\s*[(（]?[^)）]*[)）]?$/.test(original)) return null;
+  // "지하주차장"처럼 다음 줄들의 소제목 역할만 하는 한 단어는 별도 사실이 아니다.
+  if (/^(지하|지상|기계식)?\s*주차장$/.test(original)) return null;
+
+  // 주차 대수는 문장을 다시 만들지 않고 값만 표준화한다.
+  const capacity = original.match(/(?:주차\s*가능\s*[:：]?\s*)?(약\s*)?([\d,]+)\s*(여)?\s*대/);
+  if (capacity && original.length < 45) {
+    const approx = capacity[1] || capacity[3] ? '약 ' : '';
+    return { label: '주차 규모', value: `${approx}${capacity[2]}대` };
+  }
+
+  // 입차/운영시간은 키워드와 시간값만 재구성한다.
+  const timeLine = original.match(/(?:입차\s*가능\s*시간|운영\s*시간|이용\s*시간)\s*[:：]?\s*(.+)$/);
+  if (timeLine) return { label: '운영 시간', value: normalizeTimes(timeLine[1]) };
+  if (/24\s*시간\s*운영/.test(original)) return { label: '운영 시간', value: '24시간 운영' };
+
+  // 여러 초과요금이 한 줄에 있는 경우 숫자 조합만 다시 묶는다.
+  if (/초과\s*요금/.test(original)) {
+    const pairs = [...original.matchAll(/(\d+)\s*(분|시간)\s*[-:：]?\s*([\d,]+)\s*원/g)];
+    if (pairs.length > 0) {
+      return {
+        label: '초과 요금',
+        value: pairs.map((m) => `${m[1]}${m[2]} ${m[3]}원`).join(' · '),
+      };
+    }
+  }
+
+  // 무료시간·정액할인은 확인된 숫자와 조건만 표준 문장으로 만든다.
+  const free = original.match(/(\d+)\s*시간\s*(\d+\s*분\s*)?(?:이내\s*)?무료/);
+  if (free && !/(최대|합산|추가)/.test(original.slice(Math.max(0, (free.index ?? 0) - 12), free.index))) {
+    const duration = `${free[1]}시간${free[2] ? ` ${free[2].replace(/\s/g, '')}` : ''}`;
+    const ticket = /티켓|관람/.test(original) ? '영화 관람 시 ' : '';
+    return { label: '무료 주차', value: `${ticket}${duration} 무료` };
+  }
+
+  const flat = original.match(/(\d+)\s*시간\s*([\d,]+)\s*원/);
+  if (flat && !/초과|부과/.test(original)) {
+    return { label: '무료 주차', value: `영화 관람 할인 · ${flat[1]}시간 ${flat[2]}원` };
+  }
+
+  const perMinute = original.match(/(\d+)\s*분\s*(?:당|초과[^\d]{0,12})\s*([\d,]+)\s*원/);
+  if (perMinute) return { label: '초과 요금', value: `${perMinute[1]}분당 ${perMinute[2]}원` };
+
+  // 대표적인 인증 문장을 짧게 재구성한다.
+  if (/매표소.*티켓.*(확인|제시)/.test(original)) {
+    return { label: '주차 인증', value: '매표소에서 당일 영화 티켓 확인' };
+  }
+  if (/출차.*영화\s*티켓\s*제시/.test(original)) {
+    return { label: '주차 인증', value: '출차 시 영화 티켓 제시' };
+  }
+  if (/키오스크.*(티켓|바코드).*(인증|인식|할인)/.test(original)) {
+    return { label: '주차 인증', value: '주차 키오스크에서 영화 티켓 인증' };
+  }
+  if (/주차\s*정산기.*(할인|등록|정산)/.test(rewriteCommon(original))) {
+    const floor = normalizeFloors(original).match(/(?:CGV\s*)?([B\dF~.-]+층?|\d+층)\s*(?:로비\s*)?주차\s*정산기/);
+    return {
+      label: '주차 인증',
+      value: floor ? `${floor[1]} 주차 정산기에서 할인 등록·정산` : '주차 정산기에서 할인 등록·정산',
+    };
+  }
+
+  // 합산/재입차/카드결제는 의미를 바꾸지 않는 고정 문장으로 재작성한다.
+  const maxCombined = original.match(/(?:타\s*매장|타매장|다른\s*매장).*?(?:포함|합산).*?최대\s*(\d+)\s*시간/);
+  if (maxCombined) return { label: '다른 매장 합산', value: `다른 매장 이용분과 합산해 최대 ${maxCombined[1]}시간 할인` };
+
+  if (/1일\s*1회/.test(original) && /재입차/.test(original)) {
+    return { label: '주의사항', value: '주차 할인은 하루 1회 · 재입차 시 요금 부과' };
+  }
+  if (/재입차/.test(original) && /할인\s*불가|요금\s*발생|정상\s*요금/.test(original)) {
+    return { label: '주의사항', value: '출차 후 재입차 시 할인 미적용' };
+  }
+  if (/카드\s*결제만\s*가능/.test(original)) {
+    return { label: '주의사항', value: '주차요금 결제는 카드만 가능' };
+  }
+  if (/주차장.*협소|주차\s*공간.*협소/.test(original)) {
+    return { label: '주의사항', value: /대중교통/.test(original) ? '주차 공간 협소 · 대중교통 이용 권장' : '주차 공간이 협소함' };
+  }
+
+  const rewritten = rewriteCommon(original)
+    .replace(/테크노마트와\s*프라임상가\s*사이/g, '테크노마트·프라임상가 사이')
+    .replace(/몰오브케이\s*주차장/g, '몰오브케이 주차장')
+    .replace(/영화\s*관람\s*고객\s*한\s*함/g, '영화 관람 고객 대상')
+    .replace(/영화\s*미관람\s*시/g, '영화 미관람 시')
+    .replace(/별도\s*정산/g, '별도 결제')
+    .replace(/초과\s*요금은\s*주차장\s*무인\s*정산기\s*정산\s*필요/g, '초과요금은 무인 정산기에서 결제')
+    .replace(/할인\s*적용\s*후\s*재입차\s*시\s*주차\s*요금\s*발생/g, '할인 후 재입차 시 주차요금 부과')
+    .trim();
+
+  const label = inferLabel(original, rewritten);
+  if (!label || !rewritten) return null;
+
+  // 공식 문장이 사실상 그대로 남는 경우에는 화면에 싣지 않는다.
+  if (clean(rewritten) === clean(original)) return null;
+  return { label, value: rewritten };
+}
+
 export function parkingGroups(branch: Branch): ParkingGroup[] {
   const p = branch.parking;
   const sources = [p.raw, p.guide, p.howTo, p.fee].filter(Boolean) as string[];
   if (sources.length === 0) return [];
 
-  const raw = sources
+  const rawLines = sources
     .join(NEWLINE)
     .split(NEWLINE)
-    .map((l) => l.replace(/^[\s■\-●•○★ㆍ:]+/, '').trim())
-    // "■ 주차 확인(인증 방법)" 같은 구간 제목은 이제 우리가 붙이는 항목명이
-    // 대신하므로 항목으로 들어가면 안 된다. 뒤에 괄호 설명만 붙은 형태까지 잡는다.
-    .filter((l) => l.length > 1 && !/^주차\s*(안내|확인|요금|위치)\s*[(（]?[^)）]*[)）]?$/.test(l));
+    .map(stripDecorations)
+    .filter((line) => line.length > 1);
 
-  // 원문이 한 문장을 여러 줄로 흘려 쓴 곳이 있다("… 제한될 수 있으며," / "… 변경될
-  // 수 있습니다.)"). 괄호가 안 닫혔거나 쉼표로 끝나면 다음 줄과 이어 붙인다.
+  // 괄호로 이어진 문장은 한 사실로 합친다.
   const lines: string[] = [];
-  for (const line of raw) {
+  for (const line of rawLines) {
     const prev = lines[lines.length - 1];
     const open = prev ? (prev.match(/[(（]/g) ?? []).length - (prev.match(/[)）]/g) ?? []).length : 0;
     if (prev && (open > 0 || /[,·]$/.test(prev))) lines[lines.length - 1] = `${prev} ${line}`;
@@ -205,34 +358,23 @@ export function parkingGroups(branch: Branch): ParkingGroup[] {
 
   const buckets = new Map<string, string[]>();
   const push = (label: string, value: string) => {
+    const normalized = value.replace(/\s/g, '');
     const list = buckets.get(label) ?? [];
-    // 같은 사실이 여러 필드에 중복으로 들어온 지점이 있다
-    if (!list.some((v) => v.replace(/\s/g, '') === value.replace(/\s/g, ''))) list.push(value);
+    if (!list.some((v) => v.replace(/\s/g, '') === normalized)) list.push(value);
     buckets.set(label, list);
   };
 
+  for (const line of lines) {
+    const fact = standardizeFact(line);
+    if (fact) push(fact.label, fact.value);
+  }
+
+  // 원문에서 핵심 요약을 확실히 추출했는데 개별 줄 변환이 못 잡은 경우 보완한다.
   const summary = parkingSummary(branch);
   if (summary?.free) push('무료 주차', `영화 관람 시 ${summary.free} 무료`);
-  if (summary?.flat) push('무료 주차', `영화 관람 시 ${summary.flat}`);
+  if (summary?.flat) push('무료 주차', `영화 관람 할인 · ${summary.flat}`);
   if (summary?.overage) push('초과 요금', summary.overage);
-  if (summary?.verify) push('주차 인증', summary.verify);
-
-  // 정규화된 값이 이미 말한 사실을 원문으로 한 번 더 싣지 않는다. 다만 원문
-  // 줄에 값 말고 다른 정보가 함께 있으면(예외 조항 등) 남긴다.
-  const normalized = [summary?.free, summary?.flat, summary?.overage]
-    .filter((v): v is string => Boolean(v))
-    .map((v) => v.split(/\s+/).filter(Boolean).map((t) => t.replace(/\s/g, '')));
-
-  for (const line of lines) {
-    const bare = line.replace(/\s/g, '');
-    const isEcho =
-      normalized.some((parts) => parts.every((t) => bare.includes(t))) &&
-      !/(최대|합산|추가|이상|미관람|이외|단,|※|\()/.test(line);
-    if (isEcho) continue;
-
-    const hit = LINE_CATEGORIES.find(([, re]) => re.test(line));
-    push(hit ? hit[0] : '그 밖의 안내', line);
-  }
+  if (summary?.verify) push('주차 인증', `${summary.verify} 이용`);
 
   return GROUP_ORDER.filter((label) => buckets.get(label)?.length).map((label) => ({
     label,
