@@ -1,4 +1,5 @@
 import type { Branch } from './types';
+import { reviewedTransitOverride } from './transit-overrides';
 
 /**
  * 브랜드 원본 교통 문구를 화면 파서가 읽기 좋은 형태로만 정리한다.
@@ -290,6 +291,9 @@ function stripBusOnlyHeading(text: string): string {
 }
 
 export function normalizeBranchTransit(branch: Branch): Branch {
+  const override = reviewedTransitOverride(branch);
+  if (override) return { ...branch, transit: override };
+
   const originalRaw = branch.transit.raw;
 
   if (originalRaw && !branch.transit.bus && !branch.transit.subway && rawLooksBusOnly(originalRaw)) {
