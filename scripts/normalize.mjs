@@ -70,6 +70,30 @@ const SIDO_ORDER = [
 ];
 
 /**
+ * 시군구 표기를 하나로 맞춘다.
+ *
+ * 원본 주소가 같은 도시를 다르게 적는 경우가 있다. 그대로 두면 시도 페이지의
+ * 시·군·구 묶음에서 같은 도시가 둘로 갈린다:
+ *   "경기도 고양특례시 덕양구 …" → 고양특례시 (다른 지점은 고양시)
+ *   "경기도 용인 처인구 …"       → 용인       (다른 지점은 용인시)
+ * 특례시는 행정 명칭일 뿐 같은 도시이고, "시"가 빠진 것은 원본 누락이다.
+ */
+function normalizeSigungu(sigungu, rest) {
+  if (!sigungu) return sigungu;
+  // 특례시는 행정 명칭일 뿐 같은 도시다 — 고양특례시와 고양시가 갈리면 안 된다
+  const fixed = sigungu.replace(/특례시$/, '시');
+  if (/[시군구]$/.test(fixed)) return fixed;
+  // 세종특별자치시는 시·군·구 단계가 없어 주소가 곧바로 도로명으로 간다
+  // ("세종특별자치시 도움1로 108"). 도로명을 시군구로 잡으면 안 되므로 버린다.
+  if (/[로길가]$/.test(fixed)) return null;
+  // "경기도 용인 처인구 …"처럼 '시'가 빠진 원본이 있다. 뒤따르는 토막이 '구'로
+  // 끝날 때만 시 단위로 본다 — 이 조건 없이 무조건 '시'를 붙이면 주소가 동
+  // 단위까지만 있는 지점이 "제주1동시"처럼 망가진다.
+  const next = String(rest || '').split(' ')[1] || '';
+  return /구$/.test(next) ? `${fixed}시` : fixed;
+}
+
+/**
  * 주소 문자열에서 시도·시군구를 추출한다.
  * "경기용인시 기흥구 …"처럼 붙여 쓴 표기도 접두어 매칭으로 처리된다.
  */
@@ -80,7 +104,7 @@ function parseAddress(rawAddress) {
   for (const [alias, sido] of ALIAS_TABLE) {
     if (!address.startsWith(alias)) continue;
     const rest = address.slice(alias.length).trim();
-    const sigungu = rest.split(' ')[0] || null;
+    const sigungu = normalizeSigungu(rest.split(' ')[0] || null, rest);
     return { sido, sigungu, address };
   }
   return { sido: null, sigungu: null, address };

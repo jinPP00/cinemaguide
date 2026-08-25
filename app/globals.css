@@ -1630,3 +1630,23 @@ a.card:hover .brand-icon {
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
+
+/* 시도 페이지 — 시·군·구별 지점 묶음 */
+.city-group {
+  margin-top: 16px;
+}
+
+.city-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.city-group-head .count {
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+  font-weight: 500;
+}

@@ -13,7 +13,7 @@ import {
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
 import { guidePath, GUIDES } from '@/lib/paths';
-import { brandFareSummaries, baseFare, won } from '@/lib/fares';
+import { brandFareSummaries, baseFare, fareSpread, won } from '@/lib/fares';
 import { screensInBranches } from '@/lib/screens';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
@@ -73,6 +73,26 @@ export default async function SidoPage({
   const rivals = summaries.filter((s) => s.brand !== key);
   const screens = screensInBranches(list);
 
+  // 시·군·구로 묶는다. 경기 CGV는 52곳이 27개 시군구에 흩어져 있어서 한 줄로
+  // 늘어놓으면 "우리 동네에 있나"를 찾을 수가 없다. 시군구가 두 곳 이하면
+  // 묶어봐야 그냥 목록이라 평면으로 둔다.
+  const byCity = new Map<string, typeof list>();
+  for (const b of list) {
+    const city = b.sigungu?.trim() || sido;
+    byCity.set(city, [...(byCity.get(city) ?? []), b]);
+  }
+  const cities = [...byCity.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+  const groupByCity = cities.length >= 3;
+
+  // 이 지역에서 가장 싸게 보는 조합. 지점 페이지가 자기 지점 안에서 찾는 것을
+  // 지역 전체로 넓힌 값이라, 어느 지점으로 갈지 정하는 데 쓸 수 있다.
+  const cheapestPlay = list
+    .map((b) => ({ branch: b, spread: fareSpread(b) }))
+    .filter((x): x is { branch: (typeof list)[number]; spread: NonNullable<typeof x.spread> } =>
+      x.spread != null,
+    )
+    .sort((a, b) => a.spread.cheapest.adult - b.spread.cheapest.adult)[0] ?? null;
+
   const withFare = list
     .map((b) => ({ branch: b, fare: baseFare(b) }))
     .filter((x): x is { branch: (typeof list)[number]; fare: NonNullable<typeof x.fare> } =>
@@ -126,7 +146,27 @@ export default async function SidoPage({
 
       {/* 지점 목록 */}
       <section className="section" aria-labelledby="branches">
-        <h2 id="branches">지점 목록</h2>
+        <h2 id="branches">
+          {groupByCity ? `시·군·구별 지점 (${cities.length}곳)` : '지점 목록'}
+        </h2>
+        {groupByCity &&
+          cities.map(([city, group]) => (
+            <div key={city} className="city-group">
+              <h3 className="city-group-head">
+                {city} <span className="count">{group.length}곳</span>
+              </h3>
+              <ul className="chip-list">
+                {group.map((b) => (
+                  <li key={b.id}>
+                    <Link className="chip" href={branchPath(b)}>
+                      {b.name}
+                      {b.status === '휴관' && ' (휴관)'}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         <div className="card-grid cols-2" style={{ marginTop: 16 }}>
           {list.map((b) => (
             <Link key={b.id} href={branchPath(b)} className="card">
@@ -228,6 +268,29 @@ export default async function SidoPage({
             )}
           </p>
         </section>
+      )}
+
+      {cheapestPlay && (
+        <p className="fare-standing" style={{ marginTop: 18 }}>
+          {sido} {info.name} 가운데 가장 싼 조합은{' '}
+          <Link href={branchPath(cheapestPlay.branch)}>{cheapestPlay.branch.name}</Link> 지점의{' '}
+          <strong>
+            {cheapestPlay.spread.cheapest.dayType}{' '}
+            {cheapestPlay.spread.cheapest.timeSlot === '일반'
+              ? ''
+              : `${cheapestPlay.spread.cheapest.timeSlot} `}
+            {cheapestPlay.spread.cheapest.label} {won(cheapestPlay.spread.cheapest.adult)}
+          </strong>
+          입니다
+          {fare && cheapestPlay.spread.cheapest.adult < fare.weekdayCommon && (
+            <>
+              {' '}
+              — 이 지역에서 가장 흔한 평일 요금({won(fare.weekdayCommon)})보다{' '}
+              {won(fare.weekdayCommon - cheapestPlay.spread.cheapest.adult)} 쌉니다
+            </>
+          )}
+          .
+        </p>
       )}
 
       {screens.length > 0 && (
