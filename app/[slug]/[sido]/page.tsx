@@ -12,6 +12,9 @@ import {
   branchPath,
 } from '@/lib/data';
 import { sidoIntro } from '@/lib/content';
+import { guidePath, GUIDES } from '@/lib/paths';
+import { brandFareSummaries, baseFare, won } from '@/lib/fares';
+import { screensInBranches } from '@/lib/screens';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
 import { brandThemeVars } from '@/lib/colors';
@@ -63,6 +66,22 @@ export default async function SidoPage({
 
   const specialCount = list.filter((b) => b.specialScreens.length > 0).length;
   const cityCount = new Set(list.map((b) => b.sigungu).filter(Boolean)).size;
+
+  // 이 지역 요금·특별관 — 지점 목록만으로는 알 수 없는 내용을 채운다
+  const summaries = brandFareSummaries(sido);
+  const fare = summaries.find((s) => s.brand === key) ?? null;
+  const rivals = summaries.filter((s) => s.brand !== key);
+  const screens = screensInBranches(list);
+
+  const withFare = list
+    .map((b) => ({ branch: b, fare: baseFare(b) }))
+    .filter((x): x is { branch: (typeof list)[number]; fare: NonNullable<typeof x.fare> } =>
+      x.fare != null,
+    )
+    .map((x) => ({ branch: x.branch, adult: x.fare.weekdayAdult }))
+    .sort((a, b) => a.adult - b.adult);
+  const cheapest = withFare[0] ?? null;
+  const priciest = withFare[withFare.length - 1] ?? null;
 
   // 지점이 적은 지역은 인접 지역을 크게 노출해 빈약한 페이지가 되지 않게 한다 (기획서 5.3)
   const isSmall = list.length <= 2;
@@ -135,6 +154,111 @@ export default async function SidoPage({
           ))}
         </div>
       </section>
+
+      {/* 여기부터는 지점 목록만으로는 알 수 없는 것 — 이 지역에서 얼마를 내고
+          무엇을 볼 수 있는지. 값은 전부 data/prices.json·specialScreens에서
+          계산하므로 지역마다 다른 내용이 나온다. */}
+      {fare && (
+        <section className="section" aria-labelledby="sido-fare">
+          <h2 id="sido-fare">{sido} {info.name} 관람료</h2>
+          <p className="card-sub" style={{ marginTop: 4 }}>
+            일반 상영관 2D, 일반 시간대, 성인 기준입니다.
+          </p>
+          <div className="table-scroll" style={{ marginTop: 14 }}>
+            <table className="fare-table">
+              <thead>
+                <tr>
+                  <th scope="col">구분</th>
+                  <th scope="col">평일</th>
+                  <th scope="col">주말</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">가장 흔한 금액</th>
+                  <td>{won(fare.weekdayCommon)}</td>
+                  <td>{won(fare.weekendCommon)}</td>
+                </tr>
+                {fare.weekdayLow !== fare.weekdayHigh && (
+                  <tr>
+                    <th scope="row">지점별 범위</th>
+                    <td colSpan={2} className="fare-range">
+                      {won(fare.weekdayLow)} ~ {won(fare.weekdayHigh)}
+                    </td>
+                  </tr>
+                )}
+                {fare.morningLow != null && (
+                  <tr>
+                    <th scope="row">가장 싼 조조</th>
+                    <td colSpan={2}>{won(fare.morningLow)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ marginTop: 14, color: 'var(--ink-soft)' }}>
+            {/* 지점이 하나뿐인 지역에서 "지점끼리 같다"고 말하면 비교 대상이 없어
+                이상해진다 — 두 곳 이상일 때만 지점 간 차이를 언급한다. */}
+            {withFare.length > 1 &&
+              (cheapest!.adult !== priciest!.adult ? (
+                <>
+                  같은 {sido} 안에서도{' '}
+                  <Link href={branchPath(cheapest!.branch)}>{cheapest!.branch.name}</Link>{' '}
+                  {won(cheapest!.adult)}부터{' '}
+                  <Link href={branchPath(priciest!.branch)}>{priciest!.branch.name}</Link>{' '}
+                  {won(priciest!.adult)}까지 차이가 납니다.{' '}
+                </>
+              ) : (
+                <>
+                  {sido} 지역 {info.name} 지점은 {withFare.length}곳 모두 기준 요금이 같습니다.{' '}
+                </>
+              ))}
+            {rivals.length > 0 && (
+              <>
+                같은 지역 다른 브랜드는{' '}
+                {rivals.map((r, i) => (
+                  <span key={r.brand}>
+                    {i > 0 && ', '}
+                    {r.brandName} {won(r.weekdayCommon)}
+                  </span>
+                ))}
+                입니다. 자세한 비교는{' '}
+                <Link href={guidePath(GUIDES.fares)}>관람료 비교</Link>를 참고하세요.
+              </>
+            )}
+          </p>
+        </section>
+      )}
+
+      {screens.length > 0 && (
+        <section className="section" aria-labelledby="sido-screens">
+          <h2 id="sido-screens">{sido}에서 볼 수 있는 특별관</h2>
+          <p className="card-sub" style={{ marginTop: 4 }}>
+            {sido} 지역 {info.name} 지점 {specialCount}곳이 특별관을 함께 운영합니다.
+          </p>
+          <dl className="screen-notes" style={{ marginTop: 14 }}>
+            {screens.map((s) => (
+              <div key={s.name}>
+                <dt>
+                  {s.name} <span className="fare-note">{s.branches.length}곳</span>
+                </dt>
+                <dd>
+                  {s.branches.map((b, i) => (
+                    <span key={b.id}>
+                      {i > 0 && ' · '}
+                      <Link href={branchPath(b)}>{b.name}</Link>
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="card-sub" style={{ marginTop: 14 }}>
+            상영관별 추가요금은 <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>에
+            정리했습니다.
+          </p>
+        </section>
+      )}
 
       {/* 지점이 적은 지역은 주변 지역을 크게, 많은 지역은 링크만 */}
       <section className="section" aria-labelledby="nearby">

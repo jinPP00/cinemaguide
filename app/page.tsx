@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { meta, branches, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
+import { brandProfiles, won } from '@/lib/fares';
 import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
@@ -15,6 +16,17 @@ export const metadata = {
 export default function HomePage() {
   const total = meta.totalBranches;
   const specialBranches = branches.filter((b) => b.specialScreens.length > 0).length;
+
+  // 비교표 아래 문단은 "어느 브랜드가 무엇을 쪼개는가"를 설명한다. 브랜드 이름을
+  // 문장에 박아두면 데이터가 바뀔 때 틀린 말이 되므로 매번 데이터에서 찾는다.
+  const profiles = brandProfiles();
+  const slotLeader = [...profiles].sort((a, b) => b.commonSlots.length - a.commonSlots.length)[0];
+  const seatLeader = [...profiles].sort(
+    (a, b) => b.seatGradedCount / b.branchCount - a.seatGradedCount / a.branchCount,
+  )[0];
+  const screenLeader = [...profiles].sort(
+    (a, b) => b.specialBranchCount / b.branchCount - a.specialBranchCount / a.branchCount,
+  )[0];
 
   return (
     <div className="wrap page">
@@ -101,6 +113,87 @@ export default function HomePage() {
             </div>
             <div className="card-more">순위 보기 →</div>
           </Link>
+        </div>
+      </section>
+
+      {/* 브랜드 카드는 "몇 곳인가"만 말해준다. 정작 고를 때 필요한 건 "요금을
+          어떤 축으로 쪼개는가"인데, 이건 세 브랜드 요금표를 나란히 놓아야만
+          보인다. 표의 숫자는 전부 data/prices.json에서 계산한다. */}
+      <section className="section" aria-labelledby="brand-diff">
+        <h2 id="brand-diff">세 브랜드는 무엇이 다른가</h2>
+        <p className="card-sub" style={{ marginTop: 6 }}>
+          기준 요금은 세 곳이 거의 같습니다. 차이는 그 요금을 무엇으로 나누느냐에서 납니다.
+        </p>
+        <div className="table-scroll" style={{ marginTop: 16 }}>
+          <table className="fare-table">
+            <thead>
+              <tr>
+                <th scope="col">구분</th>
+                {profiles.map((p) => (
+                  <th scope="col" key={p.brand}>
+                    {p.brandName}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">전국 지점</th>
+                {profiles.map((p) => (
+                  <td key={p.brand}>{p.branchCount}곳</td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">평일 기준 요금</th>
+                {profiles.map((p) => (
+                  <td key={p.brand}>{p.weekdayCommon != null ? won(p.weekdayCommon) : '-'}</td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">요금 시간대 구분</th>
+                {profiles.map((p) => (
+                  <td key={p.brand}>
+                    {p.commonSlots.length}구간
+                    <span className="fare-note">{p.commonSlots.join('·')}</span>
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">좌석 등급별 요금</th>
+                {profiles.map((p) => (
+                  <td key={p.brand}>
+                    {p.seatGradedCount === 0 ? '없음' : `${p.seatGradedCount}곳`}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">특별관 운영</th>
+                {profiles.map((p) => (
+                  <td key={p.brand}>
+                    {p.specialBranchCount}곳
+                    <span className="fare-note">{p.specialKindCount}종류</span>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="prose" style={{ marginTop: 16 }}>
+          <p>
+            {slotLeader.brandName}는 요금을 {slotLeader.commonSlots.length}개 시간대로 나눠서, 상영
+            시간을 조금만 옮겨도 금액이 달라집니다. 반대로 {seatLeader.brandName}는 시간대가{' '}
+            {seatLeader.commonSlots.length}구간뿐이지만 같은 상영관 안에서 좌석 등급마다 값을 따로
+            받습니다
+            {seatLeader.seatGradedCount === seatLeader.branchCount
+              ? ' — 전 지점이 그렇습니다.'
+              : ` — ${seatLeader.branchCount}곳 중 ${seatLeader.seatGradedCount}곳이 그렇습니다.`}
+          </p>
+          <p>
+            특별관 비중도 다릅니다. {screenLeader.brandName}는 전국 {screenLeader.branchCount}곳 중{' '}
+            {screenLeader.specialBranchCount}곳이 특별관을 함께 운영합니다. 상영관 종류에 따라
+            요금이 얼마나 벌어지는지는{' '}
+            <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>에 정리했습니다.
+          </p>
         </div>
       </section>
 

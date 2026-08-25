@@ -253,3 +253,27 @@ export function specialScreenBranchCount(): number {
 export function comparableBranchCount(): number {
   return branches.filter((b) => baseFare(b) != null).length;
 }
+
+export interface ScreenPresence {
+  name: string;
+  branches: Branch[];
+}
+
+/**
+ * 주어진 지점들이 어떤 특별관을 갖고 있는지. 시도 목록 페이지에서
+ * "이 지역에서 아이맥스를 보려면 어디로 가야 하나"에 답하는 데 쓴다.
+ * 전국 집계(screenStats)와 달리 요금은 다루지 않는다 — 지역 단위로 묶으면
+ * 표본이 한두 곳이라 대푯값이라고 부를 수 없기 때문이다.
+ */
+export function screensInBranches(list: Branch[]): ScreenPresence[] {
+  const found = new Map<string, Branch[]>();
+  for (const branch of list) {
+    for (const name of branch.specialScreens) {
+      found.set(name, [...(found.get(name) ?? []), branch]);
+    }
+  }
+  return SCREEN_KINDS.filter((k) => found.has(k.name)).map((k) => ({
+    name: k.name,
+    branches: found.get(k.name)!,
+  }));
+}
