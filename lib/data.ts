@@ -57,17 +57,59 @@ export function pricesOf(branchId: string): PriceRow[] {
   return prices[branchId] ?? [];
 }
 
+/* ------------------------------------------------------------------ *
+ * 지점이 어떤 정보를 실제로 갖고 있는지
+ * ------------------------------------------------------------------ */
+
+const filled = (value: string | null | undefined) => value != null && value.trim() !== '';
+
 /**
- * 실제 교통·주차·요금 정보를 채워서 "준비 중" 대신 보여줄 지점인지.
- * 서울→경기→인천 순으로 지역을 넓혀오다 전국 425곳을 모두 공개해서
- * 지금은 항상 true다. 개별 항목(교통·주차·요금)이 원본부터 없는 지점은
- * 각 섹션에서 "확인하지 못했습니다" 안내로 처리하므로 여기서 거르지 않는다.
+ * 교통 안내가 있는가. 브랜드마다 담기는 필드가 달라 셋 다 봐야 한다.
  *
- * 색인 여부(robots)·sitemap 포함 여부도 이 값을 따르므로, 앞으로 특정
- * 지점을 다시 비공개로 돌릴 일이 생기면 여기 한 곳만 고치면 된다.
+ * 마지막 조건은 크롤링 경계 오류 보정이다. 지하철 안내가 교통이 아니라 주차
+ * 필드에 "■ 지하철 …" 조각으로 섞여 들어온 지점(대전탄방 등)이 있고, 화면에서는
+ * 그걸 되찾아 지하철 카드로 보여주고 있다. 여기서 빠뜨리면 실제로는 교통 안내가
+ * 멀쩡히 뜨는 페이지를 색인에서 제외하게 된다.
  */
-export function hasFilledContent(_branch: Branch): boolean {
-  return true;
+export function hasTransitInfo(branch: Branch): boolean {
+  return (
+    filled(branch.transit.raw) ||
+    filled(branch.transit.subway) ||
+    filled(branch.transit.bus) ||
+    (branch.parking.raw?.includes('■ 지하철') ?? false)
+  );
+}
+
+/** 주차 안내가 있는가. CGV는 raw 한 덩어리, 나머지는 항목별로 나뉜다. */
+export function hasParkingInfo(branch: Branch): boolean {
+  return (
+    filled(branch.parking.raw) ||
+    filled(branch.parking.guide) ||
+    filled(branch.parking.howTo) ||
+    filled(branch.parking.fee)
+  );
+}
+
+export function hasPriceInfo(branch: Branch): boolean {
+  return pricesOf(branch.id).length > 0;
+}
+
+/**
+ * 검색엔진에 색인시킬 지점인지. robots 설정과 sitemap 포함 여부가 모두 이
+ * 값을 따르므로, 색인 범위를 조정할 일이 생기면 여기 한 곳만 고치면 된다.
+ *
+ * 기준은 "화면에 '아직 확인하지 못했습니다'가 뜨는 페이지는 색인하지 않는다"
+ * 하나다. 교통·주차·요금 중 하나라도 원본에 없으면 그 자리에 안내문이 나가는데,
+ * 그건 이용자에게 정직하게 알리려고 두는 것이지 검색결과로 끌어올 내용은
+ * 아니다. 원본 데이터가 채워지면 이 함수를 고치지 않아도 자동으로 색인 대상이
+ * 된다.
+ *
+ * ⚠️ 이 값은 본문 렌더링과는 무관하다. 색인하지 않는 지점도 갖고 있는 정보
+ * (주소·요금표·특별관·근처 영화관)는 그대로 다 보여준다 — 링크를 타고 들어온
+ * 사람에게까지 내용을 감출 이유는 없다.
+ */
+export function isIndexable(branch: Branch): boolean {
+  return hasTransitInfo(branch) && hasParkingInfo(branch) && hasPriceInfo(branch);
 }
 
 /* ------------------------------------------------------------------ *

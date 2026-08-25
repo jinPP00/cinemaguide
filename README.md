@@ -69,14 +69,24 @@ npm run data
 
 ```
 app/
-  page.tsx                          홈 (브랜드 선택)
-  [brand]/page.tsx                  브랜드 허브
-  [brand]/[sido]/page.tsx           시도별 지점 목록
-  [brand]/[sido]/[branch]/page.tsx  지점 상세
+  page.tsx                       홈 (브랜드 선택 · 안내 페이지 진입)
+  [slug]/page.tsx                브랜드 허브 · 지점 상세 · 안내 페이지를 모두 맡는 라우트
+  [slug]/[sido]/page.tsx         시도별 지점 목록
+  [slug]/guides/                 안내 페이지 본문
+    FareComparison.tsx             /관람료비교/
+    SpecialScreens.tsx             /특별관/
+    BoxOfficeGuide.tsx             /박스오피스/
+  [slug]/NearbySection.tsx       지점 상세 — 근처 다른 영화관
+  [slug]/SpecialScreenSection.tsx 지점 상세 — 특별관 추가요금
   about · contact · privacy · terms · disclaimer · affiliate-disclosure
   sitemap.ts · robots.ts
 lib/
   data.ts     데이터 조회와 URL 생성
+  paths.ts    경로 헬퍼 (데이터 import 없음 — 클라이언트 컴포넌트용)
+  fares.ts    3사 요금표를 비교 가능한 형태로 맞추는 계산
+  screens.ts  특별관 분류와 추가요금 집계
+  geo.ts      좌표 기반 인근 지점 계산
+  josa.ts     한국어 조사 자동 선택
   types.ts    공통 타입
   site.ts     사이트 상수 (도메인·운영자·이메일)
   legal.ts    정책 문서 플래그
@@ -85,16 +95,26 @@ scripts/      normalize · verify · check-links
 data/         빌드 입력 (커밋 대상)
 ```
 
+**한글 경로는 정적 라우트로 만들 수 없다.**
+`app/특별관/page.tsx`처럼 한글 폴더로 라우트를 만들면 `next build`의 export
+단계가 `InvalidCharacterError`로 죽는다(Next 16.2 확인). `[slug]` 동적 세그먼트는
+같은 한글 경로를 정상 처리하므로, 안내 페이지는 `app/[slug]/page.tsx`의
+`GUIDE_PAGES`에 등록해서 연결한다.
+
 ## 주의사항
 
 **URL은 한글을 쓴다.** (`/cgv/서울/강남/`)
 링크를 직접 문자열로 조합하지 말고 `lib/data.ts`의 `brandPath`·`sidoPath`·`branchPath`를 쓴다.
 인코딩 형태가 섞이면 같은 페이지가 다른 URL로 취급돼 중복 색인 문제가 생긴다.
 
-**지점 페이지 425개는 현재 `noindex`다.**
-교통·주차·요금 본문이 아직 비어 있어 검색엔진에 색인시키지 않는다.
-내용을 채운 뒤 `app/[brand]/[sido]/[branch]/page.tsx`의 `robots` 설정을 제거하고
-`app/sitemap.ts`에 지점 URL을 추가한다.
+**지점 색인 여부는 `lib/data.ts`의 `isIndexable()` 한 곳에서 갈린다.**
+지점 상세의 `robots` 설정과 `app/sitemap.ts` 포함 여부가 모두 이 값을 따른다.
+기준은 "화면에 '아직 확인하지 못했습니다'가 뜨는 페이지는 색인하지 않는다"
+하나이며, 교통·주차·요금이 모두 있어야 색인 대상이 된다(현재 425곳 중 394곳).
+원본 데이터가 채워지면 함수를 고치지 않아도 자동으로 색인 대상이 된다.
+
+색인 여부는 **본문 렌더링과 무관하다.** 색인하지 않는 지점도 갖고 있는 정보는
+그대로 다 보여주고, 없는 항목만 각 섹션에서 안내문으로 표시된다.
 
 **정책 문서는 실제 운영 상태를 따라간다.**
 `lib/legal.ts`의 `usesAnalytics`·`usesAds` 플래그가 `false`인 동안

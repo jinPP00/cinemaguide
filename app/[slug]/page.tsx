@@ -14,7 +14,7 @@ import {
   sidoPath,
   branchPath,
   pricesOf,
-  hasFilledContent,
+  isIndexable,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { SITE } from '@/lib/site';
@@ -91,9 +91,10 @@ export async function generateMetadata({
       title: `${branch.name} ${branch.brandName} 상영시간표·주차·관람료 안내`,
       description: `${branch.name} ${branch.brandName}의 위치와 가는 길, 주차 조건, 관람료 정보입니다. 공식 상영시간표로 바로 이동할 수 있습니다.`,
       alternates: { canonical: branchPath(branch) },
-      // 아직 교통·주차·요금 본문을 채우지 못한 지점만 색인하지 않는다. (기획서 10.2)
-      // 내용을 채우는 대로(현재 서울) hasFilledContent에 조건을 추가하고 색인으로 전환한다.
-      robots: hasFilledContent(branch) ? undefined : { index: false, follow: true },
+      // 교통·주차·요금 중 하나라도 원본에 없어 "확인하지 못했습니다" 안내가
+      // 나가는 지점은 색인하지 않는다. 판단 기준은 lib/data.ts의 isIndexable 참고.
+      // follow는 남긴다 — 색인은 안 해도 이 페이지가 거는 내부 링크는 따라가야 한다.
+      robots: isIndexable(branch) ? undefined : { index: false, follow: true },
     };
   }
 
@@ -360,10 +361,6 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         )}?c=${b.lng},${b.lat},15,0,0,0,dh`
       : null);
 
-  // 서울 지점은 "준비 중" 안내 대신 실제 교통·주차·요금 정보를 보여준다.
-  // 나머지 지역은 순차적으로 hasFilledContent()의 조건을 넓혀가며 확장한다.
-  const isContentPreview = hasFilledContent(b);
-
   // 예매·상영시간표는 우리 사이트가 아니라 공식 사이트의 일이다.
   // 콘텐츠 미리보기 지점에서는 관람료 다음, 대중교통 이용 방법 앞에 배치해
   // "우리 정보를 보다가 예매하러 갈지 정하는" 흐름에 자연스럽게 놓는다.
@@ -542,20 +539,11 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </section>
       )}
 
-      {isContentPreview ? (
-        <ContentPreview branch={b} scheduleBar={scheduleBar} />
-      ) : (
-        <>
-          <section className="section" aria-labelledby="coming">
-            <h2 id="coming">준비 중인 정보</h2>
-            <div className="note" style={{ marginTop: 12 }}>
-              이 지점의 <strong>대중교통 이용 방법, 주차 조건과 요금, 상영관별 관람료</strong>는
-              현재 정리 중입니다. 아래 버튼으로 {info.name} 공식 페이지에서 확인하실 수 있습니다.
-            </div>
-          </section>
-          {scheduleBar}
-        </>
-      )}
+      {/* 색인 대상이 아닌 지점도 본문은 똑같이 다 보여준다 — 없는 항목만 각
+          섹션에서 "확인하지 못했습니다"로 표시된다. 예전에는 여기서 페이지를
+          통째로 "준비 중인 정보" 안내 하나로 갈아치웠는데, 그러면 갖고 있는
+          요금표까지 같이 숨기게 돼서 없앴다. */}
+      <ContentPreview branch={b} scheduleBar={scheduleBar} />
 
       {/* 여기부터는 3사 데이터를 가로질러야만 나오는 내용이다. 각 브랜드
           공식 사이트는 구조상 자사 지점만 다루므로 이 두 섹션은 그쪽에
@@ -638,6 +626,41 @@ function classifyParkingTitle(title: string): '주차 안내' | '주차 확인' 
   return '주차 안내';
 }
 
+/**
+ * 제목 줄 하나로만 이루어진 구간을 살려낸다.
+ *
+ * splitByMarker()는 첫 줄을 제목, 나머지를 본문으로 나눈다. 그래서 줄바꿈 없이
+ * 한 줄로만 적힌 안내는 본문이 비어버리고, 그대로 두면 빈 카드 거르기에 걸려
+ * 내용이 통째로 사라진다. 실제로 두 지점에서 주차 안내가 화면에 아예 안 나오고
+ * "확인하지 못했습니다"가 대신 떠 있었다:
+ *   - 충남논산 "■ 주차안내: CGV논산 지상주차장"  → 콜론 뒤가 본문이다
+ *   - 경남양산삼호 "주차장이 협소하오니 …"        → 마커가 없는 안내 문장 한 줄
+ * 콜론이 있으면 그 앞뒤를 제목·본문으로 나누고, 없으면 문장 전체를 본문으로 쓴다.
+ */
+function rescueTitleOnlySection(section: { title: string; body: string }): {
+  title: string;
+  body: string;
+} {
+  if (section.body) return section;
+
+  const separator = section.title.indexOf(':');
+  if (separator > 0) {
+    const head = section.title.slice(0, separator).trim();
+    const tail = section.title.slice(separator + 1).trim();
+    if (head && tail) return { title: head, body: tail };
+  }
+  // 제목이 GENERIC_PARKING_TITLE이면 원문에 기호 한 글자만 있어서 앞 단계가
+  // 붙여준 이름이다(인천계양 등). 살릴 내용이 애초에 없으므로 본문을 비운 채
+  // 돌려보내 빈 카드 거르기에 걸리게 한다 — 안 그러면 본문이 "주차 안내"라는
+  // 제목 문자열과 똑같은 카드가 생긴다.
+  if (section.title === GENERIC_PARKING_TITLE) return section;
+  return { title: GENERIC_PARKING_TITLE, body: section.title };
+}
+
+/** 원문에 쓸 만한 제목이 없을 때 붙이는 이름. rescueTitleOnlySection이 이
+ * 값인지 보고 "되살릴 내용이 없는 구간"을 판별하므로 두 곳이 같은 상수를 쓴다. */
+const GENERIC_PARKING_TITLE = '주차 안내';
+
 function buildParkingSections(b: Branch): { title: string; body: string }[] {
   const raw: { title: string; body: string }[] = b.parking.raw
     ? // "■"로 쪼개면 첫 "■" 이전 내용은 title이 원문 첫 줄이 되는데, 일부
@@ -647,15 +670,16 @@ function buildParkingSections(b: Branch): { title: string; body: string }[] {
       splitByMarker(b.parking.raw, '■')
         .map((s) => ({
           ...s,
-          title: /^[^가-힣a-zA-Z0-9]*$/.test(s.title) ? '주차 안내' : s.title,
+          title: /^[^가-힣a-zA-Z0-9]*$/.test(s.title) ? GENERIC_PARKING_TITLE : s.title,
         }))
-        // "'■ 주차 안내" 처럼 첫 "■" 앞에 기호 한 글자만 있으면 본문 없는
-        // 빈 카드가 생긴다 — 걸러낸다.
-        .filter((s) => s.body)
         // 원문 크롤링 경계 오류로 "■ 지하철" 같은 지하철 안내가 주차 필드에
         // 통째로 섞여 들어온 지점(대전탄방 등)이 있다 — 주차 카드로는 안
         // 보여주고, extractStrayParkingSubway()가 따로 지하철 카드로 옮긴다.
         .filter((s) => s.title.trim() !== '지하철')
+        .map(rescueTitleOnlySection)
+        // "'■ 주차 안내" 처럼 첫 "■" 앞에 기호 한 글자만 있으면 본문 없는
+        // 빈 카드가 생긴다 — 걸러낸다.
+        .filter((s) => s.body)
     : [
         b.parking.guide && { title: '주차 안내', body: b.parking.guide },
         b.parking.howTo && { title: '주차 확인', body: b.parking.howTo },
@@ -1301,7 +1325,7 @@ const IconCoin = () => (
 );
 
 /**
- * 2단계 콘텐츠 — 실제 교통·주차·요금 정보. hasFilledContent()가 true인
+ * 2단계 콘텐츠 — 실제 교통·주차·요금 정보. 모든 지점에서
  * 지점(현재 서울 70곳)에서 "준비 중" 안내 대신 이 컴포넌트를 쓴다.
  * 다른 지역으로 넓힐 때도 이 컴포넌트를 그대로 재사용하면 된다.
  */

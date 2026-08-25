@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { meta, sidosOfBrand, brandPath, sidoPath, branches, branchPath, hasFilledContent } from '@/lib/data';
+import { meta, sidosOfBrand, brandPath, sidoPath, branches, branchPath, isIndexable } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
 import { SITE } from '@/lib/site';
 import { dataGeneratedAt, branchLastModified } from '@/lib/dates';
@@ -7,8 +7,9 @@ import { dataGeneratedAt, branchLastModified } from '@/lib/dates';
 /**
  * sitemap에는 "색인 대상 canonical URL"만 넣는다. (가이드 5.7 / 기획서 10.2)
  *
- * 지점 상세는 hasFilledContent()가 true인 지점(현재 서울)만 포함한다 —
- * 아직 내용이 없는 나머지 지점은 페이지 자체가 noindex라 여기 넣어도 의미가 없다.
+ * 지점 상세는 isIndexable()이 true인 지점만 포함한다 — 교통·주차·요금 중
+ * 하나라도 비어 "확인하지 못했습니다"가 나가는 페이지는 그 자체가 noindex라
+ * 여기 넣어도 의미가 없다.
  * robots.txt로 차단하지는 않는다 — 검색엔진이 페이지를 읽어야 noindex를 인식할 수 있기 때문이다.
  *
  * lastmod 계산(페이지 종류별로 다르게 매기는 이유·근거)은 lib/dates.ts 참고.
@@ -70,7 +71,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   for (const branch of branches) {
-    if (!hasFilledContent(branch)) continue;
+    if (!isIndexable(branch)) continue;
     entries.push({
       url: `${base}${branchPath(branch)}`,
       lastModified: branchLastModified(branch.checkedAt),
