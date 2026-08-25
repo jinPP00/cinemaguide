@@ -1,0 +1,66 @@
+name: One-time neutralize branch FAQ
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refactor-branch-faq.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Neutralize branch-detail FAQ copy
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'app/[slug]/page.tsx';
+          let s = fs.readFileSync(path, 'utf8');
+
+          s = s.replace("import { baseFare, specialFares, won as wonLabel } from '@/lib/fares';\n", '');
+          s = s.replace("import { nearbyBranches, formatDistance } from '@/lib/geo';\n", '');
+          s = s.replace("import { screenKind } from '@/lib/screens';\n", '');
+
+          const compareStart = s.indexOf('  // 여기부터는 위 본문을 되풀이하지 않고 계산해야만 나오는 답들이다.');
+          const specialStart = s.indexOf('\n  if (b.specialScreens.length > 0) {', compareStart);
+          if (compareStart < 0 || specialStart < 0) throw new Error('price comparison FAQ block not found');
+          s = s.slice(0, compareStart) + s.slice(specialStart + 1);
+
+          const specialBlockStart = s.indexOf('  if (b.specialScreens.length > 0) {', s.indexOf('function buildBranchFaqs'));
+          const scheduleStart = s.indexOf("\n\n  faqs.push({\n    q: `${full} 상영시간표는 어디서 확인하나요?`,", specialBlockStart);
+          if (specialBlockStart < 0 || scheduleStart < 0) throw new Error('special FAQ block not found');
+
+          const neutralSpecial = `  if (b.specialScreens.length > 0) {
+            const names = b.specialScreens.join(', ');
+            faqs.push({
+              q: \`${'${full}'}에 특별관이 있나요?\`,
+              a: \`운영하는 특별관은 ${'${names}'}입니다.\`,
+            });
+          }`;
+          s = s.slice(0, specialBlockStart) + neutralSpecial + s.slice(scheduleStart);
+
+          fs.writeFileSync(path, s);
+          NODE
+
+      - name: Verify removed comparison copy
+        run: |
+          if grep -nE '근처에 더 싼|가장 싼 곳|보다 .*쌉니다|specialFares\(|baseFare\(b\)' 'app/[slug]/page.tsx'; then
+            echo 'comparison copy still remains' >&2
+            exit 1
+          fi
+
+      - name: Commit source refactor
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'app/[slug]/page.tsx'
+          git diff --cached --quiet && exit 0
+          git commit -m 'Neutralize price language in branch FAQs'
+          git push origin HEAD:main
