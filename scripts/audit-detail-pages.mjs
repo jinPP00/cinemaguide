@@ -216,4 +216,9 @@ else {
   if (issues.length > 200) console.log(`... ${issues.length - 200}건 추가`);
 }
 
+if (issues.length > 0) {
+  console.error('\n감사 실패: 위 문제를 수정한 뒤 다시 배포하세요.');
+  process.exit(1);
+}
+
 process.exit(0);

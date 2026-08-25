@@ -1666,7 +1666,7 @@ function buildBrandFaqs(
   if (top.length > 0) {
     faqs.push({
       q: `${brandName} 특별관은 어떤 것이 있나요?`,
-      a: `${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등을 운영합니다. 특별관은 일반관보다 관람료가 높고 지점마다 보유 여부가 달라, 방문 전 지점 페이지에서 확인하는 것이 좋습니다.`,
+      a: `${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등을 운영합니다. 특별관 종류와 운영 지점, 관람료는 지점마다 다르므로 각 지점 페이지의 요금표를 확인해주세요.`,
     });
   }
 
@@ -1711,22 +1711,18 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
     });
   }
 
-  // 주차는 "주차 요금" 카드 본문의 앞부분만 쓴다. 원문이 길고 예외 조항이 많아
-  // 통째로 넣으면 답변이 문단이 되어버린다.
-  const fee = buildParkingSections(b).find((s) => s.title === '주차 요금')?.body;
-  if (fee) {
-    const summary = fee
-      .split('\n')
-      .map((l) => l.replace(/^[-●•○★■ㆍ]\s*/, '').trim())
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(' ');
-    if (summary) {
-      faqs.push({
-        q: `${full} 주차 요금은 어떻게 되나요?`,
-        a: `${summary} 자세한 조건과 인증 방법은 위 주차 안내를 확인해주세요.`,
-      });
-    }
+  // FAQ도 화면과 동일한 구조화 주차 데이터를 사용한다. 공식 원문 앞부분을
+  // 다시 잘라 쓰면 긴 안내문이 FAQ에 재노출될 수 있으므로, 무료 주차·초과 요금처럼
+  // 이미 검증해 분류한 사실만 최대 두 항목까지 요약한다.
+  const parkingFaqGroups = buildParkingGroups(b);
+  const parkingSummary = ['무료 주차', '초과 요금']
+    .flatMap((label) => parkingFaqGroups.find((g) => g.label === label)?.items ?? [])
+    .slice(0, 2);
+  if (parkingSummary.length > 0) {
+    faqs.push({
+      q: `${full} 주차 요금은 어떻게 되나요?`,
+      a: `${parkingSummary.join(' · ')} . 자세한 인증 방법과 예외 조건은 위 주차 안내를 확인해주세요.`.replace(' .', '.'),
+    });
   }
 
   if (b.specialScreens.length > 0) {
