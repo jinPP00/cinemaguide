@@ -31,9 +31,9 @@
 }
 
 .parking-groups dt {
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.65;
 }
 
@@ -46,13 +46,14 @@
   margin: 0;
   padding-left: 18px;
   display: grid;
-  gap: 4px;
+  gap: 5px;
 }
 
 .parking-groups li {
   color: var(--ink);
   font-size: 0.92rem;
   line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 
 /* 특별관 설명: 기존 왼쪽 세로선 대신 다른 정보 카드와 같은 외곽 카드 사용 */
@@ -112,11 +113,12 @@
   font-size: 0.92rem;
 }
 
-/* 정보 확인일/출처도 기본 정보와 같은 카드형 정의 목록으로 통일 */
+/* 정보 안내: 데스크톱에서는 확인일/출처를 2칸 요약 카드로 보여 한눈에 읽히게 한다. */
 .source-list {
   margin: 14px 0 0;
-  display: block;
-  padding: 0 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0;
   background: var(--canvas);
   border: 1px solid var(--hairline-strong);
   border-radius: var(--radius);
@@ -124,26 +126,109 @@
 }
 
 .source-list > div {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 14px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--hairline);
+  min-width: 0;
+  padding: 16px 18px;
 }
 
-.source-list > div:last-child {
-  border-bottom: 0;
+.source-list > div + div {
+  border-left: 1px solid var(--hairline);
 }
 
 .source-list dt {
-  color: var(--ink-faint);
-  font-size: 0.88rem;
+  margin-bottom: 4px;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .source-list dd {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
   margin: 0;
-  font-size: 0.92rem;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.source-flag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid #f2c7a5;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #9a5215;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.source-foot {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: var(--canvas);
+}
+
+.source-caution {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.source-caution-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 50%;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.source-link-row {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.source-official-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--hairline));
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.source-official-link:hover {
+  text-decoration: none;
+  border-color: var(--accent);
 }
 
 /* 비교표는 기존 표 구조를 유지하되 교통/요금 카드와 같은 외곽선으로 정돈 */
@@ -164,32 +249,54 @@
   line-height: 1.65;
 }
 
-.source-caution {
-  line-height: 1.65;
-}
-
 @media (max-width: 639px) {
   .parking-groups,
-  .screen-notes,
-  .source-list {
+  .screen-notes {
     padding: 0 16px;
   }
 
   .parking-groups > div,
-  .screen-notes div,
-  .source-list > div {
+  .screen-notes div {
     grid-template-columns: 1fr;
     gap: 3px;
     padding: 13px 0;
   }
 
   .parking-groups dt,
-  .screen-notes dt,
-  .source-list dt {
+  .screen-notes dt {
     font-size: 0.82rem;
   }
 
   .parking-groups ul {
     padding-left: 17px;
+  }
+
+  .source-list {
+    grid-template-columns: 1fr;
+  }
+
+  .source-list > div {
+    padding: 14px 16px;
+  }
+
+  .source-list > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .source-list dd {
+    font-size: 0.95rem;
+  }
+
+  .source-foot {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 11px;
+    padding: 12px;
+  }
+
+  .source-official-link {
+    width: 100%;
+    min-height: 42px;
   }
 }
