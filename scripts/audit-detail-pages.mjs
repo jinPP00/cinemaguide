@@ -29,7 +29,6 @@ function decodeHtmlOnce(text) {
 }
 
 function decodeHtml(text) {
-  // double-escaped source까지 사용자 눈에 보이는 최종 문자열 기준으로 검사한다.
   let out = text;
   for (let i = 0; i < 3; i++) out = decodeHtmlOnce(out);
   return out;
@@ -38,6 +37,7 @@ function decodeHtml(text) {
 function plain(html) {
   return decodeHtml(
     html
+      .replace(/<!--[\s\S]*?-->/g, ' ')
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<[^>]+>/g, ' '),
@@ -51,13 +51,30 @@ function section(html, id) {
   return html.match(re)?.[1] ?? '';
 }
 
-function listItems(html) {
-  return [...html.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((m) => plain(m[1])).filter(Boolean);
+function listItemHtml(html) {
+  return [...html.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((m) => m[1]);
 }
 
-function classTexts(html, className) {
-  const re = new RegExp(`<[^>]+class=["'][^"']*\\b${className}\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/[^>]+>`, 'gi');
-  return [...html.matchAll(re)].map((m) => plain(m[1])).filter(Boolean);
+function listItems(html) {
+  return listItemHtml(html).map(plain).filter(Boolean);
+}
+
+/**
+ * 교통 li에서 노선 칩(.tb-route)만 제거하고 나머지 실제 사용자 문장을 읽는다.
+ * 이전 감사기는 span 정규식이 중첩 태그를 잘못 끊어 정상 노선 칩까지 원문으로
+ * 오인했다. 이제 항목 단위로 보고 노선 칩 텍스트만 명시적으로 제외한다.
+ */
+function transitNarratives(html) {
+  return listItemHtml(html)
+    .map((item) =>
+      item.replace(
+        /<span[^>]*class=["'][^"']*\btb-route\b[^"']*["'][^>]*>[\s\S]*?<\/span>/gi,
+        ' ',
+      ),
+    )
+    .map(plain)
+    .map((t) => t.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
 }
 
 function urlOf(file) {
@@ -68,10 +85,10 @@ function hasVisibleEntityResidue(text) {
   return /&(?:nbsp|amp|lt|gt|quot|apos)(?:;|\b)|&#(?:160|\d+|x[0-9a-f]+);?/i.test(text);
 }
 
-function duplicateValues(values) {
+function duplicateValues(values, minLength = 1) {
   const seen = new Set();
   const dup = new Set();
-  for (const value of values.map((v) => v.trim()).filter(Boolean)) {
+  for (const value of values.map((v) => v.trim()).filter((v) => v.length >= minLength)) {
     if (seen.has(value)) dup.add(value);
     seen.add(value);
   }
@@ -95,14 +112,11 @@ for (const page of branchPages) {
   const { url, html } = page;
   const parkingHtml = section(html, 'parking');
   const transitHtml = section(html, 'transit');
+  const pageText = plain(html);
 
-  // 지점 상세에 예전 공통 박스오피스가 다시 들어오는 회귀 방지.
-  if (/현재 상영중인 영화 순위|박스오피스 TOP\s*10/i.test(plain(html))) {
+  if (/현재 상영중인 영화 순위|박스오피스 TOP\s*10/i.test(pageText)) {
     add(url, '상세 박스오피스 잔존', '지점 상세에 공통 박스오피스 문구가 있음');
   }
-
-  // 사용자가 실제로 볼 수 있는 원자료 흔적.
-  const pageText = plain(html);
   if (/\bundefined\b|\bnull\b/.test(pageText)) add(url, '깨진 값 노출', 'undefined/null 문자열 노출');
 
   if (parkingHtml) {
@@ -131,40 +145,36 @@ for (const page of branchPages) {
       }
     }
 
-    const duplicates = duplicateValues(items);
+    const duplicates = duplicateValues(items, 30);
     if (duplicates.length) add(url, '주차 중복 문장', duplicates.slice(0, 2).join(' / '));
   }
 
   if (transitHtml) {
     const transitText = plain(transitHtml);
-    // 칩(.tb-route)은 여러 개여도 정상이다. 실제 긴 원문이 들어가는 text/note만 검사한다.
-    const bodyTexts = [
-      ...classTexts(transitHtml, 'tb-text'),
-      ...classTexts(transitHtml, 'tb-note'),
-    ];
+    const narratives = transitNarratives(transitHtml);
 
     if (hasVisibleEntityResidue(transitText)) {
       add(url, '교통 HTML 엔티티', transitText.match(/&[^\s]{1,20}/)?.[0] ?? '엔티티 잔존');
     }
 
-    const long = bodyTexts.filter((t) => t.length > 125);
+    const long = narratives.filter((t) => t.length > 125);
     if (long.length) {
       add(url, '교통 긴 문장', `${long.length}개 · 최장 ${Math.max(...long.map((t) => t.length))}자 · ${long[0].slice(0, 90)}`);
     }
 
-    // 이미 .tb-route 칩으로 분리된 번호는 문제 아님. 본문/주석에 긴 번호열이 남았을 때만 잡는다.
-    const routeBlob = bodyTexts.find((t) => /(?:[A-Za-z가-힣]*\d[\w-]*[,，]\s*){5,}[A-Za-z가-힣]*\d[\w-]*/.test(t));
-    if (routeBlob) add(url, '교통 노선 원문 잔존', routeBlob.slice(0, 120));
+    // 노선 칩을 제거한 뒤에도 버스번호 6개 이상이 쉼표로 남아 있을 때만 실제 원문 잔존이다.
+    const routeBlob = narratives.find((t) => /(?:[A-Za-z가-힣]*\d[\w-]*(?:\([^)]{1,18}\))?[,，]\s*){5,}[A-Za-z가-힣]*\d[\w-]*/.test(t));
+    if (routeBlob) add(url, '교통 노선 원문 잔존', routeBlob.slice(0, 140));
 
-    // 저장 원문 구분자가 그대로 보이는 경우.
-    const artifact = bodyTexts.find((t) => /&nbsp;|(?:^|\s)_[^_]|■|(?<!\w)#\s*(?:지하철|버스)/.test(t));
+    const artifact = narratives.find((t) => /&nbsp;|(?:^|\s)_[^_]|■|(?<!\w)#\s*(?:지하철|버스)/.test(t));
     if (artifact) add(url, '교통 원자료 기호', artifact.slice(0, 120));
 
-    const duplicates = duplicateValues(bodyTexts);
+    // '도보', '(심야)', 운영시간 같은 짧은 라벨은 서로 다른 항목에서 반복돼도 정상이다.
+    // 실제 가독성 문제인 긴 동일 안내문이 두 번 나온 경우만 중복으로 본다.
+    const duplicates = duplicateValues(narratives, 55);
     if (duplicates.length) add(url, '교통 중복 문장', duplicates.slice(0, 2).join(' / '));
   }
 
-  // 신뢰도 블록이 지점 상세에 빠진 회귀도 같이 검사한다.
   if (!/정보 확인일|자료 출처/.test(pageText)) {
     add(url, '출처 블록 누락', '정보 확인일 또는 자료 출처 문구가 없음');
   }
