@@ -64,8 +64,8 @@ const OVERRIDES: Record<string, Transit> = {
     raw: null,
     subway: null,
     bus: [
-      '[한솔동(첫마을) 정류장] B5, 61, 204, 430, 665, 991, 1000, 1005',
-      '[한솔동 정류장(BRT)] B0, B1, B2, B3',
+      '[한솔동 첫마을 정류장] B5, 61, 204, 430, 665, 991, 1000, 1005',
+      '[한솔동 정류장 · BRT] B0, B1, B2, B3',
     ].join('\n'),
   },
 
