@@ -29,6 +29,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Audit all branch detail pages
+        run: node scripts/audit-detail-pages.mjs
+
       - name: Deploy
         run: npx wrangler deploy
         env:
