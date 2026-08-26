@@ -55,6 +55,23 @@ function rewriteRawSubwayFinal(raw: string | null): string | null {
 }
 
 export function finalizeBranchSubwayDisplay(branch: Branch): Branch {
+  // 수원남문은 공식 원본의 두 지하철 안내가 모두 `역 하차 후 버스 이용` 형식이고,
+  // 첫 줄에는 정류장이 두 곳 이어져 있어 일반 정규식으로 자르면 의미가 흐려진다.
+  // 원본에 적힌 역·정류장·노선만 사용해 환승 순서로 재배열한다.
+  if (branch.pageSlug === '경기수원남문-메가박스') {
+    return {
+      ...branch,
+      transit: {
+        ...branch.transit,
+        raw: rewriteRawSubwayFinal(branch.transit.raw),
+        subway: [
+          '1호선 수원역 → 버스 환승 → 팔달문 정류장에서 내려 · 13번 → 녹산문고 앞·경기도박치유센터 정류장에서 내려 · 730번, 10번, 11-1번, 720-2번',
+          '수인분당선 매교역 → 버스 환승 → 팔달문 정류장에서 내려 · 20번, 25번, 64번, 112번, 20-1번',
+        ].join('\n'),
+      },
+    };
+  }
+
   return {
     ...branch,
     transit: {
