@@ -3,10 +3,14 @@ import pricesJson from '@/data/prices.json';
 import metaJson from '@/data/meta.json';
 import type { Branch, BrandKey, Meta, PriceRow } from './types';
 import { normalizeBranchTransit } from './transit-normalize';
+import { rewriteBranchSubwayDisplay } from './subway-display';
 
 // 원본 JSON은 근거 데이터로 그대로 보존하고, 화면에서 읽는 순간에만 교통 문구의
-// HTML 엔티티·붙어버린 구분자·노선/정류장 경계를 정리한다.
-export const branches = (branchesJson as Branch[]).map(normalizeBranchTransit);
+// HTML 엔티티·붙어버린 구분자·노선/정류장 경계를 정리한다. 지하철 안내는 그 뒤
+// 한 번 더 화면용 길찾기 문장으로 재구성해 공식 원문 표현을 그대로 노출하지 않는다.
+export const branches = (branchesJson as Branch[])
+  .map(normalizeBranchTransit)
+  .map(rewriteBranchSubwayDisplay);
 export const prices = pricesJson as Record<string, PriceRow[]>;
 export const meta = metaJson as Meta;
 
