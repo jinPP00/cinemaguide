@@ -7,6 +7,9 @@ if (!fs.existsSync(OUT)) {
   process.exit(1);
 }
 
+const sourceBranches = JSON.parse(fs.readFileSync('data/branches.json', 'utf8'));
+const branchByUrl = new Map(sourceBranches.map((branch) => [`/${branch.pageSlug}/`, branch]));
+
 function walk(dir, acc = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
@@ -90,6 +93,26 @@ function duplicateValues(values, minLength = 1) {
   return [...dup];
 }
 
+/**
+ * 원본 주차 안내 안에 실제 주차 가능 대수가 있는지 검사한다.
+ * `1대당 요금` 같은 단가 표현은 규모가 아니므로 제외하고, 오탐을 줄이기 위해
+ * 10대 이상만 감사 대상으로 삼는다. 화면 파서는 더 넓은 표현을 지원할 수 있다.
+ */
+function sourceParkingCapacities(branch) {
+  if (!branch?.parking) return [];
+  const text = [branch.parking.raw, branch.parking.guide, branch.parking.howTo, branch.parking.fee]
+    .filter(Boolean)
+    .join('\n')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/<br\s*\/?\s*>/gi, '\n');
+  const values = [];
+  for (const match of text.matchAll(/(?<!\d)([\d,]+)\s*(?:여\s*)?대(?!\s*당)/g)) {
+    const count = Number(match[1].replace(/,/g, ''));
+    if (Number.isFinite(count) && count >= 10) values.push(count);
+  }
+  return [...new Set(values)];
+}
+
 const files = walk(OUT);
 const branchPages = [];
 
@@ -164,6 +187,12 @@ for (const page of branchPages) {
       if (t.length > 45 || /엘리베이터|연결통로|입구|이동|구역/.test(t)) {
         add(url, '주차 규모 오분류', `${t.length}자 · ${t.slice(0, 80)}`);
       }
+    }
+
+    const sourceBranch = branchByUrl.get(url);
+    const sourceCapacities = sourceParkingCapacities(sourceBranch);
+    if (sourceCapacities.length > 0 && capacityRows.length === 0) {
+      add(url, '주차 규모 누락', `원본에 ${sourceCapacities.map((n) => `${n.toLocaleString()}대`).join(', ')} 있음`);
     }
 
     const duplicates = duplicateValues(items, 30);
