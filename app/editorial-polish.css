@@ -1,0 +1,291 @@
+/* ------------------------------------------------------------------ *
+ * 최근 추가된 비교/안내 콘텐츠 공통 디자인
+ *
+ * 홈·관람료 비교·특별관·박스오피스·지역/지점 보조 콘텐츠가 서로 다른
+ * 테이블/카드 문법을 쓰지 않도록 공통 시각 체계를 둔다. 기존 브랜드 컬러를
+ * 과하게 늘리지 않고 흰 카드 + 옅은 헤더 + 선명한 정보 위계로 정리한다.
+ * ------------------------------------------------------------------ */
+
+.guide-lead {
+  margin-top: 12px;
+  max-width: 920px;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.guide-copy {
+  margin-top: 12px;
+  max-width: 920px;
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+.guide-copy a,
+.guide-inline-link {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.guide-copy a:hover,
+.guide-inline-link:hover {
+  text-decoration: underline;
+}
+
+/* 한 줄 보조 설명. 긴 줄글 대신 표/카드 바로 위·아래에 한 번만 사용한다. */
+.section-kicker {
+  margin: 6px 0 0;
+  max-width: 920px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+/* 공통 데이터 표 -------------------------------------------------- */
+.data-table-shell {
+  margin-top: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.data-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--canvas);
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 18px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--hairline);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table thead th {
+  background: #f1f4f7;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.data-table tbody th {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.data-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.data-table tbody tr:hover > * {
+  background: #fbfcfd;
+}
+
+.data-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table .center {
+  text-align: center;
+}
+
+.data-table .muted {
+  color: var(--ink-faint);
+}
+
+.data-table .subline {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 홈의 4열 비교표: 빈 공간이 생기지 않게 4개 열을 명확히 나눈다. */
+.data-table--brand-compare {
+  table-layout: fixed;
+  min-width: 680px;
+}
+
+.data-table--brand-compare th:first-child,
+.data-table--brand-compare td:first-child {
+  width: 28%;
+  text-align: left;
+}
+
+.data-table--brand-compare th:not(:first-child),
+.data-table--brand-compare td:not(:first-child) {
+  width: 24%;
+  text-align: center;
+}
+
+/* 관람료/지역 비교는 지점명은 왼쪽, 금액은 오른쪽이 읽기 쉽다. */
+.data-table--fare th:first-child,
+.data-table--fare td:first-child {
+  text-align: left;
+}
+
+.data-table--fare td:not(:first-child) {
+  text-align: right;
+}
+
+.data-table--fare td.text {
+  text-align: left;
+  white-space: normal;
+}
+
+/* 표 아래의 해석형 줄글 대신 쓰는 짧은 사실 카드 ----------------- */
+.fact-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 680px) {
+  .fact-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fact-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.fact-card {
+  min-width: 0;
+  padding: 15px 17px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(22, 32, 44, 0.03);
+}
+
+.fact-label {
+  display: block;
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.fact-value {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.fact-meta {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+/* 가이드 간 이동: 상세/가이드 어디서 들어와도 홈으로 돌아갈 필요가 없게 한다. */
+.guide-jump-list {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+
+.guide-jump-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  background: var(--canvas);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.guide-jump-link::after {
+  content: '→';
+  margin-left: 7px;
+  color: var(--ink-faint);
+}
+
+.guide-jump-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* 특별관 카드도 새 비교표와 같은 깊이/헤더 위계를 쓴다. */
+.screen-card {
+  padding: 18px;
+  box-shadow: 0 1px 2px rgba(22, 32, 44, 0.035);
+}
+
+.screen-card-head {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.screen-card-desc {
+  line-height: 1.65;
+}
+
+/* 박스오피스 목록도 다른 카드와 같은 외곽 깊이를 사용한다. */
+.boxoffice-list {
+  background: var(--canvas);
+  box-shadow: var(--shadow);
+}
+
+/* 홈 3사 비교 뒤의 사실 카드. 브랜드색 대신 숫자와 라벨로만 구분한다. */
+.home-compare-facts .fact-card {
+  background: var(--canvas);
+}
+
+/* 상세페이지에 새로 추가한 다른 정보 보기 링크도 칩보다 카드형 버튼에 가깝게. */
+.detail-guide-section .chip-list {
+  gap: 10px;
+}
+
+.detail-guide-section .chip {
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .guide-lead,
+  .guide-copy {
+    font-size: 0.96rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px 14px;
+  }
+
+  .data-table {
+    font-size: 0.88rem;
+  }
+
+  .fact-card {
+    padding: 14px 15px;
+  }
+}
