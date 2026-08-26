@@ -191,6 +191,33 @@
   white-space: nowrap;
 }
 
+/* 이전에 추가된 .fare-table도 같은 카드/헤더 계열로 보이게 연결한다. */
+.table-scroll {
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.table-scroll > .fare-table {
+  border: 0;
+  border-radius: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: visible;
+}
+
+.table-scroll > .fare-table thead th {
+  background: #f1f4f7;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.table-scroll > .fare-table tbody tr:hover > * {
+  background: #fbfcfd;
+}
+
 /* 표 아래의 해석형 줄글 대신 쓰는 짧은 사실 카드 ----------------- */
 .fact-grid {
   margin-top: 14px;
