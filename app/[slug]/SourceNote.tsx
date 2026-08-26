@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Branch } from '@/lib/types';
 import { guidePath, GUIDES } from '@/lib/paths';
 
-/** "2026-07-23" → "2026년 7월 23일" */
 function formatDate(iso: string): string | null {
   const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return null;
@@ -17,28 +16,15 @@ export default function SourceNote({ branch }: { branch: Branch }) {
     <>
       <section className="section detail-guide-section" aria-labelledby="detail-guides">
         <h2 id="detail-guides">다른 정보 보기</h2>
-        <ul className="chip-list" style={{ marginTop: 14 }}>
-          <li>
-            <Link className="chip" href={guidePath(GUIDES.boxoffice)}>
-              영화순위 보기
-            </Link>
-          </li>
-          <li>
-            <Link className="chip" href={guidePath(GUIDES.fares)}>
-              관람료 비교
-            </Link>
-          </li>
-          <li>
-            <Link className="chip" href={guidePath(GUIDES.screens)}>
-              특별관 안내
-            </Link>
-          </li>
+        <ul className="guide-jump-list">
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.boxoffice)}>영화순위</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.screens)}>특별관 안내</Link></li>
         </ul>
       </section>
 
       <section className="section source-section" aria-labelledby="source">
         <h2 id="source">정보 안내</h2>
-
         <dl className="source-list">
           <div>
             <dt>정보 확인일</dt>
