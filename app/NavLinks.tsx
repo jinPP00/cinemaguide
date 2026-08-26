@@ -2,18 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-// 클라이언트 컴포넌트이므로 '@/lib/data'가 아니라 '@/lib/paths'에서 가져온다 —
-// data.ts를 import하면 branches.json·prices.json 전체가 클라이언트 번들에
-// 딸려 들어간다(lib/paths.ts 주석 참고).
-import { brandPath } from '@/lib/paths';
+import { brandPath, guidePath, GUIDES } from '@/lib/paths';
 import { brandThemeVars } from '@/lib/colors';
 import type { BrandKey } from '@/lib/types';
 import type { CSSProperties } from 'react';
 
 /**
- * 지금 보고 있는 페이지가 어느 브랜드에 속하는지는 정적 export 사이트라
- * 서버 컴포넌트(레이아웃)에서 알 수 없다 — usePathname()으로 클라이언트에서
- * 판단해서 상단바의 해당 브랜드 링크만 강조한다.
+ * 브랜드 메뉴와 영화순위를 모든 페이지 상단에서 바로 이동할 수 있게 한다.
+ * 브랜드 활성 상태는 해당 브랜드 허브·지역·지점 페이지에서 표시하고,
+ * 영화순위는 박스오피스 안내 페이지에서만 활성화한다.
  */
 export default function NavLinks({
   brands,
@@ -22,6 +19,8 @@ export default function NavLinks({
 }) {
   const pathname = usePathname() ?? '';
   const decoded = decodeURIComponent(pathname);
+  const boxOfficePath = decodeURIComponent(guidePath(GUIDES.boxoffice));
+  const isBoxOffice = decoded === boxOfficePath || decoded === boxOfficePath.replace(/\/$/, '');
 
   return (
     <nav className="nav" aria-label="주요 메뉴">
@@ -42,6 +41,9 @@ export default function NavLinks({
           </Link>
         );
       })}
+      <Link href={guidePath(GUIDES.boxoffice)} aria-current={isBoxOffice ? 'page' : undefined}>
+        영화순위
+      </Link>
     </nav>
   );
 }
