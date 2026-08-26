@@ -113,7 +113,7 @@
   font-size: 0.92rem;
 }
 
-/* 정보 안내: 데스크톱에서는 확인일/출처를 2칸 요약 카드로 보여 한눈에 읽히게 한다. */
+/* 정보 안내는 신뢰용 보조정보다. 날짜/출처가 본문 제목처럼 커 보이지 않게 낮춘다. */
 .source-list {
   margin: 14px 0 0;
   display: grid;
@@ -127,7 +127,7 @@
 
 .source-list > div {
   min-width: 0;
-  padding: 16px 18px;
+  padding: 13px 16px;
 }
 
 .source-list > div + div {
@@ -135,9 +135,9 @@
 }
 
 .source-list dt {
-  margin-bottom: 4px;
-  color: var(--ink-soft);
-  font-size: 0.8rem;
+  margin-bottom: 2px;
+  color: var(--ink-faint);
+  font-size: 0.76rem;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -146,34 +146,34 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
   margin: 0;
-  color: var(--ink);
-  font-size: 1rem;
-  font-weight: 800;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  font-weight: 600;
   line-height: 1.5;
 }
 
 .source-flag {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
-  padding: 2px 8px;
+  min-height: 22px;
+  padding: 1px 7px;
   border: 1px solid #f2c7a5;
   border-radius: 999px;
   background: #fff7ed;
   color: #9a5215;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
 }
 
 .source-foot {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 13px 14px;
+  padding: 11px 13px;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-sm);
   background: var(--canvas);
@@ -186,8 +186,8 @@
   min-width: 0;
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
 .source-caution-icon {
@@ -195,13 +195,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   margin-top: 1px;
   border: 1px solid var(--hairline-strong);
   border-radius: 50%;
   color: var(--ink-soft);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 800;
 }
 
@@ -215,13 +215,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 38px;
-  padding: 7px 12px;
+  min-height: 36px;
+  padding: 6px 11px;
   border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--hairline));
   border-radius: var(--radius-sm);
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -238,6 +238,104 @@
 
 .table-scroll .fare-table {
   border-color: var(--hairline-strong);
+}
+
+/* 근처 영화관 표: 영화관명이 넓이를 독점하지 않게 하고 주소를 주 정보로 넓게 배치 */
+.nearby-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.nearby-table th,
+.nearby-table td {
+  text-align: left;
+  vertical-align: top;
+}
+
+.nearby-table th:nth-child(1),
+.nearby-table td:nth-child(1) {
+  width: 24%;
+}
+
+.nearby-table th:nth-child(2),
+.nearby-table td:nth-child(2) {
+  width: 10%;
+}
+
+.nearby-table th:nth-child(3),
+.nearby-table td:nth-child(3) {
+  width: 46%;
+}
+
+.nearby-table th:nth-child(4),
+.nearby-table td:nth-child(4) {
+  width: 20%;
+}
+
+.nearby-table .nearby-distance {
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.nearby-table .nearby-address {
+  color: var(--ink-soft);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* 요금표 아래 상영 방식 설명. 평가 대신 실제 관람 방식 차이만 짧게 보여준다. */
+.fare-format-guide {
+  margin-top: 18px;
+  padding: 15px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--canvas);
+}
+
+.fare-format-heading {
+  margin-bottom: 9px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.fare-format-list {
+  margin: 0;
+}
+
+.fare-format-list > div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.fare-format-list > div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.fare-format-list > div:last-child {
+  padding-bottom: 0;
+}
+
+.fare-format-list dt {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.fare-format-list dd {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* BranchDetail 맨 아래의 비공식 고지는 전역 푸터와 중복되므로 화면에서 반복하지 않는다. */
+.brand-themed:has(.source-section) > .section:last-child {
+  display: none;
 }
 
 /* 비교 결과 한 줄은 표와 떨어진 작은 본문처럼 보이지 않게 보조 카드화 */
@@ -276,7 +374,7 @@
   }
 
   .source-list > div {
-    padding: 14px 16px;
+    padding: 12px 14px;
   }
 
   .source-list > div + div {
@@ -285,18 +383,32 @@
   }
 
   .source-list dd {
-    font-size: 0.95rem;
+    font-size: 0.86rem;
   }
 
   .source-foot {
     align-items: stretch;
     flex-direction: column;
-    gap: 11px;
-    padding: 12px;
+    gap: 10px;
+    padding: 11px;
   }
 
   .source-official-link {
     width: 100%;
-    min-height: 42px;
+    min-height: 40px;
+  }
+
+  .nearby-table {
+    min-width: 720px;
+  }
+
+  .fare-format-guide {
+    padding: 14px;
+  }
+
+  .fare-format-list > div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding: 10px 0;
   }
 }
