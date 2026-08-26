@@ -337,6 +337,13 @@
   font-weight: 800;
 }
 
+/* 지점 상세 하단의 비공식 사이트 고지는 전역 푸터와 중복된다. SourceNote가 있는
+   실제 지점 상세에서만 마지막 중복 note 섹션을 숨긴다. 브랜드/지역 페이지의
+   자체 안내는 건드리지 않는다. */
+.brand-themed:has(.source-section) > .section:last-child:has(.note) {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .guide-lead,
   .guide-copy {
