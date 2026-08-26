@@ -37,6 +37,44 @@ function transitSection(html) {
   return m?.[1] ?? '';
 }
 
+/** 시작 위치의 div 하나를 중첩 깊이까지 포함해 통째로 반환한다. */
+function balancedDiv(html, start) {
+  const tagRe = /<\/?div\b[^>]*>/gi;
+  tagRe.lastIndex = start;
+  let depth = 0;
+  let started = false;
+  let match;
+
+  while ((match = tagRe.exec(html))) {
+    const closing = /^<\/div/i.test(match[0]);
+    if (!started) {
+      if (closing) continue;
+      started = true;
+      depth = 1;
+      continue;
+    }
+    depth += closing ? -1 : 1;
+    if (depth === 0) return html.slice(start, tagRe.lastIndex);
+  }
+  return '';
+}
+
+/** 대중교통 섹션 중 '지하철' 카드만 검사한다. 버스 카드 문구를 오탐하지 않는다. */
+function subwayCard(html) {
+  const transit = transitSection(html);
+  if (!transit) return '';
+
+  const startRe = /<div[^>]*class=["'][^"']*\btransit-card\b[^"']*["'][^>]*>/gi;
+  let match;
+  while ((match = startRe.exec(transit))) {
+    const block = balancedDiv(transit, match.index);
+    if (!block) continue;
+    const head = block.match(/<div[^>]*class=["'][^"']*\btransit-card-head\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    if (head && /지하철/.test(plain(head[1]))) return block;
+  }
+  return '';
+}
+
 function compareForm(text) {
   return decode(text)
     .replace(/^[\s\-·•●○★■ㆍ]+/, '')
@@ -79,7 +117,6 @@ function sourceSubwayLines(branch) {
   if (branch.transit?.subway) lines.push(...decode(branch.transit.subway).split('\n'));
   if (branch.transit?.raw) lines.push(...sourceSubwayLinesFromText(branch.transit.raw));
 
-  // 일부 수집 데이터는 지하철 구획이 주차 raw에 섞여 있다.
   for (const value of [branch.parking?.raw, branch.parking?.guide, branch.parking?.howTo, branch.parking?.fee]) {
     if (value && /지하철/.test(value)) lines.push(...sourceSubwayLinesFromText(value));
   }
@@ -98,18 +135,21 @@ const residualPatterns = [
 ];
 
 const issues = [];
+let subwayCards = 0;
 for (const branch of branches) {
   const file = path.join(OUT, branch.pageSlug, 'index.html');
   if (!fs.existsSync(file)) continue;
 
   const html = fs.readFileSync(file, 'utf8');
-  const rendered = plain(transitSection(html));
+  const card = subwayCard(html);
+  if (!card) continue;
+  subwayCards++;
+
+  const rendered = plain(card);
   const renderedCompare = compareForm(rendered);
-  if (!rendered) continue;
 
   for (const sourceLine of sourceSubwayLines(branch)) {
     const sourceCompare = compareForm(sourceLine);
-    // 짧은 `4호선 범계역` 같은 사실 라벨까지 억지로 바꿀 필요는 없다.
     if (sourceCompare.length < 28) continue;
     if (renderedCompare.includes(sourceCompare)) {
       issues.push({
@@ -132,7 +172,7 @@ for (const branch of branches) {
 }
 
 console.log('\n=== 지하철 안내 문구 전수 검사 ===');
-console.log(`검사 지점: ${branches.length}개`);
+console.log(`전체 지점: ${branches.length}개 · 지하철 카드: ${subwayCards}개`);
 console.log(`문제 건수: ${issues.length}건`);
 
 if (issues.length) {
