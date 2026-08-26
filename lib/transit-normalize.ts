@@ -28,6 +28,8 @@ const ROUTE_GROUP_WORDS = ['급행', '간선', '지선', '광역', '마을', '�
 const ROUTE_GROUP_ALT = ROUTE_GROUP_WORDS.join('|');
 const ROUTE_BAD_SUFFIX = /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|거리|이내|이상|하차|도보|개|호기|회|대|명|석|원|m)$/i;
 
+type TransitNormalizeKind = 'raw' | 'field' | 'subway';
+
 function cleanEdge(text: string): string {
   return text
     .replace(/^\s*[.,:：/·)]+\s*/, '')
@@ -226,6 +228,74 @@ function normalizeRawMarkers(input: string[]): string[] {
   return expanded;
 }
 
+/**
+ * 지하철 길찾기 문구를 원문의 사실은 그대로 두고 짧은 표준 표현으로 바꾼다.
+ * 장소명·노선·출구·거리·층수는 손대지 않고 조사/존댓말/반복 동사만 정리한다.
+ * 예: "4번출구 (도보 직진 50미터 > 우측 건물 진입 후 엘리베이터 이용 7층)"
+ *  → "4번 출구 → 50m 직진 → 우측 건물 진입 → 엘리베이터로 7층"
+ */
+function rewriteSubwayLine(input: string): string {
+  const marker = input.match(/^(\[[^\]]+\]\s*)/);
+  const prefix = marker?.[1] ?? '';
+  let line = marker ? input.slice(marker[0].length).trim() : input.trim();
+
+  line = line
+    .replace(/(\d+)\s*번\s*출구/g, '$1번 출구')
+    .replace(/(\d+(?:\.\d+)?)\s*(?:미터|[mM])(?=\s|$|[),·→>])/g, '$1m')
+    .replace(/^(\d+번 출구)\s*\(([^()]+)\)$/, '$1 → $2')
+    .replace(/도보\s*직진\s*(\d+(?:\.\d+)?)m/g, '$1m 직진')
+    .replace(/(\d+번 출구)에서\s*/g, '$1 → ')
+    .replace(/(\d+번 출구)\s+(?=(?:도보|직진|좌측|우측|횡단보도|약\s*\d+m))/g, '$1 → ')
+    .replace(/([가-힣A-Za-z0-9·()]+역)\s+하차\s+(\d+번 출구)/g, '$1 하차 → $2')
+    .replace(/하차\s*(?:후|하여)\s*,?\s*/g, '하차 → ')
+    .replace(/진입\s*후\s*,?\s*/g, '진입 → ')
+    .replace(/이동\s*후\s*,?\s*/g, '이동 → ')
+    .replace(/이용\s*후\s*,?\s*/g, '이용 → ')
+    .replace(/건넌\s*후\s*,?\s*/g, '건너 → ')
+    .replace(/나온\s*후\s*,?\s*/g, '나와 → ')
+    .replace(/나오신\s*후\s*,?\s*/g, '나와 → ')
+    .replace(/나와서\s*/g, '나와 → ')
+    .replace(/엘리베이터(?:를)?\s*(?:이용(?:하여|해)?|타고|탑승(?:하여|해)?)\s*(\d+층)/g, '엘리베이터로 $1')
+    .replace(/E\/V(?:를)?\s*(?:이용(?:하여|해)?|타고|탑승(?:하여|해)?)\s*(\d+층)/gi, 'E/V로 $1')
+    .replace(/(?:도보로|도보)\s*(약\s*)?(\d+)\s*분\s*소요/g, '도보 $1$2분')
+    .replace(/이용(?:하여|해)\s+/g, '이용 → ')
+    .replace(/방면으로\s*이동/g, '방면 이동')
+    .replace(/\s*(?:오시면|가시면|이동하시면)\s*됩니다[.!]?$/g, '')
+    .replace(/\s*(?:해\s*주세요|해주세요|해주시기\s*바랍니다|바랍니다)[.!]?$/g, '')
+    .replace(/\s*[>→]\s*/g, ' → ')
+    .replace(/\s*→\s*→\s*/g, ' → ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  return `${prefix}${line}`.trim();
+}
+
+/** raw 한 덩어리 안에서도 지하철 구획에 들어 있는 줄만 표현을 바꾼다. */
+function rewriteRawSubwayLines(lines: string[]): string[] {
+  let inSubway = false;
+
+  return lines.map((line) => {
+    const trimmed = line.trim();
+    const plain = trimmed.replace(/^[-·•]\s*/, '').trim();
+
+    const inlineSubway = plain.match(/^(?:\d+[.)]\s*)?지하철\s*(?:이용\s*시|안내)?\s*[:：]\s*(.+)$/);
+    if (inlineSubway) {
+      return trimmed.replace(inlineSubway[1], rewriteSubwayLine(inlineSubway[1]));
+    }
+
+    if (/^(?:[#■]\s*|\[)?[^\n\]]*지하철(?:\s*이용\s*시|\s*안내)?\]?\s*$/.test(plain)) {
+      inSubway = true;
+      return line;
+    }
+    if (/^(?:[#■]\s*|\[)?[^\n\]]*버스(?:\s*이용\s*시|\s*안내)?\]?\s*$/.test(plain)) {
+      inSubway = false;
+      return line;
+    }
+
+    return inSubway ? rewriteSubwayLine(line) : line;
+  });
+}
+
 function dedupeLines(lines: string[]): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -241,7 +311,7 @@ function dedupeLines(lines: string[]): string[] {
   return result;
 }
 
-export function normalizeTransitText(value: string | null | undefined, kind: 'raw' | 'field' = 'field'): string | null {
+export function normalizeTransitText(value: string | null | undefined, kind: TransitNormalizeKind = 'field'): string | null {
   if (!value) return value ?? null;
 
   const decoded = splitGluedSubway(decodeEntities(value))
@@ -257,6 +327,7 @@ export function normalizeTransitText(value: string | null | undefined, kind: 'ra
     .trim();
 
   let lines = normalized.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (kind === 'raw') lines = rewriteRawSubwayLines(lines);
   if (kind === 'raw') lines = normalizeRawMarkers(lines);
   lines = joinWrappedRouteBlocks(lines).flatMap(splitPairedRouteGroups);
 
@@ -271,6 +342,8 @@ export function normalizeTransitText(value: string | null | undefined, kind: 'ra
     // 화면 파서가 다음 줄을 앞 항목의 note로 합쳐 긴 문단을 다시 만들므로 제거한다.
     .map((line) => /^#\s+/.test(line) ? line : line.replace(/^[-·•]\s*/, '').replace(/^:\s*/, '').trim())
     .filter(Boolean);
+
+  if (kind === 'subway') lines = lines.map(rewriteSubwayLine);
 
   return dedupeLines(lines).join('\n');
 }
@@ -292,7 +365,15 @@ function stripBusOnlyHeading(text: string): string {
 
 export function normalizeBranchTransit(branch: Branch): Branch {
   const override = reviewedTransitOverride(branch);
-  if (override) return { ...branch, transit: override };
+  if (override) {
+    return {
+      ...branch,
+      transit: {
+        ...override,
+        subway: normalizeTransitText(override.subway, 'subway'),
+      },
+    };
+  }
 
   const originalRaw = branch.transit.raw;
 
@@ -312,8 +393,8 @@ export function normalizeBranchTransit(branch: Branch): Branch {
     transit: {
       ...branch.transit,
       raw: normalizeTransitText(originalRaw, 'raw'),
-      subway: normalizeTransitText(branch.transit.subway),
-      bus: normalizeTransitText(branch.transit.bus),
+      subway: normalizeTransitText(branch.transit.subway, 'subway'),
+      bus: normalizeTransitText(branch.transit.bus, 'field'),
     },
   };
 }
