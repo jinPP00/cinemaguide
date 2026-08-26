@@ -32,7 +32,6 @@
   text-decoration: underline;
 }
 
-/* 한 줄 보조 설명. 긴 줄글 대신 표/카드 바로 위·아래에 한 번만 사용한다. */
 .section-kicker {
   margin: 6px 0 0;
   max-width: 920px;
@@ -114,7 +113,6 @@
   line-height: 1.4;
 }
 
-/* 홈의 4열 비교표: 빈 공간이 생기지 않게 4개 열을 명확히 나눈다. */
 .data-table--brand-compare {
   table-layout: fixed;
   min-width: 680px;
@@ -132,7 +130,6 @@
   text-align: center;
 }
 
-/* 관람료/지역 비교는 지점명은 왼쪽, 금액은 오른쪽이 읽기 쉽다. */
 .data-table--fare th:first-child,
 .data-table--fare td:first-child {
   text-align: left;
@@ -145,6 +142,53 @@
 .data-table--fare td.text {
   text-align: left;
   white-space: normal;
+}
+
+/* 근처 영화관은 주소를 가장 넓게 쓰고 거리 열은 좁게 고정한다. */
+.data-table--nearby {
+  table-layout: fixed;
+  min-width: 760px;
+}
+
+.data-table--nearby th:nth-child(1),
+.data-table--nearby td:nth-child(1) {
+  width: 22%;
+}
+
+.data-table--nearby th:nth-child(2),
+.data-table--nearby td:nth-child(2) {
+  width: 10%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.data-table--nearby th:nth-child(3),
+.data-table--nearby td:nth-child(3) {
+  width: 48%;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.55;
+}
+
+.data-table--nearby th:nth-child(4),
+.data-table--nearby td:nth-child(4) {
+  width: 20%;
+  text-align: left;
+  white-space: normal;
+}
+
+.data-table--region {
+  min-width: 500px;
+}
+
+.data-table--region th:first-child,
+.data-table--region td:first-child {
+  width: 42%;
+}
+
+.data-table--region td:not(:first-child) {
+  text-align: right;
+  white-space: nowrap;
 }
 
 /* 표 아래의 해석형 줄글 대신 쓰는 짧은 사실 카드 ----------------- */
@@ -233,7 +277,6 @@
   text-decoration: none;
 }
 
-/* 특별관 카드도 새 비교표와 같은 깊이/헤더 위계를 쓴다. */
 .screen-card {
   padding: 18px;
   box-shadow: 0 1px 2px rgba(22, 32, 44, 0.035);
@@ -248,18 +291,15 @@
   line-height: 1.65;
 }
 
-/* 박스오피스 목록도 다른 카드와 같은 외곽 깊이를 사용한다. */
 .boxoffice-list {
   background: var(--canvas);
   box-shadow: var(--shadow);
 }
 
-/* 홈 3사 비교 뒤의 사실 카드. 브랜드색 대신 숫자와 라벨로만 구분한다. */
 .home-compare-facts .fact-card {
   background: var(--canvas);
 }
 
-/* 상세페이지에 새로 추가한 다른 정보 보기 링크도 칩보다 카드형 버튼에 가깝게. */
 .detail-guide-section .chip-list {
   gap: 10px;
 }
