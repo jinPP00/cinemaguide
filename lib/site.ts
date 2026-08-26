@@ -8,7 +8,7 @@ export const SITE = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cinemaguide.kr',
   description:
     'CGV·롯데시네마·메가박스 전국 425개 지점의 위치, 교통, 주차, 관람료 정보를 한 곳에서 확인하세요.',
-  operator: '영화관 지점안내 운영팀',
+  operator: '영화관 지점안내 운영자',
   email: 'contact@cinemaguide.kr',
 } as const;
 
