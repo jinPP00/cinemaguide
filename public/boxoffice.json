@@ -1,15 +1,15 @@
 {
-  "targetDate": "20260823",
-  "fetchedAt": "2026-08-24T01:18:44.175Z",
+  "targetDate": "20260906",
+  "fetchedAt": "2026-09-07T03:18:11.107Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 502215,
-      "audienceTotal": 7109371,
-      "salesShare": 66,
+      "audienceToday": 259743,
+      "audienceTotal": 10027992,
+      "salesShare": 61.1,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -37,9 +37,9 @@
       "movieCd": "20262770",
       "name": "스파이더맨: 브랜드 뉴 데이",
       "openDate": "2026-07-29",
-      "audienceToday": 149240,
-      "audienceTotal": 8127617,
-      "salesShare": 18.6,
+      "audienceToday": 54890,
+      "audienceTotal": 8792035,
+      "salesShare": 9.8,
       "directors": [
         "데스틴 다니엘 크리튼"
       ],
@@ -64,12 +64,122 @@
     },
     {
       "rank": 3,
+      "movieCd": "20265146",
+      "name": "옵세션",
+      "openDate": "2026-09-02",
+      "audienceToday": 51463,
+      "audienceTotal": 185100,
+      "salesShare": 11.7,
+      "directors": [
+        "커리 바커"
+      ],
+      "actors": [
+        "마이클 존스턴",
+        "인디 네버레티",
+        "쿠퍼 톰린슨",
+        "메간 롤리스"
+      ],
+      "genres": [
+        "공포(호러)"
+      ],
+      "watchGrade": "청소년관람불가",
+      "runtime": 108,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/53/tn_DPF033752.jpg"
+    },
+    {
+      "rank": 4,
+      "movieCd": "20247458",
+      "name": "경주기행",
+      "openDate": "2026-08-26",
+      "audienceToday": 17834,
+      "audienceTotal": 297594,
+      "salesShare": 3.7,
+      "directors": [
+        "김미조"
+      ],
+      "actors": [
+        "이정은",
+        "공효진",
+        "박소담",
+        "이연",
+        "변요한"
+      ],
+      "genres": [
+        "범죄"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 110,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/50/tn_DPK026179.jpg"
+    },
+    {
+      "rank": 5,
+      "movieCd": "20204641",
+      "name": "비광",
+      "openDate": "2026-09-02",
+      "audienceToday": 14419,
+      "audienceTotal": 71397,
+      "salesShare": 2.9,
+      "directors": [
+        "이지원"
+      ],
+      "actors": [
+        "류승룡",
+        "하지원",
+        "김시아",
+        "김해숙",
+        "김선영"
+      ],
+      "genres": [
+        "드라마",
+        "가족"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 109,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPK026276.jpg"
+    },
+    {
+      "rank": 6,
+      "movieCd": "20264918",
+      "name": "싱 어게인",
+      "openDate": "2026-09-02",
+      "audienceToday": 12004,
+      "audienceTotal": 55931,
+      "salesShare": 2.5,
+      "directors": [
+        "존 카니"
+      ],
+      "actors": [
+        "폴 러드",
+        "닉 조나스"
+      ],
+      "genres": [
+        "드라마"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 98,
+      "nations": [
+        "아일랜드",
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPF033688.jpg"
+    },
+    {
+      "rank": 7,
       "movieCd": "20262381",
       "name": "사랑의 하츄핑: 고래보석의 전설",
       "openDate": "2026-08-05",
-      "audienceToday": 32192,
-      "audienceTotal": 788263,
-      "salesShare": 3.7,
+      "audienceToday": 8034,
+      "audienceTotal": 858709,
+      "salesShare": 1.6,
       "directors": [
         "김수훈"
       ],
@@ -85,41 +195,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPK026057.jpg"
     },
     {
-      "rank": 4,
-      "movieCd": "20264035",
-      "name": "인시디어스: 그들이 넘어왔다",
-      "openDate": "2026-08-20",
-      "audienceToday": 22726,
-      "audienceTotal": 93924,
-      "salesShare": 2.9,
-      "directors": [
-        "제이콥 체이스"
-      ],
-      "actors": [
-        "브랜든 페레아",
-        "로라 고든",
-        "린 샤예"
-      ],
-      "genres": [
-        "공포(호러)",
-        "미스터리",
-        "스릴러"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 105,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/35/tn_DPF032926.jpg"
-    },
-    {
-      "rank": 5,
+      "rank": 8,
       "movieCd": "20264635",
       "name": "명탐정 코난: 하이웨이의 타천사",
       "openDate": "2026-08-12",
-      "audienceToday": 19923,
-      "audienceTotal": 356276,
-      "salesShare": 2.5,
+      "audienceToday": 2942,
+      "audienceTotal": 420629,
+      "salesShare": 0.6,
       "directors": [],
       "actors": [],
       "genres": [
@@ -133,148 +215,64 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033598.jpg"
     },
     {
-      "rank": 6,
-      "movieCd": "20255484",
-      "name": "오케이 마담2",
-      "openDate": "2026-08-12",
-      "audienceToday": 12235,
-      "audienceTotal": 305508,
-      "salesShare": 1.5,
+      "rank": 9,
+      "movieCd": "20264557",
+      "name": "오크 스트리트의 마지막 날",
+      "openDate": "2026-08-26",
+      "audienceToday": 2433,
+      "audienceTotal": 130502,
+      "salesShare": 0.5,
       "directors": [
-        "이철하"
+        "데이빗 로버트 밋첼"
       ],
       "actors": [
-        "엄정화",
-        "박성웅",
-        "이상윤",
-        "배정남",
-        "박진주"
+        "앤 해서웨이",
+        "이완 맥그리거"
       ],
       "genres": [
-        "코미디"
+        "액션",
+        "어드벤처",
+        "미스터리",
+        "SF",
+        "스릴러"
       ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 108,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPK026153.jpg"
-    },
-    {
-      "rank": 7,
-      "movieCd": "20262945",
-      "name": "퍼피 구조대: 더 다이노 무비",
-      "openDate": "2026-08-13",
-      "audienceToday": 9837,
-      "audienceTotal": 95605,
-      "salesShare": 1.2,
-      "directors": [
-        "캘런 브런커"
-      ],
-      "actors": [
-        "은영선",
-        "문남숙",
-        "정선혜",
-        "박지윤",
-        "신용우"
-      ],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 88,
+      "watchGrade": "12세이상관람가",
+      "runtime": 99,
       "nations": [
         "미국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/45/tn_DPF033361.jpg"
-    },
-    {
-      "rank": 8,
-      "movieCd": "20233219",
-      "name": "호프",
-      "openDate": "2026-07-15",
-      "audienceToday": 6064,
-      "audienceTotal": 4518395,
-      "salesShare": 0.7,
-      "directors": [
-        "나홍진"
-      ],
-      "actors": [
-        "황정민",
-        "조인성",
-        "정호연",
-        "테일러 러셀",
-        "카메론 브리튼"
-      ],
-      "genres": [
-        "SF",
-        "스릴러",
-        "액션"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 156,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/43/tn_DPK025867.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20100810",
-      "name": "마루 밑 아리에티",
-      "openDate": "2010-09-09",
-      "audienceToday": 3941,
-      "audienceTotal": 1086258,
-      "salesShare": 0.5,
-      "directors": [
-        "요네바야시 히로마사"
-      ],
-      "actors": [
-        "시다 미라이",
-        "카미키 류노스케",
-        "미우라 토모카즈",
-        "이선영",
-        "엄상현"
-      ],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 94,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/51/tn_DPF033633.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPF033676.jpg"
     },
     {
       "rank": 10,
-      "movieCd": "20262902",
-      "name": "다윗",
-      "openDate": "2026-07-10",
-      "audienceToday": 2610,
-      "audienceTotal": 306440,
-      "salesShare": 0.3,
+      "movieCd": "20127108",
+      "name": "모모와 다락방의 수상한 요괴들",
+      "openDate": "2012-07-05",
+      "audienceToday": 2274,
+      "audienceTotal": 310413,
+      "salesShare": 0.4,
       "directors": [
-        "필 커닝햄",
-        "브렌트 도스"
+        "오키우라 히로유키"
       ],
       "actors": [
-        "브랜든 엥그먼",
-        "필 위크함",
-        "브라이언 스티베일",
-        "아담 골드",
-        "미리 메시카"
+        "미야마 카렌",
+        "유카",
+        "이선",
+        "김준현",
+        "양상국"
       ],
       "genres": [
-        "애니메이션"
+        "애니메이션",
+        "드라마",
+        "가족",
+        "판타지"
       ],
       "watchGrade": "전체관람가",
-      "runtime": 109,
+      "runtime": 120,
       "nations": [
-        "남아프리카공화국",
-        "미국"
+        "일본"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/40/tn_DPF033233.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPF033797.jpg"
     }
   ]
 }
