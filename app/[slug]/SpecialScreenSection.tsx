@@ -25,12 +25,19 @@ export default function SpecialScreenSection({ branch }: { branch: Branch }) {
     .map((name) => screenKind(name))
     .filter((k): k is NonNullable<typeof k> & { desc: string } => k != null && k.desc != null);
 
+  // 아래 설명 목록(dt)에 이름이 나오는 관은 여기 한 줄에 또 적지 않는다 —
+  // 특별관이 하나뿐인 지점은 이름이 요약·표·설명에 세 번 찍혔다.
+  const describedNames = new Set(described.map((k) => k.name));
+  const undescribed = branch.specialScreens.filter((name) => !describedNames.has(name));
+
   return (
     <section className="section" aria-labelledby="special-screens">
       <h2 id="special-screens">특별관</h2>
-      <p className="card-sub" style={{ marginTop: 4 }}>
-        {branch.specialScreens.join(', ')}
-      </p>
+      {undescribed.length > 0 && (
+        <p className="card-sub" style={{ marginTop: 4 }}>
+          {undescribed.join(', ')}
+        </p>
+      )}
 
       {fares.length > 0 && (
         <>

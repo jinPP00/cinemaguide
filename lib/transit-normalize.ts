@@ -98,7 +98,10 @@ function splitRouteSequence(input: string): string[] {
   if (parsed.length < 5) return [line];
 
   const before = cleanEdge(line.slice(0, match.index));
-  const after = cleanEdge(line.slice(match.index + rawRoutes.length));
+  // "100, 101, …, 370번"의 마지막 "번"은 목록 전체에 붙은 접미어다. 노선 조각을
+  // 떼어내고 나면 "번" 한 글자만 남아 별도 줄로 찍혔다(피카디리1958·여수웅천·
+  // 프리미엄칠곡). "번호…"처럼 다른 말의 일부인 경우는 건드리지 않는다.
+  const after = cleanEdge(line.slice(match.index + rawRoutes.length)).replace(/^번(?![가-힣])\s*/, '');
   const routes = parsed.map((p) => p.route);
   const nightRoutes = parsed.filter((p) => p.note === '심야').map((p) => p.route);
   const annotated = parsed.filter((p) => p.note && p.note !== '심야');
@@ -314,7 +317,15 @@ function dedupeLines(lines: string[]): string[] {
 export function normalizeTransitText(value: string | null | undefined, kind: TransitNormalizeKind = 'field'): string | null {
   if (!value) return value ?? null;
 
-  const decoded = splitGluedSubway(decodeEntities(value))
+  const decoded = splitGluedSubway(
+    decodeEntities(value)
+      // "1,3,5호선" → "1호선/3호선/5호선". 쉼표로 이어진 숫자 목록은 뒤의 노선번호
+      // 휴리스틱(짧은 숫자 토큰 연속 = 버스 번호 나열)에 걸려 지하철 줄이 통째로
+      // 버려지고 "번" 조각만 남았다(피카디리1958·여의도 등 7곳). 뜻은 같다.
+      .replace(/(\d{1,2}(?:\s*,\s*\d{1,2})+)\s*호선/g, (_m, list: string) =>
+        list.split(/\s*,\s*/).map((n) => `${n}호선`).join('/'),
+      ),
+  )
     // 본문 한가운데 끼어든 "# 버스 #" 같은 구획표시를 실제 줄 경계로 복원한다.
     .replace(/([^\n])\s*#\s*(지하철|버스)\s*#?\s*/g, '$1\n# $2\n');
 

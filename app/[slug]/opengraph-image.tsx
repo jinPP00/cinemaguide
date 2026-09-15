@@ -42,7 +42,13 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   } else if (branch) {
     const info = brandMeta(branch.brand);
     title = `${branch.name} ${info.name}`;
-    subtitle = `상영시간표·주차·관람료 안내 · ${branch.sido}`;
+    // 휴관·폐점 지점의 공유 카드에 "관람료 안내"라고 적히면 안 된다.
+    subtitle =
+      branch.status === '폐점'
+        ? `영업 종료 · ${branch.sido}`
+        : branch.status === '휴관'
+          ? `휴관 중 · ${branch.sido}`
+          : `상영시간표·주차·관람료 안내 · ${branch.sido}`;
     badge = info.name;
     brand = branch.brand;
   }

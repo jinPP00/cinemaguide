@@ -130,7 +130,9 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
   const intro = BRAND_INTRO[brandKey];
   const sidos = sidosOfBrand(brandKey);
   const all = branchesOfBrand(brandKey);
-  const specialCount = all.filter((b) => b.specialScreens.length > 0).length;
+  // /특별관/ 안내 페이지와 같은 기준(운영 중 지점만)으로 센다 — 폐점한 판교가
+  // 여기서는 "특별관 운영"으로, 저쪽에서는 제외로 다르게 집계되면 안 된다.
+  const specialCount = all.filter((b) => isOperating(b) && b.specialScreens.length > 0).length;
   const others = meta.brands.filter((b) => b.key !== brandKey);
   const themeVars = brandThemeVars(brandKey) as CSSProperties;
   const faqs = buildBrandFaqs(brandKey, info.name, info.count, sidos.length, specialCount);
@@ -407,7 +409,8 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
     { name: b.name, path: branchPath(b) },
   ];
 
-  const theaterJsonLd = {
+  // 휴관·폐점 지점에는 MovieTheater(영업 중인 업체) 구조화 데이터를 붙이지 않는다.
+  const theaterJsonLd = operating ? {
     '@context': 'https://schema.org',
     '@type': 'MovieTheater',
     name: `${b.name} ${info.name}`,
@@ -420,14 +423,14 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
     ...(b.tel ? { telephone: b.tel } : {}),
     ...(b.lat && b.lng ? { geo: { '@type': 'GeoCoordinates', latitude: b.lat, longitude: b.lng } } : {}),
     url: `${SITE.url}${branchPath(b)}`,
-  };
+  } : null;
 
   return (
     <div className="wrap page brand-themed" style={themeVars}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(
-          theaterJsonLd,
+          ...(theaterJsonLd ? [theaterJsonLd] : []),
           breadcrumbJsonLd(crumbs),
           webPageJsonLd(branchPath(b), branchLastModified(b.checkedAt).toISOString()),
         )}
@@ -449,11 +452,10 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
 
       <h1>{branchHeading(b)}</h1>
 
-      {b.intro && (
-        <p className="lead" style={{ marginTop: 12 }}>
-          {b.intro}
-        </p>
-      )}
+      {/* 메가박스 원본의 intro("압도적인 몰입감…", "최상의 영화 경험!")는 공식
+          사이트 홍보 문구다. 115개 지점 페이지의 첫 문장이 남의 광고 카피였던 셈이라
+          내보내지 않는다 — 확인 가능한 사실만 쓴다는 원칙(lib/screens.ts 주석)과도
+          맞지 않는다. 데이터에는 남겨둔다. */}
 
       {b.status === '휴관' && (
         <p className="notice-closed">
@@ -1113,8 +1115,10 @@ const BUS_CATEGORY_RE = new RegExp(
  * 토큰 필터를 통과해 노선 칩으로 잘못 섞여 들어가던 걸, 이런 단위·조사로
  * 끝나는 토큰은 노선번호가 아니라고 보고 제외한다. "은평02"·"달서4-1"처럼
  * 한글이 접두어로만 오는 진짜 노선명은 이 접미어들로 끝나지 않아 영향 없다. */
+// "호선"·"역"도 제외한다 — "1호선/3호선/5호선 종로3가역"이 짧은 숫자 토큰 3연속으로
+// 읽혀 지하철 줄 통째로 버스 번호 나열로 오인됐다(피카디리1958).
 const NOT_ROUTE_SUFFIX_RE =
-  /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|쪽|거리|이내|이상|하차|도보|개|호기|회|대|명|석|원)$|^\d+[mM]$/;
+  /(분|초|미터|층|아파트|사거리|입구|정류장|출구|방향|쪽|거리|이내|이상|하차|도보|개|호기|회|대|명|석|원|호선|역)$|^\d+[mM]$/;
 /** 단어(콤마·공백으로 나눈 한 조각) 하나가 "노선번호처럼 생겼는지" 판단한다.
  * 영문/숫자(대시 포함, 예: 21-B·5002B)거나, "은평02"·"강서04"처럼 한글
  * 1~3자 접두어 + 숫자로 시작하는 모양이면 노선으로 본다. "기흥역"·"압구정역"

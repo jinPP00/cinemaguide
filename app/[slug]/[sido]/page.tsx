@@ -124,8 +124,9 @@ export default async function SidoPage({
               {(b.specialScreens.length > 0 || b.status !== '운영중') && (
                 <div className="badges">
                   {b.status !== '운영중' && <span className="badge badge-closed">{b.status}</span>}
-                  {b.specialScreens.slice(0, 3).map((s) => <span key={s} className="badge">{s}</span>)}
-                  {b.specialScreens.length > 3 && <span className="badge">외 {b.specialScreens.length - 3}</span>}
+                  {/* 휴관·폐점 지점은 특별관 뱃지를 붙이지 않는다 — 지금 운영하는 관이 아니다 */}
+                  {b.status === '운영중' && b.specialScreens.slice(0, 3).map((s) => <span key={s} className="badge">{s}</span>)}
+                  {b.status === '운영중' && b.specialScreens.length > 3 && <span className="badge">외 {b.specialScreens.length - 3}</span>}
                 </div>
               )}
               <div className="card-more">지점 정보 보기 →</div>
