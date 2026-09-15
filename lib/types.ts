@@ -50,8 +50,9 @@ export interface Branch {
   parking: Parking;
   facility: Facility | null;
   mapLink: string | null;
-  status: '운영중' | '휴관';
-  /** 폐점 예정 등 시급한 수동 공지. 크롤링 데이터에 없어 data/manual-overrides.json으로만 채워진다. */
+  /** 휴관은 원본 지점명의 "(휴관)" 표기에서, 폐점은 data/manual-overrides.json에서만 온다 */
+  status: '운영중' | '휴관' | '폐점';
+  /** 폐점 예정·완료 등 시급한 수동 공지. 크롤링 데이터에 없어 data/manual-overrides.json으로만 채워진다. */
   closingNotice: string | null;
   hasPrices: boolean;
   officialUrl: string;

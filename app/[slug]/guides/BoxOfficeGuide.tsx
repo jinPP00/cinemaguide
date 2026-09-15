@@ -14,7 +14,7 @@ const PATH = guidePath(GUIDES.boxoffice);
 export const boxOfficeMetadata: Metadata = {
   title: '영화순위 — 박스오피스 순위와 영화 정보',
   description:
-    '영화진흥위원회(KOBIS) 집계 기준 박스오피스 순위와 누적 관객 수, 감독, 출연, 러닝타임, 관람등급을 확인할 수 있습니다.',
+    '영화진흥위원회(KOBIS) 집계 기준 박스오피스 순위와 집계일·누적 관객 수, 매출 점유율, 개봉일, 감독, 출연, 러닝타임, 관람등급을 확인할 수 있습니다.',
   alternates: { canonical: PATH },
 };
 
@@ -59,7 +59,7 @@ export default function BoxOfficePage() {
 
       <section className="section" aria-labelledby="how-to-read">
         <h2 id="how-to-read">순위 기준</h2>
-        <p className="guide-copy">박스오피스 순위는 집계일 하루 동안의 관객 수로 정해집니다. 누적 관객 수는 개봉 이후 전체 관객 수이므로 순위와 순서가 다를 수 있습니다. 영화명을 누르면 감독·출연·장르·관람등급·러닝타임을 확인할 수 있습니다.</p>
+        <p className="guide-copy">박스오피스 순위는 집계일 하루 동안의 관객 수로 정해집니다. 누적 관객 수는 개봉 이후 전체 관객 수이므로 순위와 순서가 다를 수 있습니다. 순위 옆의 집계일 관객 수가 그날 하루 관객이고, 영화명을 누르면 개봉일·집계일 매출 점유율·감독·출연·장르·관람등급·러닝타임을 확인할 수 있습니다.</p>
       </section>
 
       <section className="section" aria-labelledby="where">

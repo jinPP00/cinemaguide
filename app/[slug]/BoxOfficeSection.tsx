@@ -71,7 +71,10 @@ export default function BoxOfficeSection({ data }: { data: BoxOffice | null }) {
                     <span className="bo-poster bo-poster-empty" aria-hidden="true" />
                   )}
                   <span className="bo-name">{m.name}</span>
-                  <span className="bo-audience">누적 {m.audienceTotal.toLocaleString()}명</span>
+                  <span className="bo-audience">
+                    {m.audienceToday > 0 && <>집계일 {m.audienceToday.toLocaleString()}명 · </>}
+                    누적 {m.audienceTotal.toLocaleString()}명
+                  </span>
                   <svg
                     className={`bo-chevron${isOpen ? ' is-open' : ''}`}
                     width="16"
@@ -85,7 +88,12 @@ export default function BoxOfficeSection({ data }: { data: BoxOffice | null }) {
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
-                {isOpen && <MovieDetail movie={m} />}
+                {/* 상세는 조건부 렌더링이 아니라 hidden 속성으로 접는다. 조건부로
+                    두면 감독·개봉일·관객 수가 정적 HTML에 아예 없어서 검색엔진과
+                    자바스크립트를 안 돌리는 수집기에는 이름과 순위만 보였다. */}
+                <div hidden={!isOpen}>
+                  <MovieDetail movie={m} />
+                </div>
               </li>
             );
         })}
@@ -95,8 +103,20 @@ export default function BoxOfficeSection({ data }: { data: BoxOffice | null }) {
   );
 }
 
+function formatOpenDate(iso: string): string | null {
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return `${match[1]}년 ${Number(match[2])}월 ${Number(match[3])}일`;
+}
+
 function MovieDetail({ movie: m }: { movie: BoxOfficeMovie }) {
   const rows: { label: string; value: string }[] = [];
+  // 개봉일·매출 점유율은 KOBIS가 순위와 함께 내려주는 값인데 받아만 두고
+  // 화면에 내보내지 않고 있었다. 순위(집계일 관객 수)와 누적 관객 수가 왜
+  // 어긋나는지는 개봉일을 같이 봐야 읽힌다.
+  const opened = formatOpenDate(m.openDate);
+  if (opened) rows.push({ label: '개봉일', value: opened });
+  if (m.salesShare > 0) rows.push({ label: '집계일 매출 점유율', value: `${m.salesShare}%` });
   if (m.directors?.length) rows.push({ label: '감독', value: m.directors.join(', ') });
   if (m.actors?.length) rows.push({ label: '출연', value: m.actors.join(', ') });
   if (m.genres?.length) rows.push({ label: '장르', value: m.genres.join(', ') });

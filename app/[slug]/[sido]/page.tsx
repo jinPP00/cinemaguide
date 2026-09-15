@@ -110,7 +110,7 @@ export default async function SidoPage({
               <ul className="chip-list">
                 {group.map((b) => (
                   <li key={b.id}>
-                    <Link className="chip" href={branchPath(b)}>{b.name}{b.status === '휴관' && ' (휴관)'}</Link>
+                    <Link className="chip" href={branchPath(b)}>{b.name}{b.status !== '운영중' && ` (${b.status})`}</Link>
                   </li>
                 ))}
               </ul>
@@ -121,9 +121,9 @@ export default async function SidoPage({
             <Link key={b.id} href={branchPath(b)} className="card">
               <div className="card-title">{b.name} {info.name}</div>
               <div className="card-sub">{b.address}</div>
-              {(b.specialScreens.length > 0 || b.status === '휴관') && (
+              {(b.specialScreens.length > 0 || b.status !== '운영중') && (
                 <div className="badges">
-                  {b.status === '휴관' && <span className="badge badge-closed">휴관</span>}
+                  {b.status !== '운영중' && <span className="badge badge-closed">{b.status}</span>}
                   {b.specialScreens.slice(0, 3).map((s) => <span key={s} className="badge">{s}</span>)}
                   {b.specialScreens.length > 3 && <span className="badge">외 {b.specialScreens.length - 3}</span>}
                 </div>

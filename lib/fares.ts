@@ -1,4 +1,4 @@
-import { branches, meta, pricesOf } from './data';
+import { operatingBranches as branches, meta, pricesOf } from './data';
 import type { Branch, BrandKey, PriceRow } from './types';
 
 /**

@@ -1,4 +1,4 @@
-import { branches } from './data';
+import { operatingBranches, isOperating } from './data';
 import { baseFare, specialFares } from './fares';
 import type { Branch } from './types';
 
@@ -187,7 +187,7 @@ export function screenStats(): ScreenStat[] {
     { count: number; brands: Set<string>; lows: number[]; highs: number[] }
   >();
 
-  for (const branch of branches) {
+  for (const branch of operatingBranches) {
     if (branch.specialScreens.length === 0) continue;
     const fares = specialFares(branch);
 
@@ -241,17 +241,17 @@ export function formatExtra(stat: ScreenStat): string {
 
 /** 특정 특별관을 운영하는 지점 목록 */
 export function branchesWithScreen(name: string): Branch[] {
-  return branches.filter((b) => b.specialScreens.includes(name));
+  return operatingBranches.filter((b) => b.specialScreens.includes(name));
 }
 
 /** 특별관을 하나라도 운영하는 지점 수 */
 export function specialScreenBranchCount(): number {
-  return branches.filter((b) => b.specialScreens.length > 0).length;
+  return operatingBranches.filter((b) => b.specialScreens.length > 0).length;
 }
 
 /** 기준 요금을 뽑을 수 있는 지점 수 — 비교표의 모집단을 밝힐 때 쓴다 */
 export function comparableBranchCount(): number {
-  return branches.filter((b) => baseFare(b) != null).length;
+  return operatingBranches.filter((b) => baseFare(b) != null).length;
 }
 
 export interface ScreenPresence {
@@ -268,6 +268,7 @@ export interface ScreenPresence {
 export function screensInBranches(list: Branch[]): ScreenPresence[] {
   const found = new Map<string, Branch[]>();
   for (const branch of list) {
+    if (!isOperating(branch)) continue;
     for (const name of branch.specialScreens) {
       found.set(name, [...(found.get(name) ?? []), branch]);
     }

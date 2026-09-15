@@ -8,7 +8,19 @@ function formatDate(iso: string): string | null {
   return `${m[1]}년 ${Number(m[2])}월 ${Number(m[3])}일`;
 }
 
-export default function SourceNote({ branch }: { branch: Branch }) {
+/**
+ * officialLink: 공식 페이지 링크를 이 블록에 넣을지. 운영 중인 지점은 본문의
+ * 상영시간표 버튼이 이미 공식 페이지로 가는 링크라 여기서는 넣지 않는다
+ * (같은 목적지로 가는 버튼이 한 페이지에 두 개 있었다). 휴관·폐점 지점처럼
+ * 그 버튼이 없는 페이지에서만 켠다.
+ */
+export default function SourceNote({
+  branch,
+  officialLink = false,
+}: {
+  branch: Branch;
+  officialLink?: boolean;
+}) {
   const checked = branch.checkedAt ? formatDate(branch.checkedAt) : null;
   const needsRecheck = branch.verificationStatus === '확인필요';
 
@@ -50,7 +62,7 @@ export default function SourceNote({ branch }: { branch: Branch }) {
             </span>
           </p>
 
-          {branch.officialUrl && (
+          {officialLink && branch.officialUrl && (
             <p className="source-link-row">
               <a
                 className="source-official-link"

@@ -1,5 +1,6 @@
 import { baseFare, won } from './fares';
 import { parkingSummary } from './parking';
+import { withJosa } from './josa';
 import type { Branch } from './types';
 
 /**
@@ -19,18 +20,38 @@ import type { Branch } from './types';
  *    넣으면 클릭한 사람이 찾지 못한다.
  */
 
+/**
+ * 휴관·폐점 지점은 제목부터 다르게 쓴다. "관람료·주차 안내"라는 제목으로
+ * 갈 수 없는 극장 페이지가 검색결과에 남으면 제목 자체가 틀린 정보가 된다.
+ * (색인은 lib/data.ts의 isIndexable이 이미 막지만, 링크로 들어온 사람과
+ * 공유 미리보기에도 같은 제목이 쓰인다.)
+ */
+function closedLabel(branch: Branch): string | null {
+  if (branch.status === '폐점') return '영업 종료';
+  if (branch.status === '휴관') return '휴관';
+  return null;
+}
+
 export function branchTitle(branch: Branch): string {
+  const closed = closedLabel(branch);
+  if (closed) return `${branch.name} ${branch.brandName} ${closed} 안내`;
   // 레이아웃이 " | 영화관 지점안내"를 뒤에 붙이므로 여기서는 짧게 둔다 —
   // 한국어 검색결과 제목은 30자 언저리에서 잘린다.
   return `${branch.name} ${branch.brandName} 관람료·주차 | 상영시간표`;
 }
 
 export function branchHeading(branch: Branch): string {
+  const closed = closedLabel(branch);
+  if (closed) return `${branch.name} ${branch.brandName} ${closed} 안내`;
   return `${branch.name} ${branch.brandName} 관람료·주차 안내`;
 }
 
 export function branchDescription(branch: Branch): string {
   const full = `${branch.name} ${branch.brandName}`;
+  const closed = closedLabel(branch);
+  if (closed) {
+    return `${withJosa(full, '은')} 현재 ${closed} 상태입니다. 위치와 근처에서 대신 갈 수 있는 영화관을 정리했습니다.`;
+  }
   const facts: string[] = [];
 
   const fare = baseFare(branch);

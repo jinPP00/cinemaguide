@@ -15,6 +15,7 @@ import {
   branchPath,
   pricesOf,
   isIndexable,
+  isOperating,
 } from '@/lib/data';
 import { BRAND_INTRO } from '@/lib/content';
 import { SITE } from '@/lib/site';
@@ -27,12 +28,10 @@ import type { Branch, PriceRow } from '@/lib/types';
 import type { CSSProperties, ReactNode } from 'react';
 import NearbySection from './NearbySection';
 import SpecialScreenSection from './SpecialScreenSection';
-import FareStandingNote from './FareStandingNote';
 import SourceNote from './SourceNote';
 import { parkingGroups as buildParkingGroups } from '@/lib/parking';
+import { baseFare } from '@/lib/fares';
 import { branchTitle, branchHeading, branchDescription } from '@/lib/meta-branch';
-import CheapestNote from './CheapestNote';
-import NoSpecialScreenSection from './NoSpecialScreenSection';
 import { GUIDES } from '@/lib/paths';
 import BoxOfficeGuide, { boxOfficeMetadata } from './guides/BoxOfficeGuide';
 import FareComparison, { fareComparisonMetadata } from './guides/FareComparison';
@@ -217,8 +216,8 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
                           <li key={b.id}>
                             <Link className="chip" href={branchPath(b)}>
                               {b.name}
-                              {b.status === '휴관' && (
-                                <span style={{ color: '#b42318' }}> (휴관)</span>
+                              {b.status !== '운영중' && (
+                                <span style={{ color: '#b42318' }}> ({b.status})</span>
                               )}
                             </Link>
                           </li>
@@ -395,6 +394,12 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   // "확인 필요" 같은 빈 답을 FAQ로 내보내면 검색·AI 답변에 쓸모없는 내용이 실린다.
   const faqs = buildBranchFaqs(b, info.name);
 
+  // 휴관·폐점 지점은 요금표·교통·주차·상영시간표 버튼을 내보내지 않는다.
+  // 판교 CGV가 폐점 뒤에도 "관람료 15,000원", "상영시간표 확인" 버튼을 그대로
+  // 보여주고 있었다 — 갈 수 없는 극장의 운영 정보는 있는 그대로가 아니라 틀린
+  // 정보다. 대신 위치와 근처 대안 영화관, 출처만 남긴다.
+  const operating = isOperating(b);
+
   const crumbs = [
     { name: '홈', path: '/' },
     { name: info.name, path: brandPath(info.segment) },
@@ -459,7 +464,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
 
       {b.closingNotice && (
         <p className="notice-closed">
-          <strong>영업 종료 안내</strong> — {b.closingNotice}
+          <strong>{b.status === '폐점' ? '영업 종료' : '영업 종료 예정'}</strong> — {b.closingNotice}
         </p>
       )}
 
@@ -495,7 +500,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
               </div>
             </dd>
           </div>
-          {b.tel && (
+          {b.tel && b.status !== '폐점' && (
             <div>
               <dt>전화</dt>
               <dd>
@@ -503,12 +508,9 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
               </dd>
             </div>
           )}
-          {b.specialScreens.length > 0 && (
-            <div>
-              <dt>특별관</dt>
-              <dd>{b.specialScreens.join(', ')}</dd>
-            </div>
-          )}
+          {/* 특별관 목록은 여기 두지 않는다 — 요금·설명과 함께 아래 특별관
+              섹션 한 곳에서만 보여준다(예전엔 기본정보·특별관 요금 안내·FAQ
+              세 곳에 같은 목록이 반복됐다). */}
           {b.screenCount != null && (
             <div>
               <dt>상영관</dt>
@@ -546,20 +548,20 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       {/* 색인 대상이 아닌 지점도 본문은 똑같이 다 보여준다 — 없는 항목만 각
           섹션에서 "확인하지 못했습니다"로 표시된다. 예전에는 여기서 페이지를
           통째로 "준비 중인 정보" 안내 하나로 갈아치웠는데, 그러면 갖고 있는
-          요금표까지 같이 숨기게 돼서 없앴다. */}
-      <ContentPreview branch={b} scheduleBar={scheduleBar} />
+          요금표까지 같이 숨기게 돼서 없앴다. 단, 휴관·폐점 지점은 예외다(위 주석). */}
+      {operating && <ContentPreview branch={b} scheduleBar={scheduleBar} />}
 
-      {/* 여기부터는 3사 데이터를 가로질러야만 나오는 내용이다. 각 브랜드
-          공식 사이트는 구조상 자사 지점만 다루므로 이 두 섹션은 그쪽에
-          존재할 수 없다 — 이 사이트가 따로 있을 이유이기도 하다. */}
-      <SpecialScreenSection branch={b} />
-      <NoSpecialScreenSection branch={b} />
+      {/* 특별관은 이 섹션 한 곳에서만 다룬다(목록·요금·설명). 근처 영화관은
+          3사 데이터를 가로질러야만 나오는 내용이라 각 브랜드 공식 사이트에는
+          존재할 수 없다 — 폐점 지점에서는 "대신 갈 수 있는 곳"이 되므로
+          운영 여부와 상관없이 보여준다. */}
+      {operating && <SpecialScreenSection branch={b} />}
       <NearbySection branch={b} />
 
-      {/* FAQ는 화면에 반드시 보여야 한다 — 구글은 페이지에 없는 Q&A를 스키마로만
-          넣는 것을 정책 위반으로 본다. 위 본문에 흩어져 있는 사실을 질문 형태로
-          다시 모아, 음성검색·AI 답변이 그대로 인용할 수 있는 형태로 제공한다. */}
-      {faqs.length > 0 && (
+      {/* FAQ는 본문에 이미 그대로 적힌 사실을 질문 형태로 반복하지 않는다.
+          주차 무료 조건·초과 요금처럼 여러 항목을 한 답으로 모아야 답이 되는
+          것과, 요금표 여러 줄을 한 문장으로 요약한 것만 남긴다(buildBranchFaqs). */}
+      {operating && faqs.length > 0 && (
         <section className="section" aria-labelledby="faq">
           <h2 id="faq">자주 묻는 질문</h2>
           <dl className="faq-list">
@@ -573,7 +575,10 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </section>
       )}
 
-      <SourceNote branch={b} />
+      {/* 공식 사이트로 가는 링크는 페이지에 하나만 둔다. 운영 중 지점은 위의
+          상영시간표 버튼이 그 역할이고, 그 버튼이 없는 휴관·폐점 지점에서만
+          출처 블록에 공식 페이지 링크를 넣는다. */}
+      <SourceNote branch={b} officialLink={!operating} />
 
       {siblings.length > 0 && (
         <section className="section" aria-labelledby="siblings">
@@ -1291,7 +1296,28 @@ function pivotPrices(rows: PriceRow[]) {
   return [...byLabel.entries()].map(([label, bySlot]) => ({
     label,
     slots: [...bySlot.entries()].map(([timeSlot, v]) => ({ timeSlot, ...v })),
+    concession: concessionLine(rows.filter((r) => r.label === label)),
   }));
+}
+
+/**
+ * 경로·장애인 요금 한 줄. 롯데시네마 요금표는 성인·청소년 외에 경로(만 65세
+ * 이상)·장애인 금액을 지점별로 싣고 있는데(133곳 전부), 크롤링해 두고도
+ * 화면에는 내보내지 않고 있었다. 표 칸에 넣으면 모바일에서 너무 촘촘해지므로
+ * 카드 아래 한 줄로 둔다. 124곳은 상영관별로 값이 하나라 그대로, 시간대에
+ * 따라 갈리는 8곳은 "7,000~9,000원"처럼 구간으로 적는다. CGV·메가박스 원본에는
+ * 지점별 값이 없어 줄 자체가 생기지 않는다.
+ */
+function concessionLine(rows: PriceRow[]): string | null {
+  const range = (values: (number | null)[]) => {
+    const nums = [...new Set(values.filter((v): v is number => v != null))].sort((a, b) => a - b);
+    if (nums.length === 0) return null;
+    return nums.length === 1 ? `${won(nums[0])}원` : `${won(nums[0])}~${won(nums[nums.length - 1])}원`;
+  };
+  const senior = range(rows.map((r) => r.senior));
+  const disabled = range(rows.map((r) => r.disabled));
+  const parts = [senior && `경로 ${senior}`, disabled && `장애인 ${disabled}`].filter(Boolean);
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 const won = (n: number | null | undefined) => (n != null ? n.toLocaleString() : '-');
@@ -1476,11 +1502,15 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
                     ))}
                   </tbody>
                 </table>
+                {g.concession && <p className="price-concession">{g.concession}</p>}
               </div>
             ))}
           </div>
-          <FareStandingNote branch={b} />
-          <CheapestNote branch={b} />
+          {/* 상영 방식(2D·3D·IMAX 등) 설명은 여기 두지 않는다. 예전엔 "상영 방식
+              차이" 블록이 요금표 아래에 있었는데, 2D·3D 정의는 425개 지점에
+              똑같은 문장이 반복됐고 특별관 설명은 바로 아래 특별관 섹션과
+              같은 페이지에서 두 번 나왔다. 특별관은 SpecialScreenSection 한
+              곳에서만 설명하고, 일반 정의는 /특별관/ 안내 페이지가 맡는다. */}
         </section>
       )}
 
@@ -1680,34 +1710,38 @@ function buildBrandFaqs(
  * 빈 답변을 FAQ로 내보내면 음성검색·AI가 그 문장을 그대로 인용해버려서, 없느니만
  * 못한 결과가 된다. 답변 문장은 본문에 이미 있는 사실만 다시 쓴다(새 주장 금지).
  */
+/**
+ * 지점 FAQ. 본문에 그대로 적힌 사실(주소, 특별관 목록, 상영시간표 버튼)을
+ * 질문 형태로 한 번 더 쓰던 문항은 뺐다 — 같은 페이지 안에서 세 번째 반복이었고
+ * 답이 되는 정보가 하나도 늘지 않았다. 남긴 두 문항은 여러 줄을 모아야 답이
+ * 되는 것들이다: 요금표 서너 줄(평일·주말·조조·청소년·경로)을 한 문장으로,
+ * 주차 카드 두 항목(무료 조건·초과 요금)을 한 문장으로.
+ */
 function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }[] {
   const faqs: { q: string; a: string }[] = [];
   const full = `${b.name} ${brandName}`;
 
-  if (b.address) {
-    const tel = b.tel ? ` 전화번호는 ${formatTel(b.tel)}입니다.` : '';
-    faqs.push({
-      q: `${full}${subjectParticle(full)} 어디에 있나요?`,
-      a: `주소는 ${b.address}입니다.${tel}`,
-    });
-  }
-
-  // 관람료는 "일반(2D) + 일반 시간대 + 성인" 기준으로만 답한다 — 상영관·시간대별
-  // 요금이 수십 줄이라 전부 나열하면 답변으로 못 쓴다. 3사 모두 timeSlot '일반'을
-  // 표준 회차로 쓰는 것을 데이터에서 확인했다.
-  const rows = pricesOf(b.id);
-  const standard = rows.filter((r) => r.timeSlot === '일반' && r.adult != null);
-  const baseLabel = standard[0]?.label;
-  const wk = standard.find((r) => r.label === baseLabel && r.dayType === '평일');
-  const we = standard.find((r) => r.label === baseLabel && r.dayType === '주말');
-  if (wk?.adult != null || we?.adult != null) {
-    const parts = [
-      wk?.adult != null ? `평일 ${wk.adult.toLocaleString()}원` : null,
-      we?.adult != null ? `주말 ${we.adult.toLocaleString()}원` : null,
-    ].filter(Boolean);
+  const fare = baseFare(b);
+  if (fare) {
+    const parts = [`평일 ${won(fare.weekdayAdult)}원`, `주말 ${won(fare.weekendAdult)}원`];
+    if (fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult) {
+      parts.push(`${fare.morningSlot} 회차 ${won(fare.morningAdult)}원`);
+    }
+    const extras: string[] = [];
+    if (fare.weekdayYouth != null) extras.push(`청소년 평일 ${won(fare.weekdayYouth)}원`);
+    // 경로·장애인 요금은 롯데시네마 요금표에만 지점별로 실려 있다(다른 두
+    // 브랜드는 원본에 없어 적지 않는다).
+    const concession = pricesOf(b.id).find(
+      (r) => r.label === fare.label && r.timeSlot === '일반' && r.dayType === '평일',
+    );
+    if (concession?.senior != null) extras.push(`경로 ${won(concession.senior)}원`);
+    if (concession?.disabled != null) extras.push(`장애인 ${won(concession.disabled)}원`);
     faqs.push({
       q: `${full} 관람료는 얼마인가요?`,
-      a: `${baseLabel} 성인 기준 ${parts.join(', ')}입니다. 상영관 종류와 시간대(모닝·브런치 등)에 따라 요금이 달라집니다.`,
+      a:
+        `${fare.label} 성인 기준 ${parts.join(', ')}입니다.` +
+        (extras.length > 0 ? ` ${extras.join(', ')}입니다.` : '') +
+        ' 특별관 요금과 다른 시간대 요금은 위 요금표에 있습니다.',
     });
   }
 
@@ -1725,31 +1759,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
     });
   }
 
-  if (b.specialScreens.length > 0) {
-  const names = b.specialScreens.join(', ');
-  faqs.push({
-    q: `${full}에 특별관이 있나요?`,
-    a: `운영하는 특별관은 ${names}입니다.`,
-  });
-}
-
-  faqs.push({
-    q: `${full} 상영시간표는 어디서 확인하나요?`,
-    a: `실시간 상영시간표와 예매는 ${brandName} 공식 사이트에서 제공됩니다. 이 페이지의 '${full} 상영시간표 확인' 버튼을 누르면 해당 지점의 공식 시간표로 바로 이동합니다.`,
-  });
-
   return faqs;
-}
-
-/**
- * 앞 단어의 받침 유무에 따라 주격 조사 은/는을 고른다.
- * 지점명+브랜드명이 통째로 들어오므로 마지막 글자만 본다. 영문으로 끝나는
- * 경우(CGV=씨지비)는 3사 브랜드명 모두 모음으로 읽혀서 '는'이 맞다.
- */
-function subjectParticle(word: string): '은' | '는' {
-  const code = word.charCodeAt(word.length - 1);
-  if (code >= 0xac00 && code <= 0xd7a3) return (code - 0xac00) % 28 === 0 ? '는' : '은';
-  return '는';
 }
 
 /** 0212345678 → 02-1234-5678 형태로 보기 좋게 */

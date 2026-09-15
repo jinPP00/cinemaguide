@@ -1,4 +1,4 @@
-import { branches } from './data';
+import { operatingBranches } from './data';
 import type { Branch } from './types';
 
 /**
@@ -51,7 +51,7 @@ export function nearbyBranches(
   { radiusKm = 3, limit = 4 }: { radiusKm?: number; limit?: number } = {},
 ): NearbyBranch[] {
   const measured: NearbyBranch[] = [];
-  for (const branch of branches) {
+  for (const branch of operatingBranches) {
     if (branch.id === target.id) continue;
     const km = distanceKm(target, branch);
     if (km == null) continue;
@@ -92,7 +92,7 @@ export function nearestWithSpecialScreen(
   limit = 3,
 ): NearbyBranch[] {
   const found: NearbyBranch[] = [];
-  for (const branch of branches) {
+  for (const branch of operatingBranches) {
     if (branch.id === target.id || branch.specialScreens.length === 0) continue;
     const km = distanceKm(target, branch);
     if (km == null) continue;

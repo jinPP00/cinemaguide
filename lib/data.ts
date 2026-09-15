@@ -16,6 +16,19 @@ export const branches = (branchesJson as Branch[])
 export const prices = pricesJson as Record<string, PriceRow[]>;
 export const meta = metaJson as Meta;
 
+/** 지금 실제로 영화를 볼 수 있는 지점인지. 휴관·폐점은 목록에는 남기되 추천·집계에서 뺀다. */
+export function isOperating(branch: Branch): boolean {
+  return branch.status === '운영중';
+}
+
+/**
+ * 근처 영화관 추천·특별관 운영 지점 목록처럼 "지금 갈 수 있는 곳"을 답하는
+ * 자리에서는 이 목록을 쓴다. 판교 CGV처럼 폐점한 지점이 IMAX 운영 지점으로
+ * 계속 나오는 것을 막기 위해서다. 브랜드 허브·시도 목록처럼 존재 자체를
+ * 안내하는 자리는 전체 `branches`를 쓰고 (휴관)·(폐점) 표시를 붙인다.
+ */
+export const operatingBranches = branches.filter(isOperating);
+
 export const BRAND_KEYS: BrandKey[] = ['cgv', 'lotte', 'megabox'];
 
 /** URL 조각(cgv / 롯데시네마 / 메가박스) → 브랜드 키 */
@@ -118,6 +131,9 @@ export function hasPriceInfo(branch: Branch): boolean {
  * 사람에게까지 내용을 감출 이유는 없다.
  */
 export function isIndexable(branch: Branch): boolean {
+  // 휴관·폐점 지점은 요금·교통 정보가 있어도 색인하지 않는다 — 갈 수 없는
+  // 극장의 "관람료·주차 안내"가 검색결과에 뜨면 그 자체가 틀린 정보다.
+  if (!isOperating(branch)) return false;
   return hasTransitInfo(branch) && hasParkingInfo(branch) && hasPriceInfo(branch);
 }
 
