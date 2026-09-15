@@ -145,6 +145,29 @@ function overageRates(text: string): string[] {
   return unique(values);
 }
 
+/**
+ * 요일·시간대에 따라 무료와 유료가 갈리는 지점의 조건 문장.
+ *
+ * 여의도 CGV 공식 안내는 "월~금 3시간 1,500원 / 토~일(공휴일 포함) 3시간 무료"인데,
+ * 무료시간만 뽑는 요약은 이걸 "3시간 무료"로 만들어 평일 유료 조건을 지웠다.
+ * 한 줄 안에 "N시간 …원"과 "무료"가 같이 있으면 그 줄을 조건 그대로 보여주고,
+ * 무조건 무료라는 요약은 만들지 않는다. 표현은 원문 그대로 두되 마커·불릿과
+ * "티켓 인증시)" 같은 앞머리만 걷어낸다.
+ */
+function conditionalFreeLines(lines: string[]): string[] {
+  const values: string[] = [];
+  for (const line of lines) {
+    if (!/\d+\s*시간\s*[\d,]+\s*원/.test(line) || !/무료/.test(line)) continue;
+    if (/초과|부과|분당/.test(line)) continue;
+    const cleaned = line
+      .replace(/^[^)]{0,12}\)\s*/, '')
+      .replace(/\s*\/\s*/g, ' · ')
+      .trim();
+    if (cleaned) values.push(cleaned);
+  }
+  return unique(values);
+}
+
 function verificationMethods(text: string): string[] {
   const methods: string[] = [];
   if (/티켓판매기|발권기/.test(text)) methods.push('티켓판매기');
@@ -161,11 +184,14 @@ export function parkingSummary(branch: Branch): ParkingSummary | null {
   const text = sourceText(branch);
   const summary: ParkingSummary = {};
 
+  // 무료와 유료 조건이 같이 있는 지점은 어느 한쪽으로 요약하지 않는다.
+  const conditional = conditionalFreeLines(linesOf(branch)).length > 0;
+
   const free = freeDurations(text);
-  if (free.length === 1) summary.free = free[0];
+  if (free.length === 1 && !conditional) summary.free = free[0];
 
   const flat = flatDiscounts(text);
-  if (!summary.free && flat.length === 1) summary.flat = flat[0];
+  if (!summary.free && !conditional && flat.length === 1) summary.flat = flat[0];
 
   const overage = overageRates(text);
   if (overage.length === 1) summary.overage = overage[0];
@@ -288,12 +314,19 @@ export function parkingGroups(branch: Branch): ParkingGroup[] {
   push(groups, '운영 시간', operationFacts(lines));
   push(groups, '주차 규모', capacityFacts(text));
 
+  const conditional = conditionalFreeLines(lines);
   const free = freeDurations(text);
-  if (free.length === 1) push(groups, '무료 주차', [`영화 관람 시 ${free[0]} 무료`]);
-
   const flat = flatDiscounts(text);
-  if (free.length === 0 && flat.length === 1) {
-    push(groups, '무료 주차', [`영화 관람 할인 · ${flat[0]}`]);
+
+  if (conditional.length > 0) {
+    // "월~금 3시간 1,500원 · 토~일(공휴일 포함) 3시간 무료"처럼 조건이 갈리는
+    // 줄은 그대로 보여준다. 무료시간만 남긴 요약은 틀린 정보가 된다.
+    push(groups, '무료 주차', conditional.map((v) => `영화 관람 시 ${v}`));
+  } else {
+    if (free.length === 1) push(groups, '무료 주차', [`영화 관람 시 ${free[0]} 무료`]);
+    if (free.length === 0 && flat.length === 1) {
+      push(groups, '무료 주차', [`영화 관람 할인 · ${flat[0]}`]);
+    }
   }
 
   const overage = overageRates(text);
