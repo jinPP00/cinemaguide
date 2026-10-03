@@ -1,14 +1,15 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { LEGAL } from '@/lib/legal';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '이용약관',
   description:
     '영화관 지점안내 이용에 관한 조건과 책임 범위, 저작권, 링크 정책을 안내합니다.',
   alternates: { canonical: '/terms/' },
-};
+});
 
 export default function TermsPage() {
   return (

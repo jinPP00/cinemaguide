@@ -1,3 +1,4 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -38,11 +39,11 @@ export async function generateMetadata({
   const info = brandMeta(key);
   const count = branchesOfBrandSido(key, sido).length;
 
-  return {
+  return withOpenGraphUrl({
     title: `${sido} ${info.name} 지점 ${count}곳 위치와 상영시간표 안내`,
     description: `${sido} 지역 ${info.name} 지점 ${count}곳의 주소와 가는 길, 주차 조건, 관람료 정보를 정리했습니다. 지점별 공식 상영시간표로 바로 이동할 수 있습니다.`,
     alternates: { canonical: sidoPath(info.segment, sido) },
-  };
+  });
 }
 
 export default async function SidoPage({

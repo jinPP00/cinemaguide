@@ -10,10 +10,12 @@ CGV·롯데시네마·메가박스 전국 425개 지점의 위치, 교통, 주�
 |---|---|
 | 프레임워크 | Next.js 16 (App Router) |
 | 렌더링 | 정적 생성 (`output: 'export'`) |
-| 호스팅 | Cloudflare Pages |
+| 호스팅 | Cloudflare Workers Static Assets |
 | 데이터 | 빌드 시점에 `data/*.json`을 읽어 정적 페이지 생성 |
 
-서버가 없다. 빌드 결과물은 순수 HTML·CSS·JS이므로 정적 호스팅에 그대로 올라간다.
+본문은 빌드 결과물인 HTML·CSS·JS로 제공한다. `worker/index.mjs`는 HTTP·www 요청을 대표 HTTPS 주소로 옮기고 기존 정적 자산을 제공한다.
+
+운영 배포는 `.github/workflows/deploy-cloudflare.yml`의 `wrangler deploy`를 사용한다. 아래 Pages 설정은 다른 정적 호스팅으로 옮길 때 참고용이다.
 
 ## Cloudflare Pages 배포 설정
 
@@ -38,8 +40,9 @@ GitHub 저장소를 연결할 때 아래 값을 사용한다.
 npm install
 
 npm run dev          # 개발 서버
-npm run build        # 정적 사이트 빌드 → out/
-npm run check        # 빌드 + 깨진 내부 링크 검사
+npm run build        # 최신 llms.txt 생성 + 정적 사이트 빌드 → out/
+npm run check        # 빌드 + SEO 회귀 테스트 + 링크·본문·검색 메타 검사
+npm run test:seo     # 한국 집계일·일별 수치 갱신·HTTPS 리다이렉트 회귀 테스트
 
 npm run data         # 크롤링 원본 → data/*.json 재생성 + 검증
 ```
@@ -64,6 +67,12 @@ npm run data
 `scripts/verify.mjs`가 결과를 24개 항목으로 검사한다. 실패하면 종료 코드 1.
 
 갱신 주기 기준: 지점 목록·주소 6개월 / 교통·주차 3개월 / 관람료 1~3개월.
+
+박스오피스는 매주 월요일 KST 09:00에 한국 날짜 기준 어제 집계를 조회한다. 영화 순서가 같아도 집계일·관객 수·점유율이 바뀌면 저장하며, 조회 실패 시 기존 파일을 보존하고 워크플로를 실패로 표시한다. 커밋 뒤에는 배포 워크플로를 직접 호출한다.
+
+박스오피스 페이지의 `dateModified`와 사이트맵 `lastmod`는 `boxoffice.fetchedAt`을 공유한다. 지점 페이지의 확인일에는 이 값을 섞지 않는다. `public/llms.txt`는 빌드마다 실제 집계일·지점 수를 반영한다.
+
+SEO 수정 배포 후 14일에 Google Search Console·Bing Webmaster Tools·네이버 서치어드바이저에서 색인 상태와 최근 28일 노출·클릭을 비교한다. 사이트맵은 `https://cinemaguide.kr/sitemap.xml`이다. 소유 확인 태그가 있다는 것만으로 등록·사이트맵 제출 완료를 판단하지 않는다. AI 인용은 같은 질문·검색 모드·기준일로 실제 출처 URL을 기록한다.
 
 ## 구조
 

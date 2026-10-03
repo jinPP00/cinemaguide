@@ -1,14 +1,15 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { LEGAL } from '@/lib/legal';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '면책 고지',
   description:
     '영화관 지점안내는 각 영화관 공식 서비스와 무관한 비공식 정보 사이트입니다. 정보의 한계와 책임 범위를 안내합니다.',
   alternates: { canonical: '/disclaimer/' },
-};
+});
 
 export default function DisclaimerPage() {
   return (

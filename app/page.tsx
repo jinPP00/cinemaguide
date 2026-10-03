@@ -1,3 +1,4 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import { meta, branches, branchesOfBrand, brandPath, sidosOfBrand } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
@@ -7,11 +8,11 @@ import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 import { IconClapper } from './icons';
 
-export const metadata = {
+export const metadata = withOpenGraphUrl({
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
   description: SITE.description,
   alternates: { canonical: '/' },
-};
+});
 
 export default function HomePage() {
   const total = meta.totalBranches;

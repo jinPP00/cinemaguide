@@ -1,3 +1,4 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -83,16 +84,16 @@ export async function generateMetadata({
   const brandKey = brandBySegment(decoded);
   if (brandKey) {
     const info = brandMeta(brandKey);
-    return {
+    return withOpenGraphUrl({
       title: `${info.name} 상영시간표·전국 지점 안내`,
       description: `${info.name} 상영시간표를 지점별로 확인하는 방법과 전국 ${info.count}개 지점의 위치, 교통, 주차, 관람료 정보를 지역별로 정리했습니다.`,
       alternates: { canonical: brandPath(info.segment) },
-    };
+    });
   }
 
   const branch = findBranchByPageSlug(decoded);
   if (branch) {
-    return {
+    return withOpenGraphUrl({
       title: branchTitle(branch),
       description: branchDescription(branch),
       alternates: { canonical: branchPath(branch) },
@@ -100,7 +101,7 @@ export async function generateMetadata({
       // 나가는 지점은 색인하지 않는다. 판단 기준은 lib/data.ts의 isIndexable 참고.
       // follow는 남긴다 — 색인은 안 해도 이 페이지가 거는 내부 링크는 따라가야 한다.
       robots: isIndexable(branch) ? undefined : { index: false, follow: true },
-    };
+    });
   }
 
   return {};

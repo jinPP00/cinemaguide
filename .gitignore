@@ -4,6 +4,7 @@ node_modules/
 # Next.js 빌드 산출물
 .next/
 out/
+.wrangler/
 
 # 환경 변수 (도메인·측정 ID 등)
 .env

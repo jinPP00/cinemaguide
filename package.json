@@ -5,12 +5,13 @@
   "description": "영화관 지점안내 - CGV·롯데시네마·메가박스 전국 지점 정보",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/generate-llms.mjs && next build",
+    "test:seo": "node --test tests/seo.test.mjs",
     "normalize": "node scripts/normalize.mjs",
     "verify": "node scripts/verify.mjs",
     "data": "npm run normalize && npm run verify",
     "check-links": "node scripts/check-links.mjs",
-    "check": "npm run build && npm run check-links",
+    "check": "npm run build && npm run test:seo && npm run check-links && node scripts/audit-detail-pages.mjs && node scripts/audit-subway-rewrite.mjs && node scripts/audit-site-pages.mjs",
     "boxoffice": "node --env-file=.env.local scripts/fetch-boxoffice.mjs",
     "audit": "node scripts/audit-content.mjs"
   },
