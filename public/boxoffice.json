@@ -1,15 +1,43 @@
 {
-  "targetDate": "20260927",
-  "fetchedAt": "2026-09-28T04:06:02.297Z",
+  "targetDate": "20261003",
+  "fetchedAt": "2026-10-03T16:11:50.111Z",
   "movies": [
     {
       "rank": 1,
+      "movieCd": "20261807",
+      "name": "극장판 치이카와: 인어 섬의 비밀",
+      "openDate": "2026-09-30",
+      "audienceToday": 204393,
+      "audienceTotal": 463609,
+      "salesShare": 31.4,
+      "directors": [
+        "오이카와 케이"
+      ],
+      "actors": [
+        "아오키 하루카",
+        "타나카 마코토",
+        "오자와 아리",
+        "이주은",
+        "손정민"
+      ],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 98,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033835.jpg"
+    },
+    {
+      "rank": 2,
       "movieCd": "20255033",
       "name": "암살자(들)",
       "openDate": "2026-09-23",
-      "audienceToday": 260546,
-      "audienceTotal": 1566219,
-      "salesShare": 36,
+      "audienceToday": 155060,
+      "audienceTotal": 2045473,
+      "salesShare": 21.8,
       "directors": [
         "허진호"
       ],
@@ -31,13 +59,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPK026317.jpg"
     },
     {
-      "rank": 2,
+      "rank": 3,
       "movieCd": "20256161",
       "name": "타짜: 벨제붑의 노래",
       "openDate": "2026-09-23",
-      "audienceToday": 169894,
-      "audienceTotal": 833025,
-      "salesShare": 24.4,
+      "audienceToday": 110941,
+      "audienceTotal": 1236914,
+      "salesShare": 16.3,
       "directors": [
         "최국희"
       ],
@@ -60,13 +88,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPK026376.jpg"
     },
     {
-      "rank": 3,
+      "rank": 4,
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 91465,
-      "audienceTotal": 11783295,
-      "salesShare": 16.1,
+      "audienceToday": 46408,
+      "audienceTotal": 11945223,
+      "salesShare": 9.1,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -90,41 +118,41 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033591.jpg"
     },
     {
-      "rank": 4,
-      "movieCd": "20256308",
-      "name": "인턴",
-      "openDate": "2026-09-16",
-      "audienceToday": 49794,
-      "audienceTotal": 756057,
-      "salesShare": 7.1,
+      "rank": 5,
+      "movieCd": "20224573",
+      "name": "부활남: 더 레드",
+      "openDate": "2026-09-30",
+      "audienceToday": 44937,
+      "audienceTotal": 145068,
+      "salesShare": 6.6,
       "directors": [
-        "김도영"
+        "백"
       ],
       "actors": [
-        "최민식",
-        "한소희",
-        "김준한",
-        "류혜영",
-        "김금순"
+        "구교환",
+        "신승호",
+        "강기영",
+        "김시아",
+        "김성령"
       ],
       "genres": [
-        "드라마"
+        "액션"
       ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 132,
+      "watchGrade": "15세이상관람가",
+      "runtime": 101,
       "nations": [
         "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPK026252.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/51/tn_DPK026222.jpg"
     },
     {
-      "rank": 5,
+      "rank": 6,
       "movieCd": "20254904",
       "name": "가능한 사랑",
       "openDate": "2026-09-23",
-      "audienceToday": 24266,
-      "audienceTotal": 115938,
-      "salesShare": 3.6,
+      "audienceToday": 20243,
+      "audienceTotal": 203895,
+      "salesShare": 3.1,
       "directors": [
         "이창동"
       ],
@@ -146,13 +174,69 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPK026375.jpg"
     },
     {
-      "rank": 6,
+      "rank": 7,
+      "movieCd": "20264775",
+      "name": "디거",
+      "openDate": "2026-10-03",
+      "audienceToday": 13539,
+      "audienceTotal": 15436,
+      "salesShare": 2.1,
+      "directors": [
+        "알레한드로 곤잘레스 이냐리투"
+      ],
+      "actors": [
+        "톰 크루즈",
+        "산드라 휠러",
+        "존 굿맨",
+        "제시 플레먼스"
+      ],
+      "genres": [
+        "코미디",
+        "드라마"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 128,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/57/tn_DPF033973.jpg"
+    },
+    {
+      "rank": 8,
+      "movieCd": "20256308",
+      "name": "인턴",
+      "openDate": "2026-09-16",
+      "audienceToday": 11883,
+      "audienceTotal": 821121,
+      "salesShare": 1.8,
+      "directors": [
+        "김도영"
+      ],
+      "actors": [
+        "최민식",
+        "한소희",
+        "김준한",
+        "류혜영",
+        "김금순"
+      ],
+      "genres": [
+        "드라마"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 132,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPK026252.jpg"
+    },
+    {
+      "rank": 9,
       "movieCd": "20265146",
       "name": "옵세션",
       "openDate": "2026-09-02",
-      "audienceToday": 20809,
-      "audienceTotal": 849155,
-      "salesShare": 3.3,
+      "audienceToday": 11699,
+      "audienceTotal": 903861,
+      "salesShare": 1.9,
       "directors": [
         "커리 바커"
       ],
@@ -173,13 +257,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/53/tn_DPF033752.jpg"
     },
     {
-      "rank": 7,
+      "rank": 10,
       "movieCd": "20266766",
       "name": "어벤져스: 엔드게임 앙코르",
       "openDate": "2026-09-23",
-      "audienceToday": 20057,
-      "audienceTotal": 107950,
-      "salesShare": 3.3,
+      "audienceToday": 11159,
+      "audienceTotal": 138092,
+      "salesShare": 2,
       "directors": [
         "안소니 루소",
         "조 루소"
@@ -201,90 +285,6 @@
         "미국"
       ],
       "posterUrl": null
-    },
-    {
-      "rank": 8,
-      "movieCd": "20263870",
-      "name": "레지던트 이블: 0번째 밤",
-      "openDate": "2026-09-17",
-      "audienceToday": 9207,
-      "audienceTotal": 186950,
-      "salesShare": 1.4,
-      "directors": [
-        "잭 크레거"
-      ],
-      "actors": [
-        "오스틴 에이브람스"
-      ],
-      "genres": [
-        "공포(호러)",
-        "액션",
-        "SF"
-      ],
-      "watchGrade": "청소년관람불가",
-      "runtime": 93,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033833.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20262770",
-      "name": "스파이더맨: 브랜드 뉴 데이",
-      "openDate": "2026-07-29",
-      "audienceToday": 6036,
-      "audienceTotal": 9032428,
-      "salesShare": 0.8,
-      "directors": [
-        "데스틴 다니엘 크리튼"
-      ],
-      "actors": [
-        "톰 홀랜드",
-        "젠데이아 콜먼",
-        "세이디 싱크",
-        "제이콥 배덜런",
-        "존 번탈"
-      ],
-      "genres": [
-        "액션",
-        "어드벤처",
-        "판타지"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 144,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/48/tn_DPF033548.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20261807",
-      "name": "극장판 치이카와: 인어 섬의 비밀",
-      "openDate": "2026-09-30",
-      "audienceToday": 4659,
-      "audienceTotal": 30725,
-      "salesShare": 0.9,
-      "directors": [
-        "오이카와 케이"
-      ],
-      "actors": [
-        "아오키 하루카",
-        "타나카 마코토",
-        "오자와 아리",
-        "이주은",
-        "손정민"
-      ],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 98,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033835.jpg"
     }
   ]
 }
