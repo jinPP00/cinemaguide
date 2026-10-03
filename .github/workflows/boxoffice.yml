@@ -1,9 +1,8 @@
 name: 박스오피스 순위 갱신
 
-# 매주 KOBIS 일별 박스오피스를 조회해 public/boxoffice.json을 갱신한다.
+# 매주 KOBIS 일별 박스오피스를 조회해 public/boxoffice.json과 llms.txt를 갱신한다.
 # 집계일·관객 수·점유율까지 같으면 저장을 생략하고, 실제로 바뀔 때만 커밋한다.
-# 배포는 deploy-cloudflare.yml이 담당한다(2026-08-14 확인: Cloudflare git 연동
-# 자동배포는 없음 — 이 프로젝트는 wrangler deploy로만 배포됨).
+# 운영 배포는 deploy-cloudflare.yml의 wrangler deploy가 담당한다.
 #
 # ⚠️ 여기서 GITHUB_TOKEN으로 push한 커밋은 push 이벤트로 다른 워크플로를
 # 트리거하지 않는다(GitHub의 재귀 실행 방지 규칙). [skip ci]를 빼는 것만으로는
@@ -44,16 +43,19 @@ jobs:
           KMDB_API_KEY: ${{ secrets.KMDB_API_KEY }}
         run: node scripts/fetch-boxoffice.mjs
 
+      - name: AI 안내 파일 동기화
+        run: node scripts/generate-llms.mjs
+
       - name: 변경사항 커밋 & 푸시
         id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- public/boxoffice.json; then
-            echo "집계일·수치 변동 없음 — 커밋 생략"
+          if git diff --quiet -- public/boxoffice.json public/llms.txt; then
+            echo "박스오피스·AI 안내 변동 없음 — 커밋 생략"
             echo "pushed=false" >> "$GITHUB_OUTPUT"
           else
-            git add public/boxoffice.json
+            git add public/boxoffice.json public/llms.txt
             git commit -m "박스오피스 순위 자동 갱신"
             git push
             echo "pushed=true" >> "$GITHUB_OUTPUT"

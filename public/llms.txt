@@ -8,7 +8,7 @@
 
 - [관람료 비교](https://cinemaguide.kr/%EA%B4%80%EB%9E%8C%EB%A3%8C%EB%B9%84%EA%B5%90/): 공식 요금표에서 일반관 2D 성인 요금을 같은 기준으로 비교합니다. 대상 지점·평일/주말·시간대·확인일을 본문에서 확인할 수 있습니다.
 - [전국 특별관 안내](https://cinemaguide.kr/%ED%8A%B9%EB%B3%84%EA%B4%80/): IMAX·4DX·SCREENX·돌비 계열 등 상영 방식과 운영 지점을 정리합니다.
-- [박스오피스 순위](https://cinemaguide.kr/%EB%B0%95%EC%8A%A4%EC%98%A4%ED%94%BC%EC%8A%A4/): KOBIS 일별 관객 수 기준 순위. 현재 집계일 2026-09-27, 매주 월요일 갱신하는 스냅샷입니다.
+- [박스오피스 순위](https://cinemaguide.kr/%EB%B0%95%EC%8A%A4%EC%98%A4%ED%94%BC%EC%8A%A4/): KOBIS 일별 관객 수 기준 순위. 현재 집계일 2026-10-03, 매주 월요일 갱신하는 스냅샷입니다.
 
 ## 브랜드별 지점 안내
 

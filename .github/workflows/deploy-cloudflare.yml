@@ -26,11 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify source data
+        run: npm run verify
+
       - name: Build
         run: npm run build
 
       - name: Test SEO data refresh and redirects
         run: npm run test:seo
+
+      - name: Check internal links
+        run: npm run check-links
 
       - name: Audit all branch detail pages
         run: node scripts/audit-detail-pages.mjs
