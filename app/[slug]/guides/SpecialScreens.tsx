@@ -1,3 +1,4 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { meta, branchPath } from '@/lib/data';
@@ -17,12 +18,12 @@ import { dataGeneratedAt } from '@/lib/dates';
 
 const PATH = guidePath(GUIDES.screens);
 
-export const specialScreensMetadata: Metadata = {
+export const specialScreensMetadata: Metadata = withOpenGraphUrl({
   title: '전국 특별관 안내 — IMAX·4DX·SCREENX·돌비 등',
   description:
     'CGV·롯데시네마·메가박스 특별관을 상영 방식별로 정리했습니다. IMAX, 4DX, SCREENX, 돌비 계열, 리클라이너 등의 운영 지점과 요금 정보를 확인할 수 있습니다.',
   alternates: { canonical: PATH },
-};
+});
 
 const CHIP_LIMIT = 12;
 

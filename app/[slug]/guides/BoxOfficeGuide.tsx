@@ -1,9 +1,10 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { meta, brandPath } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
-import { dataGeneratedAt } from '@/lib/dates';
+import { boxOfficeLastModified } from '@/lib/dates';
 import type { BoxOffice } from '@/lib/types';
 import BoxOfficeSection from '../BoxOfficeSection';
 import boxofficeData from '../../../public/boxoffice.json';
@@ -11,12 +12,12 @@ import boxofficeData from '../../../public/boxoffice.json';
 const boxoffice = boxofficeData as BoxOffice;
 const PATH = guidePath(GUIDES.boxoffice);
 
-export const boxOfficeMetadata: Metadata = {
+export const boxOfficeMetadata: Metadata = withOpenGraphUrl({
   title: '영화순위 — 박스오피스 순위와 영화 정보',
   description:
     '영화진흥위원회(KOBIS) 집계 기준 박스오피스 순위와 집계일·누적 관객 수, 매출 점유율, 개봉일, 감독, 출연, 러닝타임, 관람등급을 확인할 수 있습니다.',
   alternates: { canonical: PATH },
-};
+});
 
 function formatTargetDate(yyyymmdd: string): string {
   const y = yyyymmdd.slice(0, 4);
@@ -37,7 +38,7 @@ export default function BoxOfficePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(
           breadcrumbJsonLd(crumbs),
-          webPageJsonLd(PATH, dataGeneratedAt.toISOString()),
+          webPageJsonLd(PATH, boxOfficeLastModified.toISOString()),
         )}
       />
       <nav className="crumbs" aria-label="현재 위치">

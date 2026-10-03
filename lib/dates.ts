@@ -1,4 +1,5 @@
 import { meta } from './data';
+import boxoffice from '../public/boxoffice.json';
 
 /**
  * lastmod/dateModified를 페이지 종류별로 다르게 매기는 단일 계산 지점.
@@ -22,6 +23,9 @@ import { meta } from './data';
  *   시점(meta.generatedAt)을 그대로 쓴다.
  */
 export const dataGeneratedAt = new Date(meta.generatedAt);
+
+// 영화 순위의 실제 저장 시점. 지점 확인일에는 이 값을 섞지 않는다.
+export const boxOfficeLastModified = new Date(boxoffice.fetchedAt);
 
 export function branchLastModified(checkedAt: string): Date {
   return new Date(checkedAt);

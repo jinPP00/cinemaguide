@@ -1,14 +1,15 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { LEGAL, REVISIONS } from '@/lib/legal';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '개인정보처리방침',
   description:
     '영화관 지점안내가 수집하는 개인정보 항목, 이용 목적, 보관 기간, 처리 위탁과 국외 이전, 이용자 권리를 안내합니다.',
   alternates: { canonical: '/privacy/' },
-};
+});
 
 export default function PrivacyPage() {
   return (

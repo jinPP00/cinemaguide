@@ -1,14 +1,15 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { meta, brandPath } from '@/lib/data';
 import { SITE } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '사이트 소개',
   description:
     '영화관 지점안내가 어떤 정보를 어떻게 수집하고 정리하는지, 무엇을 하지 않는지 설명합니다.',
   alternates: { canonical: '/about/' },
-};
+});
 
 export default function AboutPage() {
   return (

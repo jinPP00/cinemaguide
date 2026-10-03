@@ -65,6 +65,14 @@ function metaContent(html, name) {
   return '';
 }
 
+function ogUrl(html) {
+  for (const m of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const a = attrs(m[0]);
+    if (a.property === 'og:url') return a.content ?? '';
+  }
+  return '';
+}
+
 function canonical(html) {
   for (const m of html.matchAll(/<link\b[^>]*>/gi)) {
     const a = attrs(m[0]);
@@ -108,9 +116,33 @@ const pages = walk(OUT).map((file) => {
 });
 
 const indexable = pages.filter((p) => !p.noindex);
+const sitemap = new Map(
+  [...fs.readFileSync(path.join(OUT, 'sitemap.xml'), 'utf8').matchAll(/<url>([\s\S]*?)<\/url>/g)]
+    .map(m => [normalizePath(m[1].match(/<loc>([^<]*)<\/loc>/)?.[1]), m[1].match(/<lastmod>([^<]*)<\/lastmod>/)?.[1]]),
+);
+for (const p of pages) {
+  if (p.noindex && sitemap.has(p.url)) add(p.url, 'noindex 사이트맵 포함', '색인 제외 페이지가 사이트맵에 있음');
+}
+for (const url of sitemap.keys()) {
+  if (!indexable.some(p => p.url === url)) add(url, '사이트맵 대상 없음', '색인 가능한 HTML이 없음');
+}
 for (const p of indexable) {
   if (!p.title) add(p.url, 'title 누락', 'title이 없음');
   if (!p.description) add(p.url, 'description 누락', 'meta description이 없음');
+  if (ogUrl(p.html) !== p.canon) add(p.url, 'og:url 불일치', `공유 URL이 canonical과 다름: ${ogUrl(p.html)}`);
+  if (!sitemap.has(p.url)) add(p.url, '사이트맵 누락', '색인 가능한 페이지가 사이트맵에 없음');
+  for (const m of p.html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+    try {
+      const value = JSON.parse(m[1]);
+      for (const schema of Array.isArray(value) ? value : [value]) {
+        if (schema['@type'] === 'WebPage' && schema.dateModified !== sitemap.get(p.url)) {
+          add(p.url, '갱신일 불일치', 'WebPage.dateModified와 sitemap.lastmod가 다름');
+        }
+      }
+    } catch {
+      add(p.url, 'JSON-LD 문법 오류', '구조화 데이터를 JSON으로 읽을 수 없음');
+    }
+  }
   if (!p.canon) add(p.url, 'canonical 누락', 'canonical 링크가 없음');
   else if (normalizePath(p.canon) !== normalizePath(p.url)) {
     add(p.url, 'canonical 불일치', `${p.canon} → ${p.url}`);
@@ -140,6 +172,16 @@ for (const p of indexable) {
   if (p.text.length < 450 && !/^\/(privacy|terms|contact|disclaimer|affiliate-disclosure)\//.test(p.url)) {
     warn(p.url, '짧은 본문 후보', `${p.text.length}자`);
   }
+}
+
+const boxoffice = JSON.parse(fs.readFileSync('public/boxoffice.json', 'utf8'));
+if (sitemap.get('/박스오피스/') !== new Date(boxoffice.fetchedAt).toISOString()) {
+  add('/박스오피스/', '박스오피스 갱신일 오류', '사이트맵이 실제 데이터 저장일을 반영하지 않음');
+}
+const llms = fs.readFileSync(path.join(OUT, 'llms.txt'), 'utf8');
+const boxofficeDate = boxoffice.targetDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+if (!llms.includes(boxofficeDate) || llms.includes('실시간 박스오피스')) {
+  add('/llms.txt', '박스오피스 안내 오류', '집계일 또는 갱신 주기 표기가 실제 데이터와 다름');
 }
 
 function duplicates(field) {

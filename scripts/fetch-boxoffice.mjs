@@ -8,14 +8,12 @@
  * 없으면 포스터 없이(다른 정보는 그대로) 저장한다. KOBIS는 포스터 필드가 없어서
  * 영화명으로 KMDb를 한 번 더 검색해 붙인다.
  *
- * public/ 아래 두는 이유: 페이지 HTML에 굽지 않고 브라우저가 이 파일을 직접
- * fetch해서 읽게 하기 위해서다. 그래야 순위가 바뀔 때 이 파일 하나만 새로
- * 올리면 되고, 425개 지점 페이지를 통째로 재빌드·재배포할 필요가 없다.
+ * public/boxoffice.json과 전용 페이지의 정적 HTML은 빌드·배포 때 함께 반영된다.
+ * 검색엔진도 집계일·관객 수를 JavaScript 실행 없이 읽을 수 있어야 한다.
  * API 키는 이 스크립트 실행에만 쓰이고 결과 JSON에는 들어가지 않는다 — 커밋해도 안전하다.
  *
  * KOBIS는 당일 데이터가 늦게 집계되므로 관례상 "어제" 날짜를 조회한다.
- * 순위(rank 순서로 나열한 movieCd 목록)가 기존 파일과 같으면 굳이 덮어쓰지
- * 않는다 — 불필요한 배포/캐시 무효화를 줄이기 위해서다.
+ * 집계일과 일별 수치까지 모두 같을 때만 저장을 생략한다.
  *
  * 순위 10개 각각의 감독·배우·장르·관람등급·러닝타임·제작국가는 searchMovieInfo로
  * 한 편씩 추가 조회해서 같이 저장한다(총 최대 11번 호출). 이것도 API 키가
@@ -25,17 +23,14 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { sameDailyBoxOffice, yesterdayInKorea } from './boxoffice-data.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(__dirname, '..', 'public', 'boxoffice.json');
 
-function rankingOf(movies) {
-  return movies.map((m) => m.movieCd).join(',');
-}
-
 /**
  * 네트워크 문제로 갱신을 못 한 경우를 나타낸다. 설정 오류(키 누락 등)와
- * 구분해서, 이건 워크플로를 실패로 만들지 않고 기존 데이터를 유지한다.
+ * 구분해서 기존 데이터를 유지한 채 갱신 실패를 알린다.
  */
 class NetworkUnavailableError extends Error {}
 
@@ -49,7 +44,7 @@ async function fetchWithRetry(url, attempts = 5, baseDelayMs = 5000) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
-      return await fetch(url);
+      return await fetch(url, { signal: AbortSignal.timeout(20_000) });
     } catch (err) {
       lastErr = err;
       if (i < attempts - 1) {
@@ -72,15 +67,6 @@ if (!KEY) {
 const KMDB_KEY = process.env.KMDB_API_KEY;
 if (!KMDB_KEY) {
   console.log('KMDB_API_KEY가 없어 포스터 없이 진행합니다.');
-}
-
-function yesterday() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}${m}${day}`;
 }
 
 async function fetchMovieInfo(movieCd) {
@@ -154,7 +140,7 @@ async function fetchPoster(name, releaseYear) {
 }
 
 async function main() {
-  const targetDt = yesterday();
+  const targetDt = yesterdayInKorea();
   const url =
     'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json' +
     `?key=${KEY}&targetDt=${targetDt}`;
@@ -182,7 +168,10 @@ async function main() {
     throw new Error(`KOBIS 오류: ${data.faultInfo.message}`);
   }
 
-  const list = data.boxOfficeResult?.dailyBoxOfficeList ?? [];
+  const list = data.boxOfficeResult?.dailyBoxOfficeList;
+  if (!Array.isArray(list) || list.length === 0) {
+    throw new Error(`KOBIS ${targetDt} 집계가 비어 있습니다. 기존 데이터를 유지합니다.`);
+  }
   const movies = list.slice(0, 10).map((m) => ({
     rank: Number(m.rank),
     movieCd: m.movieCd,
@@ -196,11 +185,9 @@ async function main() {
   let prev = null;
   if (existsSync(OUT)) {
     prev = JSON.parse(readFileSync(OUT, 'utf-8'));
-    // 순위도 같고 상세정보(감독 등)도 이미 붙어있으면 다시 부를 필요가 없다.
-    // 상세정보 필드가 없는 옛 파일이면(스키마 추가 전) 순위가 같아도 한 번은 채워준다.
-    const hasDetails = Boolean(prev.movies?.[0]?.directors);
-    if (hasDetails && rankingOf(prev.movies) === rankingOf(movies)) {
-      console.log(`박스오피스 순위 변동 없음 — 갱신 생략 (기준일 ${targetDt})`);
+    const hasDetails = prev.movies?.every(m => Array.isArray(m.directors) && (!KMDB_KEY || m.posterUrl));
+    if (hasDetails && sameDailyBoxOffice(prev, targetDt, movies)) {
+      console.log(`박스오피스 집계일·수치 변동 없음 — 갱신 생략 (기준일 ${targetDt})`);
       return;
     }
   }
@@ -253,9 +240,8 @@ function pickDetails(m) {
 
 main().catch((err) => {
   console.error(err.message);
-  // 네트워크 문제로 갱신을 못 한 건 실패로 처리하지 않는다. 주간 갱신이라
-  // 한 주 건너뛰어도 기존 데이터로 사이트는 정상 동작하고, 매주 빨간불이
-  // 뜨면 정작 진짜 문제(키 누락 등)를 놓치게 된다. 대신 로그에 크게 남긴다.
+  // 실패해도 기존 파일은 유지한다. 워크플로는 실패로 표시해 오래된 데이터가
+  // 정상 갱신처럼 보이지 않게 한다.
   if (err instanceof NetworkUnavailableError) {
     console.warn('');
     console.warn('='.repeat(60));
@@ -263,7 +249,8 @@ main().catch((err) => {
     console.warn('사이트는 정상 동작하며, 다음 예약 실행 때 다시 시도합니다.');
     console.warn('계속 반복되면 KOBIS 서버 상태나 러너 네트워크를 확인하세요.');
     console.warn('='.repeat(60));
-    process.exit(0);
+    // 파일은 유지하되 실행은 실패로 표시해 갱신 장애가 계속 숨겨지지 않게 한다.
+    process.exit(1);
   }
   process.exit(1);
 });

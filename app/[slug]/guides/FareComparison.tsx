@@ -1,3 +1,4 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { meta, branchPath } from '@/lib/data';
@@ -16,12 +17,12 @@ import { dataGeneratedAt } from '@/lib/dates';
 
 const PATH = guidePath(GUIDES.fares);
 
-export const fareComparisonMetadata: Metadata = {
+export const fareComparisonMetadata: Metadata = withOpenGraphUrl({
   title: 'CGV·롯데시네마·메가박스 관람료 비교',
   description:
     '전국 영화관 공식 요금표에서 일반관 2D 성인 요금을 같은 기준으로 정리했습니다. 브랜드별 평일·주말 요금, 지점별 범위, 시간대와 지역 차이를 확인할 수 있습니다.',
   alternates: { canonical: PATH },
-};
+});
 
 export default function FareComparisonPage() {
   const national = brandFareSummaries();

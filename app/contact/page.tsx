@@ -1,12 +1,13 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '문의·정정 요청',
   description: '지점 정보 오류 신고, 정정 요청, 제휴 및 기타 문의를 받습니다.',
   alternates: { canonical: '/contact/' },
-};
+});
 
 const CORRECTION_SUBJECT = encodeURIComponent('[정정 요청] 지점 정보 오류 신고');
 const CORRECTION_BODY = encodeURIComponent(

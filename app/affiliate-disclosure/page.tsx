@@ -1,14 +1,15 @@
+import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { LEGAL } from '@/lib/legal';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withOpenGraphUrl({
   title: '광고·제휴 고지',
   description:
     '영화관 지점안내의 광고 게재 여부와 제휴 관계, 그것이 콘텐츠에 미치는 영향을 투명하게 밝힙니다.',
   alternates: { canonical: '/affiliate-disclosure/' },
-};
+});
 
 export default function AffiliateDisclosurePage() {
   const hasCommercial = LEGAL.usesAds;
