@@ -13,7 +13,9 @@ CGV·롯데시네마·메가박스 전국 425개 지점의 위치, 교통, 주�
 | 호스팅 | Cloudflare Workers Static Assets |
 | 데이터 | 빌드 시점에 `data/*.json`을 읽어 정적 페이지 생성 |
 
-본문은 빌드 결과물인 HTML·CSS·JS로 제공한다. `worker/index.mjs`는 HTTP·www 요청을 대표 HTTPS 주소로 옮기고 기존 정적 자산을 제공한다.
+본문은 빌드 결과물인 HTML·CSS·JS로 제공한다. HTTP→HTTPS는 Cloudflare 도메인의 SSL/TLS → Edge Certificates → Always Use HTTPS 설정을 켜서 처리한다. www의 대표 주소 이동은 기존 도메인 설정을 사용한다.
+
+정적 자산에는 Worker 스크립트를 두지 않는다. `assets.run_worker_first: true`를 추가하면 HTML·JS·CSS뿐 아니라 Next.js 화면 전환용 `.txt` 요청도 모두 Worker 실행으로 집계되어 무료 일일 요청 한도를 소모한다. 요청량 때문에 런타임이 꼭 필요해지면 실행할 경로부터 제한한다.
 
 운영 배포는 `.github/workflows/deploy-cloudflare.yml`의 `wrangler deploy`를 사용한다. 아래 Pages 설정은 다른 정적 호스팅으로 옮길 때 참고용이다.
 
@@ -42,7 +44,7 @@ npm install
 npm run dev          # 개발 서버
 npm run build        # 최신 llms.txt 생성 + 정적 사이트 빌드 → out/
 npm run check        # 빌드 + SEO 회귀 테스트 + 링크·본문·검색 메타 검사
-npm run test:seo     # 한국 집계일·일별 수치 갱신·HTTPS 리다이렉트 회귀 테스트
+npm run test:seo     # 한국 집계일·일별 수치 갱신 회귀 테스트
 
 npm run data         # 크롤링 원본 → data/*.json 재생성 + 검증
 ```

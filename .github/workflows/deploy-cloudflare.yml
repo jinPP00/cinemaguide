@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test SEO data refresh and redirects
+      - name: Test SEO data refresh
         run: npm run test:seo
 
       - name: Check internal links
