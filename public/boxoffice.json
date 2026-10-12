@@ -1,43 +1,15 @@
 {
-  "targetDate": "20261004",
-  "fetchedAt": "2026-10-05T04:28:37.442Z",
+  "targetDate": "20261011",
+  "fetchedAt": "2026-10-12T04:43:00.817Z",
   "movies": [
     {
       "rank": 1,
-      "movieCd": "20255033",
-      "name": "암살자(들)",
-      "openDate": "2026-09-23",
-      "audienceToday": 188468,
-      "audienceTotal": 2233963,
-      "salesShare": 27,
-      "directors": [
-        "허진호"
-      ],
-      "actors": [
-        "유해진",
-        "박해일",
-        "이민호",
-        "소타 신고"
-      ],
-      "genres": [
-        "범죄",
-        "드라마"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 130,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPK026317.jpg"
-    },
-    {
-      "rank": 2,
       "movieCd": "20261807",
       "name": "극장판 치이카와: 인어 섬의 비밀",
       "openDate": "2026-09-30",
-      "audienceToday": 141155,
-      "audienceTotal": 604764,
-      "salesShare": 21.1,
+      "audienceToday": 119961,
+      "audienceTotal": 1281485,
+      "salesShare": 31.1,
       "directors": [
         "오이카와 케이"
       ],
@@ -59,13 +31,41 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033835.jpg"
     },
     {
+      "rank": 2,
+      "movieCd": "20255033",
+      "name": "암살자(들)",
+      "openDate": "2026-09-23",
+      "audienceToday": 108047,
+      "audienceTotal": 2992543,
+      "salesShare": 27.3,
+      "directors": [
+        "허진호"
+      ],
+      "actors": [
+        "유해진",
+        "박해일",
+        "이민호",
+        "소타 신고"
+      ],
+      "genres": [
+        "범죄",
+        "드라마"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 130,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPK026317.jpg"
+    },
+    {
       "rank": 3,
       "movieCd": "20256161",
       "name": "타짜: 벨제붑의 노래",
       "openDate": "2026-09-23",
-      "audienceToday": 128717,
-      "audienceTotal": 1365648,
-      "salesShare": 19.1,
+      "audienceToday": 53759,
+      "audienceTotal": 1744160,
+      "salesShare": 14.2,
       "directors": [
         "최국희"
       ],
@@ -92,9 +92,9 @@
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 52985,
-      "audienceTotal": 11998206,
-      "salesShare": 10.3,
+      "audienceToday": 25270,
+      "audienceTotal": 12179160,
+      "salesShare": 8.9,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -122,9 +122,9 @@
       "movieCd": "20224573",
       "name": "부활남: 더 레드",
       "openDate": "2026-09-30",
-      "audienceToday": 44727,
-      "audienceTotal": 189802,
-      "salesShare": 6.6,
+      "audienceToday": 15183,
+      "audienceTotal": 302355,
+      "salesShare": 4.2,
       "directors": [
         "백"
       ],
@@ -147,68 +147,64 @@
     },
     {
       "rank": 6,
-      "movieCd": "20254904",
-      "name": "가능한 사랑",
-      "openDate": "2026-09-23",
-      "audienceToday": 26554,
-      "audienceTotal": 230483,
-      "salesShare": 4.1,
+      "movieCd": "20265062",
+      "name": "룩백",
+      "openDate": "2026-10-08",
+      "audienceToday": 10737,
+      "audienceTotal": 62383,
+      "salesShare": 3,
       "directors": [
-        "이창동"
+        "고레에다 히로카즈"
       ],
       "actors": [
-        "전도연",
-        "설경구",
-        "조인성",
-        "조여정",
-        "조유리"
+        "데구치 나츠키",
+        "마키타 아쥬",
+        "나나세 후리",
+        "오카다 로카"
       ],
       "genres": [
         "드라마"
       ],
-      "watchGrade": "청소년관람불가",
-      "runtime": 164,
+      "watchGrade": "전체관람가",
+      "runtime": 100,
       "nations": [
-        "한국"
+        "일본"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPK026375.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033819.jpg"
     },
     {
       "rank": 7,
-      "movieCd": "20256308",
-      "name": "인턴",
-      "openDate": "2026-09-16",
-      "audienceToday": 13744,
-      "audienceTotal": 834866,
-      "salesShare": 2.2,
+      "movieCd": "20266610",
+      "name": "입에 대한 앙케트",
+      "openDate": "2026-10-07",
+      "audienceToday": 9349,
+      "audienceTotal": 50473,
+      "salesShare": 2.4,
       "directors": [
-        "김도영"
+        "시미즈 다카시"
       ],
       "actors": [
-        "최민식",
-        "한소희",
-        "김준한",
-        "류혜영",
-        "김금순"
+        "츠나 케이토",
+        "요시카와 아이미"
       ],
       "genres": [
-        "드라마"
+        "공포(호러)"
       ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 132,
+      "watchGrade": "15세이상관람가",
+      "runtime": 88,
       "nations": [
-        "한국"
+        "일본"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/52/tn_DPK026252.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPF034036.jpg"
     },
     {
       "rank": 8,
       "movieCd": "20264775",
       "name": "디거",
       "openDate": "2026-10-03",
-      "audienceToday": 13113,
-      "audienceTotal": 28551,
-      "salesShare": 2,
+      "audienceToday": 4618,
+      "audienceTotal": 70497,
+      "salesShare": 1.2,
       "directors": [
         "알레한드로 곤잘레스 이냐리투"
       ],
@@ -234,9 +230,9 @@
       "movieCd": "20265146",
       "name": "옵세션",
       "openDate": "2026-09-02",
-      "audienceToday": 12871,
-      "audienceTotal": 916738,
-      "salesShare": 2.1,
+      "audienceToday": 4469,
+      "audienceTotal": 955136,
+      "salesShare": 1.3,
       "directors": [
         "커리 바커"
       ],
@@ -258,31 +254,26 @@
     },
     {
       "rank": 10,
-      "movieCd": "20266766",
-      "name": "어벤져스: 엔드게임 앙코르",
-      "openDate": "2026-09-23",
-      "audienceToday": 10652,
-      "audienceTotal": 148743,
-      "salesShare": 1.9,
-      "directors": [
-        "안소니 루소",
-        "조 루소"
-      ],
+      "movieCd": "20266850",
+      "name": "극장판 래브라도: 망고축제를 지켜라",
+      "openDate": "2026-10-03",
+      "audienceToday": 4085,
+      "audienceTotal": 34805,
+      "salesShare": 0.9,
+      "directors": [],
       "actors": [
-        "로버트 다우니 주니어",
-        "크리스 에반스",
-        "스칼렛 요한슨",
-        "마크 러팔로",
-        "크리스 헴스워스"
+        "정재헌",
+        "김은아",
+        "김연우",
+        "엄상현"
       ],
       "genres": [
-        "액션",
-        "SF"
+        "애니메이션"
       ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 183,
+      "watchGrade": "전체관람가",
+      "runtime": 63,
       "nations": [
-        "미국"
+        "중국"
       ],
       "posterUrl": null
     }
