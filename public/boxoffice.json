@@ -1,15 +1,15 @@
 {
-  "targetDate": "20261011",
-  "fetchedAt": "2026-10-12T04:43:00.817Z",
+  "targetDate": "20261018",
+  "fetchedAt": "2026-10-19T03:35:44.802Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20261807",
       "name": "극장판 치이카와: 인어 섬의 비밀",
       "openDate": "2026-09-30",
-      "audienceToday": 119961,
-      "audienceTotal": 1281485,
-      "salesShare": 31.1,
+      "audienceToday": 146250,
+      "audienceTotal": 1828911,
+      "salesShare": 43.3,
       "directors": [
         "오이카와 케이"
       ],
@@ -35,9 +35,9 @@
       "movieCd": "20255033",
       "name": "암살자(들)",
       "openDate": "2026-09-23",
-      "audienceToday": 108047,
-      "audienceTotal": 2992543,
-      "salesShare": 27.3,
+      "audienceToday": 56420,
+      "audienceTotal": 3249178,
+      "salesShare": 16.7,
       "directors": [
         "허진호"
       ],
@@ -63,9 +63,9 @@
       "movieCd": "20256161",
       "name": "타짜: 벨제붑의 노래",
       "openDate": "2026-09-23",
-      "audienceToday": 53759,
-      "audienceTotal": 1744160,
-      "salesShare": 14.2,
+      "audienceToday": 36249,
+      "audienceTotal": 1911190,
+      "salesShare": 11.2,
       "directors": [
         "최국희"
       ],
@@ -92,9 +92,9 @@
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 25270,
-      "audienceTotal": 12179160,
-      "salesShare": 8.9,
+      "audienceToday": 19949,
+      "audienceTotal": 12267664,
+      "salesShare": 8.7,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -119,40 +119,41 @@
     },
     {
       "rank": 5,
-      "movieCd": "20224573",
-      "name": "부활남: 더 레드",
-      "openDate": "2026-09-30",
-      "audienceToday": 15183,
-      "audienceTotal": 302355,
-      "salesShare": 4.2,
+      "movieCd": "20264444",
+      "name": " 웨일폴: 고래에 먹힌 남자",
+      "openDate": "2026-10-14",
+      "audienceToday": 13897,
+      "audienceTotal": 56363,
+      "salesShare": 4.3,
       "directors": [
-        "백"
+        "브라이언 더필드"
       ],
       "actors": [
-        "구교환",
-        "신승호",
-        "강기영",
-        "김시아",
-        "김성령"
+        "오스틴 에이브람스",
+        "조슈 브롤린",
+        "엘리자베스 슈",
+        "존 오티즈",
+        "제인 레비"
       ],
       "genres": [
-        "액션"
+        "어드벤처",
+        "스릴러"
       ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 101,
+      "watchGrade": "12세이상관람가",
+      "runtime": 105,
       "nations": [
-        "한국"
+        "미국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/51/tn_DPK026222.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPF034052.jpg"
     },
     {
       "rank": 6,
       "movieCd": "20265062",
       "name": "룩백",
       "openDate": "2026-10-08",
-      "audienceToday": 10737,
-      "audienceTotal": 62383,
-      "salesShare": 3,
+      "audienceToday": 8622,
+      "audienceTotal": 105345,
+      "salesShare": 2.7,
       "directors": [
         "고레에다 히로카즈"
       ],
@@ -174,12 +175,62 @@
     },
     {
       "rank": 7,
+      "movieCd": "20266263",
+      "name": "전자오락수호대",
+      "openDate": "2026-10-14",
+      "audienceToday": 7046,
+      "audienceTotal": 42647,
+      "salesShare": 2,
+      "directors": [
+        "엄영식"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 110,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/57/tn_DPK026450.jpg"
+    },
+    {
+      "rank": 8,
+      "movieCd": "20263410",
+      "name": "스트리트 파이터",
+      "openDate": "2026-10-14",
+      "audienceToday": 5462,
+      "audienceTotal": 34920,
+      "salesShare": 1.6,
+      "directors": [
+        "키타오 사쿠라이"
+      ],
+      "actors": [
+        "앤드류 코지",
+        "노아 센티네오",
+        "칼리나 리앙",
+        "제이슨 모모아",
+        "데이비드 다스트말치안"
+      ],
+      "genres": [
+        "액션"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 119,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033856.jpg"
+    },
+    {
+      "rank": 9,
       "movieCd": "20266610",
       "name": "입에 대한 앙케트",
       "openDate": "2026-10-07",
-      "audienceToday": 9349,
-      "audienceTotal": 50473,
-      "salesShare": 2.4,
+      "audienceToday": 4961,
+      "audienceTotal": 77114,
+      "salesShare": 1.5,
       "directors": [
         "시미즈 다카시"
       ],
@@ -198,84 +249,32 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPF034036.jpg"
     },
     {
-      "rank": 8,
-      "movieCd": "20264775",
-      "name": "디거",
-      "openDate": "2026-10-03",
-      "audienceToday": 4618,
-      "audienceTotal": 70497,
-      "salesShare": 1.2,
+      "rank": 10,
+      "movieCd": "20224573",
+      "name": "부활남: 더 레드",
+      "openDate": "2026-09-30",
+      "audienceToday": 3396,
+      "audienceTotal": 326734,
+      "salesShare": 1,
       "directors": [
-        "알레한드로 곤잘레스 이냐리투"
+        "백"
       ],
       "actors": [
-        "톰 크루즈",
-        "산드라 휠러",
-        "존 굿맨",
-        "제시 플레먼스"
+        "구교환",
+        "신승호",
+        "강기영",
+        "김시아",
+        "김성령"
       ],
       "genres": [
-        "코미디",
-        "드라마"
+        "액션"
       ],
       "watchGrade": "15세이상관람가",
-      "runtime": 128,
+      "runtime": 101,
       "nations": [
-        "미국"
+        "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/57/tn_DPF033973.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20265146",
-      "name": "옵세션",
-      "openDate": "2026-09-02",
-      "audienceToday": 4469,
-      "audienceTotal": 955136,
-      "salesShare": 1.3,
-      "directors": [
-        "커리 바커"
-      ],
-      "actors": [
-        "마이클 존스턴",
-        "인디 네버레티",
-        "쿠퍼 톰린슨",
-        "메간 롤리스"
-      ],
-      "genres": [
-        "공포(호러)"
-      ],
-      "watchGrade": "청소년관람불가",
-      "runtime": 108,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/53/tn_DPF033752.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20266850",
-      "name": "극장판 래브라도: 망고축제를 지켜라",
-      "openDate": "2026-10-03",
-      "audienceToday": 4085,
-      "audienceTotal": 34805,
-      "salesShare": 0.9,
-      "directors": [],
-      "actors": [
-        "정재헌",
-        "김은아",
-        "김연우",
-        "엄상현"
-      ],
-      "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 63,
-      "nations": [
-        "중국"
-      ],
-      "posterUrl": null
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/51/tn_DPK026222.jpg"
     }
   ]
 }
