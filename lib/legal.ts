@@ -9,7 +9,7 @@ export const LEGAL = {
   /** 정책 시행일 */
   effectiveDate: '2026-07-26',
   /** 마지막 개정일 */
-  updatedDate: '2026-08-14',
+  updatedDate: '2026-10-25',
 
   /** 현재 실제로 사용 중인 도구 — 도입 시 true로 바꾼다 */
   usesAnalytics: false,
@@ -41,7 +41,6 @@ export const LEGAL = {
 /** 정책 문서 개정 이력 — 변경할 때마다 위에 추가한다 */
 export const REVISIONS = [
   { date: '2026-07-26', note: '최초 시행' },
-  // 심사용 스크립트와 ads.txt는 올렸지만 승인 전이라 광고가 실제로 게재되지는
-  // 않는다. "도입"은 게재가 시작된 것처럼 읽히므로 문서와 실제를 맞춘다.
   { date: '2026-08-14', note: 'Google AdSense 광고 관련 내용 추가' },
+  { date: '2026-10-25', note: '제3자 쿠키 및 맞춤형 광고 해제 방법·안전성 확보 조치 안내 보강' },
 ];
