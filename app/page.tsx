@@ -1,12 +1,13 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
 import Link from 'next/link';
-import { meta, branches, branchesOfBrand, brandPath, sidoPath, sidosOfBrand } from '@/lib/data';
+import { meta, branches, branchesOfBrand, brandPath, sidoPath, sidosOfBrand, branchPath, isOperating } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
 import { brandProfiles, fareInsight, won } from '@/lib/fares';
 import { SITE } from '@/lib/site';
 import { BRAND_ICON_COLOR, BRAND_WORDMARK, brandThemeVars } from '@/lib/colors';
 import type { CSSProperties } from 'react';
 import { IconClapper } from './icons';
+import BranchQuickSearch, { type SearchableBranch } from './BranchQuickSearch';
 
 export const metadata = withOpenGraphUrl({
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
@@ -16,7 +17,7 @@ export const metadata = withOpenGraphUrl({
 
 export default function HomePage() {
   const total = meta.totalBranches;
-  const specialBranches = branches.filter((b) => b.specialScreens.length > 0).length;
+  const specialBranches = branches.filter((b) => isOperating(b) && b.specialScreens.length > 0).length;
   const profiles = brandProfiles();
   const insight = fareInsight();
   const slotLeader = [...profiles].sort((a, b) => b.commonSlots.length - a.commonSlots.length)[0];
@@ -27,12 +28,34 @@ export default function HomePage() {
     (a, b) => b.specialBranchCount / b.branchCount - a.specialBranchCount / a.branchCount,
   )[0];
 
+  const searchItems: SearchableBranch[] = branches
+    .filter((b) => isOperating(b))
+    .map((b) => ({
+      id: b.id,
+      name: b.name,
+      brand: b.brand,
+      brandName: b.brandName,
+      sido: b.sido,
+      sigungu: b.sigungu ?? '',
+      path: branchPath(b),
+      specialScreens: b.specialScreens,
+    }));
+
   return (
     <div className="wrap page">
-      <h1>전국 영화관 지점안내</h1>
-      <p className="guide-lead">
-        CGV·롯데시네마·메가박스 <strong>전국 {total}개 지점</strong>의 주소, 대중교통 가는 길, 주차 무료 시간·초과 요금·정산 방법, 상영관별·시간대별 관람료를 같은 기준으로 정리했습니다. 방문할 지점을 선택해 관람 조건과 주변 대안 극장을 비교하고 공식 상영시간표로 바로 이동할 수 있습니다.
-      </p>
+      <div className="hero-panel">
+        <div className="hero-eyebrow">NATIONWIDE CINEMA DIRECTORY &amp; GUIDE</div>
+        <h1>전국 영화관 지점안내</h1>
+        <p className="guide-lead">
+          CGV·롯데시네마·메가박스 <strong>전국 {total}개 지점</strong>의 주소, 대중교통 가는 길, 주차 무료 시간·초과 요금·정산 방법, 상영관별·시간대별 관람료를 같은 기준으로 정리했습니다. 방문할 지점을 선택해 관람 조건과 주변 대안 극장을 비교하고 공식 상영시간표로 바로 이동할 수 있습니다.
+        </p>
+        <div className="badges" style={{ marginTop: 14 }}>
+          <span className="badge">전국 {total}개 지점 수록</span>
+          <span className="badge">17개 시도 전체 커버</span>
+          <span className="badge">특별관 운영 {specialBranches}곳 비교</span>
+        </div>
+        <BranchQuickSearch items={searchItems} />
+      </div>
 
       <section className="section" aria-labelledby="brands">
         <h2 id="brands">브랜드별 전국 지점 안내</h2>
@@ -41,7 +64,7 @@ export default function HomePage() {
           {meta.brands.map((b) => {
             const list = branchesOfBrand(b.key);
             const sidoCount = sidosOfBrand(b.key).length;
-            const specialCount = list.filter((x) => x.specialScreens.length > 0).length;
+            const specialCount = list.filter((x) => isOperating(x) && x.specialScreens.length > 0).length;
             const iconColor = BRAND_ICON_COLOR[b.key];
             const themeVars = brandThemeVars(b.key) as CSSProperties;
             return (
@@ -179,8 +202,8 @@ export default function HomePage() {
         <p className="section-kicker">브랜드와 시도를 선택하면 해당 지역의 시·군·구별 지점 목록과 지역 대표 관람료·특별관 현황을 확인할 수 있습니다.</p>
         <div className="stack" style={{ marginTop: 16 }}>
           {meta.brands.map((b) => (
-            <div key={b.key}>
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>{b.name}</div>
+            <div key={b.key} className="region-brand-box">
+              <div className="region-brand-title">{b.name}</div>
               <ul className="chip-list">
                 {sidosOfBrand(b.key).map((sido) => (
                   <li key={sido}>

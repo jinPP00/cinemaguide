@@ -1,13 +1,13 @@
 import type { BrandKey } from './types';
 
-/** 브랜드 카드 아이콘 칩 색. 실제 브랜드 컬러 대신 서로 구분되는 절제된 톤을 쓴다. */
+/** 브랜드 카드 아이콘 칩 및 포인트 색. 서로 뚜렷이 구분되면서도 세련된 딥 톤을 쓴다. */
 export const BRAND_ICON_COLOR: Record<BrandKey, { bg: string; fg: string }> = {
-  cgv: { bg: '#fcebeb', fg: '#791f1f' },
-  lotte: { bg: '#faece7', fg: '#712b13' },
-  megabox: { bg: '#e6f1fb', fg: '#0c447c' },
+  cgv: { bg: '#fff1f2', fg: '#be123c' },
+  lotte: { bg: '#fff7ed', fg: '#c2410c' },
+  megabox: { bg: '#eef2ff', fg: '#4338ca' },
 };
 
-/** 홈 브랜드 카드의 로고체 표기. 한글 브랜드명은 표시용 글꼴(Oswald)에
+/** 홈 브랜드 카드의 로고체 표기. 한글 브랜드명은 표시용 글꼴에
  * 한글 글리프가 없어 그대로 쓰면 폰트가 깨지므로 로마자 표기를 따로 둔다. */
 export const BRAND_WORDMARK: Record<BrandKey, string> = {
   cgv: 'CGV',

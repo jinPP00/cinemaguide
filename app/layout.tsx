@@ -7,6 +7,7 @@ import { SITE, DISCLAIMER } from '@/lib/site';
 import { meta } from '@/lib/data';
 import { guidePath, GUIDES } from '@/lib/paths';
 import NavLinks from './NavLinks';
+import { IconClapper } from './icons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -81,7 +82,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site-header">
           <div className="wrap inner">
             <Link href="/" className="logo">
-              {SITE.name}
+              <span className="logo-mark" aria-hidden="true">
+                <IconClapper />
+              </span>
+              <span>{SITE.name}</span>
             </Link>
             <NavLinks brands={meta.brands} />
           </div>
