@@ -5,6 +5,7 @@ import type { Branch, BrandKey, Meta, PriceRow } from './types';
 import { normalizeBranchTransit } from './transit-normalize';
 import { rewriteBranchSubwayDisplay } from './subway-display';
 import { finalizeBranchSubwayDisplay } from './subway-final';
+import { parkingGroups } from './parking';
 
 // 원본 JSON은 근거 데이터로 그대로 보존하고, 화면에서 읽는 순간에만 교통 문구의
 // HTML 엔티티·붙어버린 구분자·노선/정류장 경계를 정리한다. 지하철 안내는 그 뒤
@@ -102,13 +103,14 @@ export function hasTransitInfo(branch: Branch): boolean {
   );
 }
 
-/** 주차 안내가 있는가. CGV는 raw 한 덩어리, 나머지는 항목별로 나뉜다. */
+/** 주차 안내가 있는가. 화면에 실제로 출력되는 구조화 항목(parkingGroups)이 있어야 한다. */
 export function hasParkingInfo(branch: Branch): boolean {
   return (
-    filled(branch.parking.raw) ||
-    filled(branch.parking.guide) ||
-    filled(branch.parking.howTo) ||
-    filled(branch.parking.fee)
+    (filled(branch.parking.raw) ||
+      filled(branch.parking.guide) ||
+      filled(branch.parking.howTo) ||
+      filled(branch.parking.fee)) &&
+    parkingGroups(branch).length > 0
   );
 }
 

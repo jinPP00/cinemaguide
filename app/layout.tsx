@@ -99,6 +99,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>
               </li>
               <li>
+                <Link href={guidePath(GUIDES.parking)}>주차 가이드</Link>
+              </li>
+              <li>
+                <Link href={guidePath(GUIDES.discounts)}>할인·예매 가이드</Link>
+              </li>
+              <li>
                 <Link href={guidePath(GUIDES.boxoffice)}>박스오피스 순위</Link>
               </li>
             </ul>
@@ -112,6 +118,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </li>
               <li>
                 <Link href="/terms/">이용약관</Link>
+              </li>
+              <li>
+                <Link href="/disclaimer/">면책 고지</Link>
+              </li>
+              <li>
+                <Link href="/affiliate-disclosure/">광고·제휴 고지</Link>
               </li>
               <li>
                 <Link href="/contact/">문의·정정 요청</Link>

@@ -91,8 +91,15 @@ function normalizeTimes(text: string): string {
     .trim();
 }
 
+function normalizeMoney(text: string): string {
+  return text.replace(/(\d+)\s*천\s*원/g, (_m, d) => `${Number(d).toLocaleString()},000원`);
+}
+
 function normalizeFloors(text: string): string {
   return text
+    .replace(/지하\s*(\d+)\s*층?\s*~\s*(?:지하\s*)?(\d+)\s*층/g, 'B$1~B$2')
+    .replace(/(?:지상\s*)?(\d+)\s*층?\s*~\s*(?:지상\s*)?(\d+)\s*층/g, '$1F~$2F')
+    .replace(/(?:지상\s*)?(\d+)\s*,\s*(\d+)\s*층/g, '$1F~$2F')
     .replace(/지하\s*(\d+)\s*층/g, 'B$1')
     .replace(/지상\s*(\d+)\s*층/g, '$1F')
     .replace(/\bB(\d+)F\b/gi, 'B$1')
@@ -118,20 +125,40 @@ function unique<T>(values: T[]): T[] {
  */
 function freeDurations(text: string): string[] {
   const values: string[] = [];
-  for (const m of text.matchAll(/(\d+)\s*시간\s*(\d+\s*분\s*)?(?:이내\s*)?무료/g)) {
+  for (const m of text.matchAll(/(\d+)\s*시간\s*(\d+\s*분\s*)?(?:이내|까지|의)?\s*무료/g)) {
     const at = m.index ?? 0;
-    const before = text.slice(Math.max(0, at - 14), at);
-    if (/(최대|합산|추가|구매)/.test(before)) continue;
+    const before = text.slice(Math.max(0, at - 18), at);
+    if (/(합산|추가|구매)/.test(before)) continue;
+    if (/최대/.test(before) && !/(영화|관람|티켓)/.test(before)) continue;
     values.push(duration(m));
+  }
+  if (values.length === 0) {
+    for (const m of text.matchAll(/(?:최초\s*)?(\d+)\s*분\s*(?:회차\s*|이내\s*|까지\s*)?무료/g)) {
+      const at = m.index ?? 0;
+      const before = text.slice(Math.max(0, at - 10), at);
+      if (/시간/.test(before)) continue;
+      values.push(`최초 ${m[1]}분`);
+    }
   }
   return unique(values);
 }
 
+function hasUnconditionalFreeParking(text: string): boolean {
+  if (/무료\s*주차\s*불가|무료주차\s*불가/.test(text)) return false;
+  if (/\d+\s*(?:시간|분)\s*(?:\d+\s*분\s*)?(?:이내|까지|의|회차)?\s*무료/.test(text)) return false;
+  if (/\d+\s*시간(?:에|\s*당|\s*기준)?\s*[\d,]+\s*원/.test(text)) return false;
+  return /(?:영화\s*관람\s*시|관람\s*고객[^\n]{0,12}|주차\s*요금\s*[:：]?\s*|건물\s*주차장\s*|외부\s*주차장\s*|야외\s*무료\s*주차장\s*|주차\s*등록\s*없이\s*)무료|(?:\b|^)무료\s*(?:주차|출차|이용)|이용\s*요금\s*없음|정산\s*없이\s*출차\s*가능|\(무료\)/m.test(
+    text,
+  );
+}
+
 function flatDiscounts(text: string): string[] {
   const values: string[] = [];
-  for (const line of text.split('\n')) {
-    if (/초과|부과|분당/.test(line)) continue;
-    const m = line.match(/(\d+)\s*시간\s*([\d,]+)\s*원/);
+  const normalized = normalizeMoney(text);
+  for (const rawLine of normalized.split('\n')) {
+    const line = rawLine.split(/이후|초과/)[0];
+    if (/초과|분당|분마다|추가당/.test(line)) continue;
+    const m = line.match(/(\d+)\s*시간(?:에|\s*당|\s*기준)?\s*([\d,]+)\s*원/);
     if (m) values.push(`${m[1]}시간 ${m[2]}원`);
   }
   return unique(values);
@@ -139,7 +166,8 @@ function flatDiscounts(text: string): string[] {
 
 function overageRates(text: string): string[] {
   const values: string[] = [];
-  for (const m of text.matchAll(/(\d+)\s*분\s*(?:당|초과[^\d]{0,12})\s*([\d,]+)\s*원/g)) {
+  const normalized = normalizeMoney(text);
+  for (const m of normalized.matchAll(/(\d+)\s*분\s*(?:당|마다|에|추가\s*당|초과[^\d]{0,12})\s*([\d,]+)\s*원/g)) {
     values.push(`${m[1]}분당 ${m[2]}원`);
   }
   return unique(values);
@@ -175,8 +203,8 @@ function verificationMethods(text: string): string[] {
   if (/매표소|매점/.test(text)) methods.push('매표소');
   if (/\bAPP\b|앱|어플/i.test(text)) methods.push('모바일 앱');
   if (/무인\s*정산|자동\s*정산|주차\s*정산기|정산기/.test(text)) methods.push('주차 정산기');
-  if (/(영화|관람)?\s*티켓\s*(제시|확인|인증)/.test(text)) methods.push('영화 티켓');
-  if (/주차안내요원|안내요원|현장\s*정산/.test(text)) methods.push('현장 직원');
+  if (/(영화|관람)?\s*티켓\s*(제시|확인|인증|소지)|극장표\s*[^\n]{0,8}지참/.test(text)) methods.push('영화 티켓');
+  if (/주차안내요원|안내요원|주차\s*안내\s*요원|현장\s*정산/.test(text)) methods.push('현장 직원');
   return unique(methods);
 }
 
@@ -189,6 +217,9 @@ export function parkingSummary(branch: Branch): ParkingSummary | null {
 
   const free = freeDurations(text);
   if (free.length === 1 && !conditional) summary.free = free[0];
+  else if (free.length === 0 && !conditional && hasUnconditionalFreeParking(text)) {
+    summary.free = '관람 시';
+  }
 
   const flat = flatDiscounts(text);
   if (!summary.free && !conditional && flat.length === 1) summary.flat = flat[0];
@@ -218,20 +249,49 @@ function contextForLine(line: string): string | null {
 }
 
 /** 위치는 이름과 층 범위를 모두 확실히 읽을 수 있을 때만 만든다. */
-function locationFacts(lines: string[]): string[] {
+function locationFacts(lines: string[], text: string): string[] {
   const result: string[] = [];
   for (const raw of lines) {
     const line = normalizeFloors(raw);
-    for (const name of ['본관', '별관', '지하주차장', '지상주차장']) {
+    for (const name of ['본관', '별관', '신관', '지하주차장', '지상주차장', '건물 내', '영화관']) {
       const re = new RegExp(`${name}[^,;]{0,35}?(B\\d+(?:~(?:B\\d+|\\d+F))?|\\d+F(?:~\\d+F)?)`);
       const m = line.match(re);
       if (m) result.push(`${name} ${m[1]}`);
     }
   }
+  if (result.length > 0) return unique(result);
+
+  if (/스타필드\s*고양\s*주차장/.test(text)) result.push('스타필드 고양 주차장 (B1~4F)');
+  else if (/부천스타필드시티\s*주차장/.test(text)) result.push('부천스타필드시티 주차장 (B5~9F)');
+  else if (/아이스퀘어몰\s*주차장/.test(text)) result.push('아이스퀘어몰 주차장 (A·B동)');
+  else if (/모다아울렛\s*충주\s*주차장/.test(text)) result.push('모다아울렛 충주 주차장 · 건물 뒤편 외부 주차장');
+  else if (/몰오브광양/.test(text)) result.push('몰오브광양 지상 주차장');
+  else if (/광양\s*LF\s*스퀘어/.test(text)) result.push('광양 LF스퀘어 1F~2F 및 외부 야외 주차장');
+  else if (/인천아시아드\s*주경기장/.test(text)) result.push('인천아시아드 주경기장 GATE2 주차장');
+  else if (/롯데마트/.test(text) && /1층\s*주차장/.test(text) && /2층\s*주차장/.test(text)) {
+    result.push('롯데마트 1F·2F 주차장');
+  } else if (/지하\s*주차장|지하주차장|지하\s*1층/.test(text) && /야외\s*주차장|옥외\s*주차장|외부\s*주차장/.test(text)) {
+    result.push('건물 내 지하주차장 · 외부 주차장');
+  } else if (/지상\s*1층/.test(text) && /지하\s*주차장|지하주차장/.test(text)) {
+    result.push('건물 지상 1F·지하주차장 및 전용 주차장');
+  } else if (/지하\s*1층|B1층/.test(text)) {
+    result.push('건물 내 지하주차장 (B1)');
+  } else if (/지상\s*주차장|지상주차장/.test(text)) {
+    result.push('지상 주차장');
+  } else if (/야외\s*(?:무료\s*)?주차장/.test(text)) {
+    result.push('야외 주차장');
+  } else if (/전용\s*외부\s*주차장/.test(text)) {
+    result.push('전용 외부 주차장');
+  } else if (/주차\s*타워|주차타워/.test(text)) {
+    result.push('건물 내 주차타워');
+  } else if (/건물\s*뒷?편/.test(text)) {
+    result.push('건물 뒤편 주차장');
+  }
+
   return unique(result);
 }
 
-function operationFacts(lines: string[]): string[] {
+function operationFacts(lines: string[], text: string): string[] {
   const result: string[] = [];
   for (const raw of lines) {
     const line = normalizeTimes(raw);
@@ -244,6 +304,13 @@ function operationFacts(lines: string[]): string[] {
     const weekend = line.match(/주말[^\d]{0,10}(\d{2}:\d{2})\s*까지/);
     if (weekend) value += ` · 주말 ${weekend[1]}까지`;
     result.push(context ? `${context} ${value}` : value);
+  }
+  if (result.length === 0) {
+    if (/첫\s*영화\s*시작\s*30분\s*전/.test(text) && /마지막\s*영화\s*종영/.test(text)) {
+      result.push('첫 영화 시작 30분 전~마지막 영화 종료 시까지');
+    } else if (/상영\s*1시간\s*전부터\s*입차/.test(text)) {
+      result.push('1회차 상영 1시간 전 · 이후 회차 상영 30분 전부터 입차 가능');
+    }
   }
   return unique(result);
 }
@@ -264,8 +331,8 @@ function capacityFacts(text: string): string[] {
 function combinedFacts(text: string): string[] {
   const values: string[] = [];
   for (const line of text.split('\n')) {
-    if (!/(타\s*매장|타매장|다른\s*매장|백화점|마트|아울렛)/.test(line)) continue;
-    if (!/(합산|포함|추가)/.test(line)) continue;
+    if (!/(타\s*매장|타매장|다른\s*매장|백화점|마트|아울렛|아이스퀘어몰|쇼핑몰)/.test(line)) continue;
+    if (!/(합산|포함|추가|인정)/.test(line)) continue;
     const m = line.match(/최대\s*(\d+)\s*시간/);
     if (m) values.push(`다른 매장 이용분과 합산해 최대 ${m[1]}시간 할인`);
   }
@@ -290,6 +357,24 @@ function warningFacts(text: string, freeValues: string[]): string[] {
   if (/주차장.*협소|주차\s*공간.*협소/.test(text)) {
     values.push(/대중교통/.test(text) ? '주차 공간 협소 · 대중교통 이용 권장' : '주차 공간이 협소함');
   }
+  if (/주차\s*시설\s*미\s*운영|주차장\s*미\s*운영/.test(text)) {
+    values.push('전용 주차시설 미운영 · 대중교통 이용 권장');
+  }
+  if (/지하\s*주차장\s*이용\s*불가/.test(text) && /공영\s*주차장/.test(text)) {
+    values.push('건물 내 지하주차장 이용 불가 · 인근 유료 공영주차장 이용 (본인 부담)');
+  }
+  if (/제휴\s*주차장[^\n]*운영\s*종료/.test(text)) {
+    values.push('기존 제휴 주차장 운영 종료 · 인근 유료주차장 이용');
+  }
+  if (/발렛\s*주차가?\s*불가/.test(text)) {
+    values.push('전기차·대형차·슈퍼카·튜닝차량은 발렛주차 불가');
+  }
+  if (/지정좌석제가\s*아니며/.test(text)) {
+    values.push('승용차·SUV 구간별 입차 순서대로 좌석 배정');
+  }
+  if (/23시\s*롯데마트\s*폐점/.test(text)) {
+    values.push('21시 이후 심야 상영 관람 시 1층 주차장 이용 권장');
+  }
 
   return unique(values);
 }
@@ -310,8 +395,8 @@ export function parkingGroups(branch: Branch): ParkingGroup[] {
   const lines = linesOf(branch);
   const groups = new Map<GroupLabel, string[]>();
 
-  push(groups, '주차 위치', locationFacts(lines));
-  push(groups, '운영 시간', operationFacts(lines));
+  push(groups, '주차 위치', locationFacts(lines, text));
+  push(groups, '운영 시간', operationFacts(lines, text));
   push(groups, '주차 규모', capacityFacts(text));
 
   const conditional = conditionalFreeLines(lines);
@@ -324,8 +409,10 @@ export function parkingGroups(branch: Branch): ParkingGroup[] {
     push(groups, '무료 주차', conditional.map((v) => `영화 관람 시 ${v}`));
   } else {
     if (free.length === 1) push(groups, '무료 주차', [`영화 관람 시 ${free[0]} 무료`]);
-    if (free.length === 0 && flat.length === 1) {
+    else if (free.length === 0 && flat.length === 1) {
       push(groups, '무료 주차', [`영화 관람 할인 · ${flat[0]}`]);
+    } else if (free.length === 0 && flat.length === 0 && hasUnconditionalFreeParking(text)) {
+      push(groups, '무료 주차', ['영화 관람 시 무료 주차']);
     }
   }
 

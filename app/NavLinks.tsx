@@ -8,9 +8,7 @@ import type { BrandKey } from '@/lib/types';
 import type { CSSProperties } from 'react';
 
 /**
- * 브랜드 메뉴와 영화순위를 모든 페이지 상단에서 바로 이동할 수 있게 한다.
- * 브랜드 활성 상태는 해당 브랜드 허브·지역·지점 페이지에서 표시하고,
- * 영화순위는 박스오피스 안내 페이지에서만 활성화한다.
+ * 브랜드 메뉴와 핵심 안내 페이지(관람료 비교·특별관·영화순위)를 상단에서 바로 이동할 수 있게 한다.
  */
 export default function NavLinks({
   brands,
@@ -19,8 +17,10 @@ export default function NavLinks({
 }) {
   const pathname = usePathname() ?? '';
   const decoded = decodeURIComponent(pathname);
-  const boxOfficePath = decodeURIComponent(guidePath(GUIDES.boxoffice));
-  const isBoxOffice = decoded === boxOfficePath || decoded === boxOfficePath.replace(/\/$/, '');
+  const isGuide = (slug: string) => {
+    const p = decodeURIComponent(guidePath(slug as (typeof GUIDES)[keyof typeof GUIDES]));
+    return decoded === p || decoded === p.replace(/\/$/, '');
+  };
 
   return (
     <nav className="nav" aria-label="주요 메뉴">
@@ -41,7 +41,13 @@ export default function NavLinks({
           </Link>
         );
       })}
-      <Link href={guidePath(GUIDES.boxoffice)} aria-current={isBoxOffice ? 'page' : undefined}>
+      <Link href={guidePath(GUIDES.fares)} aria-current={isGuide(GUIDES.fares) ? 'page' : undefined}>
+        관람료비교
+      </Link>
+      <Link href={guidePath(GUIDES.screens)} aria-current={isGuide(GUIDES.screens) ? 'page' : undefined}>
+        특별관
+      </Link>
+      <Link href={guidePath(GUIDES.boxoffice)} aria-current={isGuide(GUIDES.boxoffice) ? 'page' : undefined}>
         영화순위
       </Link>
     </nav>

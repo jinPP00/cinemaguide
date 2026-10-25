@@ -30,6 +30,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const [path, changeFrequency, modified] of [
     [guidePath(GUIDES.fares), 'monthly', lastModified],
     [guidePath(GUIDES.screens), 'monthly', lastModified],
+    [guidePath(GUIDES.parking), 'monthly', lastModified],
+    [guidePath(GUIDES.discounts), 'monthly', lastModified],
     [guidePath(GUIDES.boxoffice), 'weekly', boxOfficeLastModified],
   ] as const) {
     entries.push({ url: `${base}${path}`, lastModified: modified, changeFrequency, priority: 0.7 });

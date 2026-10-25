@@ -32,11 +32,14 @@ import SpecialScreenSection from './SpecialScreenSection';
 import SourceNote from './SourceNote';
 import { parkingGroups as buildParkingGroups } from '@/lib/parking';
 import { baseFare } from '@/lib/fares';
+import { nearbyBranches, formatDistance } from '@/lib/geo';
 import { branchTitle, branchHeading, branchDescription } from '@/lib/meta-branch';
-import { GUIDES } from '@/lib/paths';
+import { GUIDES, guidePath } from '@/lib/paths';
 import BoxOfficeGuide, { boxOfficeMetadata } from './guides/BoxOfficeGuide';
 import FareComparison, { fareComparisonMetadata } from './guides/FareComparison';
 import SpecialScreens, { specialScreensMetadata } from './guides/SpecialScreens';
+import ParkingGuide, { parkingGuideMetadata } from './guides/ParkingGuide';
+import DiscountGuide, { discountGuideMetadata } from './guides/DiscountGuide';
 
 /**
  * 이 라우트 하나가 두 가지 페이지를 모두 담당한다: 브랜드 허브(/cgv/)와 지점 상세
@@ -44,7 +47,7 @@ import SpecialScreens, { specialScreensMetadata } from './guides/SpecialScreens'
  * 써야 하므로 여기서 값을 보고 분기한다.
  */
 /**
- * 안내 페이지(박스오피스·관람료비교·특별관)도 이 라우트가 함께 맡는다.
+ * 안내 페이지(박스오피스·관람료비교·특별관·주차가이드·할인가이드)도 이 라우트가 함께 맡는다.
  *
  * app/박스오피스/page.tsx처럼 한글 폴더로 정적 라우트를 만들면 next build의
  * export 단계가 InvalidCharacterError로 죽는다(Next 16.2 확인). 반면 이
@@ -56,6 +59,8 @@ const GUIDE_PAGES = {
   [GUIDES.boxoffice]: { Page: BoxOfficeGuide, metadata: boxOfficeMetadata },
   [GUIDES.fares]: { Page: FareComparison, metadata: fareComparisonMetadata },
   [GUIDES.screens]: { Page: SpecialScreens, metadata: specialScreensMetadata },
+  [GUIDES.parking]: { Page: ParkingGuide, metadata: parkingGuideMetadata },
+  [GUIDES.discounts]: { Page: DiscountGuide, metadata: discountGuideMetadata },
 } as const;
 
 type GuideSlug = keyof typeof GUIDE_PAGES;
@@ -311,6 +316,23 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
             </li>
           ))}
         </ul>
+        <p style={{ marginTop: 14 }}>
+          <Link className="see-all-link" href={guidePath(GUIDES.fares)}>
+            3사 관람료 비교 보기 →
+          </Link>
+          {' · '}
+          <Link className="see-all-link" href={guidePath(GUIDES.screens)}>
+            특별관 종류·운영 지점 보기 →
+          </Link>
+          {' · '}
+          <Link className="see-all-link" href={guidePath(GUIDES.parking)}>
+            주차·인증 가이드 보기 →
+          </Link>
+          {' · '}
+          <Link className="see-all-link" href={guidePath(GUIDES.discounts)}>
+            조조·우대 할인 가이드 보기 →
+          </Link>
+        </p>
       </section>
 
       <section className="section" aria-labelledby="other-brands">
@@ -402,6 +424,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   // 보여주고 있었다 — 갈 수 없는 극장의 운영 정보는 있는 그대로가 아니라 틀린
   // 정보다. 대신 위치와 근처 대안 영화관, 출처만 남긴다.
   const operating = isOperating(b);
+  const leadSummary = operating ? buildBranchLeadSummary(b, info.name) : null;
 
   const crumbs = [
     { name: '홈', path: '/' },
@@ -456,7 +479,13 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       {/* 메가박스 원본의 intro("압도적인 몰입감…", "최상의 영화 경험!")는 공식
           사이트 홍보 문구다. 115개 지점 페이지의 첫 문장이 남의 광고 카피였던 셈이라
           내보내지 않는다 — 확인 가능한 사실만 쓴다는 원칙(lib/screens.ts 주석)과도
-          맞지 않는다. 데이터에는 남겨둔다. */}
+          맞지 않는다. 대신 보유한 지점 데이터(위치·규모·대표 요금·특별관·주차)를
+          조합한 객관적 안내 문단을 상단에 제공한다. */}
+      {leadSummary && (
+        <p className="lead" style={{ marginTop: 12 }}>
+          {leadSummary}
+        </p>
+      )}
 
       {b.status === '휴관' && (
         <p className="notice-closed">
@@ -561,6 +590,8 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       {operating && <SpecialScreenSection branch={b} />}
       <NearbySection branch={b} />
 
+      {operating && <BranchVisitChecklist branch={b} brandName={info.name} />}
+
       {/* FAQ는 본문에 이미 그대로 적힌 사실을 질문 형태로 반복하지 않는다.
           주차 무료 조건·초과 요금처럼 여러 항목을 한 답으로 모아야 답이 되는
           것과, 요금표 여러 줄을 한 문장으로 요약한 것만 남긴다(buildBranchFaqs). */}
@@ -615,6 +646,162 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
         </div>
       </section>
     </div>
+  );
+}
+
+/**
+ * 지점 상단 리드 요약 문단 생성기.
+ * 보유한 지점 데이터(시도·시군구·상영관 수·좌석 수·특별관·기본 관람료·주차 핵심 조건)를
+ * 조합해 방문자가 첫 화면에서 지점의 핵심 스펙을 바로 파악할 수 있게 한다.
+ */
+function buildBranchLeadSummary(b: Branch, brandName: string): string {
+  const full = `${b.name} ${brandName}`;
+  const regionPart = [b.sido, b.sigungu].filter(Boolean).join(' ');
+  const scalePart =
+    b.screenCount != null
+      ? b.seatCount != null && b.screenCount > 0
+        ? `총 ${b.screenCount}개 상영관(${b.seatCount.toLocaleString()}석, 관당 평균 약 ${Math.round(
+            b.seatCount / b.screenCount,
+          )}석 규모)을 갖춘 극장입니다.`
+        : `총 ${b.screenCount}개 상영관을 운영하는 극장입니다.`
+      : '운영 중인 영화관입니다.';
+
+  const fare = baseFare(b);
+  const farePart = fare
+    ? ` 기본 요금표(${fare.label}) 성인 기준 평일 일반 ${won(fare.weekdayAdult)}원·주말 ${won(
+        fare.weekendAdult,
+      )}원${
+        fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult
+          ? `(평일 ${fare.morningSlot} ${won(fare.morningAdult)}원)`
+          : ''
+      }으로 책정되어 있으며,`
+    : '';
+
+  const screenPart =
+    b.specialScreens.length > 0
+      ? ` 일반관 외에도 ${b.specialScreens.join(', ')} 특별관을 함께 운영합니다.`
+      : fare
+        ? ' 일반 상영관을 중심으로 상영 회차가 편성됩니다.'
+        : '';
+
+  const pGroups = buildParkingGroups(b);
+  const freeParking = pGroups.find((g) => g.label === '무료 주차')?.items[0];
+  const parkingPart = freeParking
+    ? ` 차량 방문 시 주차는 '${freeParking}' 기준이 적용되며, 상영관별 상세 관람료와 대중교통·주차 인증 방법을 아래에서 차례대로 확인할 수 있습니다.`
+    : ' 상영관별 상세 관람료와 대중교통 노선, 주차장 이용 조건을 아래에서 차례대로 확인할 수 있습니다.';
+
+  return `${full}는 ${regionPart}에 위치한 ${brandName} 지점으로, ${scalePart}${farePart}${screenPart}${parkingPart}`;
+}
+
+/**
+ * 지점별 방문 전 확인 체크리스트 섹션.
+ * 각 지점의 실제 요금표 구성, 주차 그룹 항목, 주변 대안 영화관 거리·개수를 바탕으로
+ * 방문 전 점검해야 할 실질적 가이드를 제공한다.
+ */
+function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandName: string }) {
+  const full = `${b.name} ${brandName}`;
+  const priceGroups = pivotPrices(pricesOf(b.id));
+  const fare = baseFare(b);
+  const pGroups = buildParkingGroups(b);
+  const nearby = nearbyBranches(b);
+
+  const timeSlots = [
+    ...new Set(
+      pricesOf(b.id)
+        .map((r) => r.timeSlot)
+        .filter((s): s is string => Boolean(s)),
+    ),
+  ];
+
+  const parkingAuth = pGroups.find((g) => g.label === '인증 방법')?.items[0];
+  const parkingFree = pGroups.find((g) => g.label === '무료 주차')?.items[0];
+  const parkingExtra = pGroups.find((g) => g.label === '초과 요금')?.items[0];
+  const parkingLoc = pGroups.find((g) => g.label === '주차 위치')?.items[0];
+
+  const nearestOne = nearby[0];
+  const nearestTwo = nearby[1];
+
+  return (
+    <section className="section" aria-labelledby="visit-checklist">
+      <h2 id="visit-checklist">{full} 방문 전 확인 가이드</h2>
+      <div className="card-grid cols-3" style={{ marginTop: 14 }}>
+        <div className="card" style={{ cursor: 'default' }}>
+          <div className="card-title" style={{ fontSize: 16 }}>
+            1. 시간대·우대 요금 및 예매 취소 기준
+          </div>
+          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
+            {priceGroups.length > 0 ? (
+              <>
+                현재 {full}는 <strong>{priceGroups.map((g) => g.label).join(', ')}</strong> 등 총{' '}
+                {priceGroups.length}종의 상영관 요금표를 운영하며, 회차 시간대는{' '}
+                <strong>{timeSlots.join('·')}</strong> 구분으로 나뉩니다.{' '}
+                {fare && fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult
+                  ? `평일 ${fare.morningSlot} 회차(성인 ${won(fare.morningAdult)}원)는 일반 회차(${won(
+                      fare.weekdayAdult,
+                    )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 납니다. `
+                  : ''}
+                청소년·경로(만 65세 이상)·장애인 우대 할인을 적용해 예매한 경우 입장 시 학생증·신분증·복지카드 등 증빙 서류 확인이 필요하며, 온라인 예매 취소는 상영 시작 20분 전까지 가능합니다.
+              </>
+            ) : (
+              <>
+                상영관 형태에 따라 일반 극장과 별도의 요금 체계가 적용될 수 있으므로 {brandName} 공식 앱·웹에서 회차별 관람료와 예매 취소 마감 시간(통상 상영 20분 전)을 미리 확인하시기 바랍니다.
+              </>
+            )}
+          </p>
+        </div>
+
+        <div className="card" style={{ cursor: 'default' }}>
+          <div className="card-title" style={{ fontSize: 16 }}>
+            2. 주차 인증 및 총 체류 시간 계산
+          </div>
+          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
+            {pGroups.length > 0 ? (
+              <>
+                {parkingLoc ? `주차 공간은 ${parkingLoc} 기준이며, ` : ''}
+                {parkingFree ? `기본 혜택은 '${parkingFree}'입니다. ` : ''}
+                {parkingAuth ? `인증은 '${parkingAuth}' 방식으로 진행됩니다. ` : ''}
+                {parkingExtra ? `무료 시간 경과 시 '${parkingExtra}' 기준이 부과되므로, ` : ''}
+                영화 본편 러닝타임뿐 아니라 상영 전 대기 시간, 본편 시작 전 광고(약 15~20분), 퇴장 후 엘리베이터·출차 이동 시간까지 합산해 입차~출차 소요 시간을 계산하는 것이 안전합니다.
+              </>
+            ) : (
+              <>
+                방문 전 {brandName} 공식 페이지에서 주차 가능 여부와 인근 공영·제휴 주차장 위치를 확인하시고, 주말·공휴일 피크 시간대에는 가급적 대중교통 이용을 권장합니다.
+              </>
+            )}
+          </p>
+        </div>
+
+        <div className="card" style={{ cursor: 'default' }}>
+          <div className="card-title" style={{ fontSize: 16 }}>
+            3. 매진·혼잡 시 주변 대안 극장 비교
+          </div>
+          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
+            {nearby.length > 0 && nearestOne ? (
+              <>
+                원하는 시간대 좌석이 매진되었거나 주차장이 혼잡할 때는 직선거리{' '}
+                <strong>{formatDistance(nearestOne.km)}</strong> 거리의{' '}
+                <Link className="guide-inline-link" href={branchPath(nearestOne.branch)}>
+                  {nearestOne.branch.name} {nearestOne.branch.brandName}
+                </Link>
+                {nearestTwo ? (
+                  <>
+                    {' '}또는 <strong>{formatDistance(nearestTwo.km)}</strong> 거리의{' '}
+                    <Link className="guide-inline-link" href={branchPath(nearestTwo.branch)}>
+                      {nearestTwo.branch.name} {nearestTwo.branch.brandName}
+                    </Link>
+                  </>
+                ) : null}{' '}
+                등 주변 {nearby.length}개 영화관의 상영시간표·주차 조건·특별관 유무를 위 비교 표에서 함께 대조해 볼 수 있습니다.
+              </>
+            ) : (
+              <>
+                {b.sido} 지역 내 다른 {brandName} 지점이나 인접 지역 영화관의 상영시간표와 주차 조건을 함께 비교하면 원하는 시간대 회차를 찾기가 한결 수월합니다.
+              </>
+            )}
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1705,6 +1892,11 @@ function buildBrandFaqs(
     });
   }
 
+  faqs.push({
+    q: `${brandName} 주차 무료 시간과 인증 방법은 어떻게 되나요?`,
+    a: `영화 관람 시 보통 2시간~3시간 30분의 무료 주차 또는 정액 주차 혜택이 제공되지만, 입점 건물(백화점·복합쇼핑몰·단독 건물)에 따라 티켓 바코드 사전 정산, 매표소 차량번호 등록, 영수증 합산 가능 여부가 모두 다릅니다. 방문할 지점 페이지의 '주차 안내' 섹션에서 정확한 기준을 확인할 수 있습니다.`,
+  });
+
   return faqs;
 }
 
@@ -1714,13 +1906,6 @@ function buildBrandFaqs(
  * 원칙: 데이터가 없으면 그 질문 자체를 넣지 않는다. "확인이 필요합니다" 같은
  * 빈 답변을 FAQ로 내보내면 음성검색·AI가 그 문장을 그대로 인용해버려서, 없느니만
  * 못한 결과가 된다. 답변 문장은 본문에 이미 있는 사실만 다시 쓴다(새 주장 금지).
- */
-/**
- * 지점 FAQ. 본문에 그대로 적힌 사실(주소, 특별관 목록, 상영시간표 버튼)을
- * 질문 형태로 한 번 더 쓰던 문항은 뺐다 — 같은 페이지 안에서 세 번째 반복이었고
- * 답이 되는 정보가 하나도 늘지 않았다. 남긴 두 문항은 여러 줄을 모아야 답이
- * 되는 것들이다: 요금표 서너 줄(평일·주말·조조·청소년·경로)을 한 문장으로,
- * 주차 카드 두 항목(무료 조건·초과 요금)을 한 문장으로.
  */
 function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }[] {
   const faqs: { q: string; a: string }[] = [];
@@ -1734,6 +1919,10 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
     }
     const extras: string[] = [];
     if (fare.weekdayYouth != null) extras.push(`청소년 평일 ${won(fare.weekdayYouth)}원`);
+    const weekendRow = pricesOf(b.id).find(
+      (r) => r.label === fare.label && r.timeSlot === '일반' && r.dayType === '주말',
+    );
+    if (weekendRow?.youth != null) extras.push(`청소년 주말 ${won(weekendRow.youth)}원`);
     // 경로·장애인 요금은 롯데시네마 요금표에만 지점별로 실려 있다(다른 두
     // 브랜드는 원본에 없어 적지 않는다).
     const concession = pricesOf(b.id).find(
@@ -1751,16 +1940,48 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
   }
 
   // FAQ도 화면과 동일한 구조화 주차 데이터를 사용한다. 공식 원문 앞부분을
-  // 다시 잘라 쓰면 긴 안내문이 FAQ에 재노출될 수 있으므로, 무료 주차·초과 요금처럼
-  // 이미 검증해 분류한 사실만 최대 두 항목까지 요약한다.
+  // 다시 잘라 쓰면 긴 안내문이 FAQ에 재노출될 수 있으므로, 무료 주차·초과 요금·인증 방법처럼
+  // 이미 검증해 분류한 사실만 요약한다.
   const parkingFaqGroups = buildParkingGroups(b);
-  const parkingSummary = ['무료 주차', '초과 요금']
-    .flatMap((label) => parkingFaqGroups.find((g) => g.label === label)?.items ?? [])
-    .slice(0, 2);
+  const parkingSummary = ['무료 주차', '초과 요금', '인증 방법']
+    .flatMap((label) => parkingFaqGroups.find((g) => g.label === label)?.items.slice(0, 1) ?? [])
+    .slice(0, 3);
   if (parkingSummary.length > 0) {
     faqs.push({
-      q: `${full} 주차 요금은 어떻게 되나요?`,
-      a: `${parkingSummary.join(' · ')} . 자세한 인증 방법과 예외 조건은 위 주차 안내를 확인해주세요.`.replace(' .', '.'),
+      q: `${full} 주차 요금과 인증 방법은 어떻게 되나요?`,
+      a: `${parkingSummary.join(' · ')} . 자세한 주차 위치와 유의사항은 위 주차 안내를 확인해주세요.`.replace(' .', '.'),
+    });
+  }
+
+  const priceLabels = pivotPrices(pricesOf(b.id)).map((g) => g.label);
+  if (b.screenCount != null || b.specialScreens.length > 0 || priceLabels.length > 0) {
+    const scaleText =
+      b.screenCount != null
+        ? `총 ${b.screenCount}개 상영관${b.seatCount != null ? `(${b.seatCount.toLocaleString()}석)` : ''} 규모로 운영되며`
+        : '운영 중이며';
+    const specialText =
+      b.specialScreens.length > 0
+        ? ` 특별관은 ${b.specialScreens.join(', ')}이(가) 설치되어 있습니다.`
+        : ' 특별관 없이 일반 상영관을 중심으로 운영됩니다.';
+    const labelText =
+      priceLabels.length > 0
+        ? ` 운영 요금표는 ${priceLabels.join(', ')} 등 총 ${priceLabels.length}종입니다.`
+        : '';
+    faqs.push({
+      q: `${full} 상영관 규모와 운영 중인 특별관·요금표 종류는 무엇인가요?`,
+      a: `${full}는 ${scaleText},${specialText}${labelText}`,
+    });
+  }
+
+  const nearby = nearbyBranches(b);
+  if (nearby.length > 0) {
+    const topNearby = nearby
+      .slice(0, 3)
+      .map((x) => `${x.branch.name} ${x.branch.brandName}(${formatDistance(x.km)})`)
+      .join(', ');
+    faqs.push({
+      q: `${full} 근처에 함께 비교할 수 있는 다른 영화관이 있나요?`,
+      a: `${full}(${b.address}) 기준 가까운 영화관으로는 ${topNearby} 등이 있습니다. 원하는 시간대 좌석이 매진되었거나 주차 여건을 비교하고 싶다면 위 '근처 다른 영화관' 표에서 각 지점 페이지로 이동해 확인할 수 있습니다.`,
     });
   }
 
