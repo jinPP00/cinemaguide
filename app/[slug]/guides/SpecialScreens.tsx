@@ -21,7 +21,7 @@ const PATH = guidePath(GUIDES.screens);
 export const specialScreensMetadata: Metadata = withOpenGraphUrl({
   title: '전국 특별관 안내 — IMAX·4DX·SCREENX·돌비 등',
   description:
-    'CGV·롯데시네마·메가박스 특별관을 상영 방식별로 정리했습니다. IMAX, 4DX, SCREENX, 돌비 계열, 리클라이너 등의 운영 지점과 요금 정보를 확인할 수 있습니다.',
+    'CGV·롯데시네마·메가박스 특별관을 상영 방식별로 묶었습니다. IMAX, 4DX, SCREENX, 돌비 계열, 리클라이너가 있는 지점과 추가 요금.',
   alternates: { canonical: PATH },
 });
 
@@ -60,18 +60,13 @@ export default function SpecialScreensPage() {
       </nav>
 
       <h1>전국 특별관 안내</h1>
-      <p className="guide-lead">전국 {meta.totalBranches}개 지점 중 {total}곳에서 확인된 특별관을 화면·좌석·음향·체감형 상영 방식 기준으로 묶었습니다. 브랜드별 명칭이 달라도 같은 방식이면 같은 그룹에서 비교하고 운영 지점으로 바로 이동할 수 있습니다.</p>
+      <p className="guide-lead">{meta.totalBranches}개 지점 중 {total}곳에 특별관이 있습니다. 모두 {stats.length}종류이고, 브랜드마다 이름이 달라도 방식이 같으면 한 묶음으로 모았습니다.</p>
 
-      <div className="badges" style={{ marginTop: 16 }}>
-        <span className="badge">확인된 특별관 {stats.length}종류</span>
-        <span className="badge">특별관 운영 {total}곳</span>
-      </div>
-
-      <ul className="guide-jump-list" aria-label="다른 영화 정보">
+      <ul className="guide-jump-list" aria-label="다른 안내">
         <li><Link className="guide-jump-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link></li>
-        <li><Link className="guide-jump-link" href={guidePath(GUIDES.parking)}>주차 가이드</Link></li>
-        <li><Link className="guide-jump-link" href={guidePath(GUIDES.discounts)}>할인·예매 가이드</Link></li>
-        <li><Link className="guide-jump-link" href={guidePath(GUIDES.boxoffice)}>영화순위</Link></li>
+        <li><Link className="guide-jump-link" href={guidePath(GUIDES.parking)}>주차</Link></li>
+        <li><Link className="guide-jump-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link></li>
+        <li><Link className="guide-jump-link" href={guidePath(GUIDES.boxoffice)}>영화 순위</Link></li>
       </ul>
 
       {SCREEN_GROUP_ORDER.filter((g) => byGroup.has(g)).map((group) => (
@@ -113,8 +108,8 @@ export default function SpecialScreensPage() {
 
       {noExtra.length > 0 && (
         <section className="section" aria-labelledby="no-extra">
-          <h2 id="no-extra">기본관과 같은 요금으로 확인된 특별관</h2>
-          <p className="section-kicker">요금표를 확인한 지점에서 좌석 등급을 포함해 기본관과 같은 금액으로 표시된 상영관입니다.</p>
+          <h2 id="no-extra">기본관과 요금이 같은 특별관</h2>
+          <p className="section-kicker">요금표를 확인한 지점에서 좌석 등급까지 기본관과 같은 금액으로 적힌 상영관입니다.</p>
           <ul className="chip-list" style={{ marginTop: 14 }}>
             {noExtra.map((s) => (
               <li key={s.kind.name}><span className="chip chip-plain">{s.kind.name}</span></li>
@@ -124,60 +119,60 @@ export default function SpecialScreensPage() {
       )}
 
       <section className="section" aria-labelledby="selection-guide">
-        <h2 id="selection-guide">관람 목적·영화 장르별 특별관 선택 기준</h2>
+        <h2 id="selection-guide">어떤 영화를 어느 관에서 볼까</h2>
         <div className="prose">
-          <h3>1. 화면비 확장과 대형 스크린 몰입감이 중요한 작품 (SF·블록버스터)</h3>
+          <h3>큰 화면이 중요한 영화 (SF·블록버스터)</h3>
           <p>
-            아이맥스(IMAX) 전용 카메라로 촬영되었거나 확장 화면비(1.43:1 또는 1.90:1)를 지원하는 영화는 일반 상영관(2.39:1 시네마스코프)에서 볼 때보다 위아래 화면 정보가 더 넓게 표시됩니다. CGV의 <strong>아이맥스(IMAX)</strong>와 롯데시네마의 <strong>수퍼플렉스</strong>가 대표적이며, 정면뿐 아니라 좌우 벽면까지 3면으로 시야를 넓히고 싶다면 <strong>SCREENX</strong>가 대안이 됩니다.
+            IMAX 카메라로 찍었거나 1.43:1, 1.90:1 화면비를 지원하는 영화는 일반관(2.39:1)보다 화면 위아래가 더 보입니다. CGV <strong>IMAX</strong>와 롯데시네마 <strong>수퍼플렉스</strong>가 여기에 맞고, 좌우 벽까지 화면을 넓히는 <strong>SCREENX</strong>도 있습니다.
           </p>
 
-          <h3>2. 명암비·색감과 입체 음향이 핵심인 작품 (음악·뮤지컬·공연 실황)</h3>
+          <h3>소리와 색이 중요한 영화 (음악 영화·공연 실황)</h3>
           <p>
-            콘서트 실황, 음악 영화, 사운드 디자인이 정교한 영화는 천장 오버헤드 스피커까지 개별 채널로 구동하는 <strong>DOLBY ATMOS(돌비 애트모스)</strong> 또는 돌비 비전 HDR 영사 시스템이 결합된 <strong>DOLBY CINEMA(돌비 시네마)</strong>에서 차이가 뚜렷하게 드러납니다. 롯데시네마에서는 저음역대 우퍼와 음향 출력을 강화한 <strong>광음시네마</strong>를 운영합니다.
+            천장 스피커까지 따로 소리를 내는 <strong>DOLBY ATMOS</strong>나, 여기에 돌비 비전 영사기를 더한 <strong>DOLBY CINEMA</strong>에서 차이가 잘 느껴집니다. 롯데시네마에는 저음과 출력을 키운 <strong>광음시네마</strong>가 있습니다.
           </p>
 
-          <h3>3. 모션 체감과 환경 효과를 즐기는 작품 (액션·레이싱·애니메이션)</h3>
+          <h3>움직임을 느끼고 싶은 영화 (액션·레이싱·애니메이션)</h3>
           <p>
-            장면의 움직임에 맞춰 좌석이 상하좌우로 흔들리고 바람·물·향기·진동 효과가 함께 작동하는 포맷은 CGV <strong>4DX</strong>, 롯데시네마 <strong>수퍼 4D·수퍼MX4D</strong>, 메가박스 <strong>MEGA | MX4D</strong>입니다. 단, 움직임이 큰 만큼 멀미가 심하거나 임산부·노약자·일정 신장 이하 어린이는 이용이 제한될 수 있으며 따뜻한 음료 반입에 유의해야 합니다.
+            장면에 맞춰 좌석이 흔들리고 바람·물·향기 효과가 나오는 관은 CGV <strong>4DX</strong>, 롯데시네마 <strong>수퍼 4D·수퍼MX4D</strong>, 메가박스 <strong>MEGA | MX4D</strong>입니다. 멀미가 심한 사람, 임산부, 키가 기준보다 작은 어린이는 이용이 제한될 수 있고 뜨거운 음료는 피하는 게 좋습니다.
           </p>
 
-          <h3>4. 장시간 러닝타임과 편안한 좌석이 우선일 때 (리클라이너·프리미엄관)</h3>
+          <h3>긴 영화를 편하게 보고 싶을 때</h3>
           <p>
-            러닝타임이 2시간 30분~3시간을 넘는 영화를 피로감 없이 관람하려면 등받이 각도와 발받침을 조절할 수 있는 <strong>리클라이너관</strong>이나 좌석 간격이 넓은 <strong>COMFORT관</strong>, 또는 소규모 인원으로 운영되는 프리미엄 상영관(<strong>샤롯데·BOUTIQUE by MEGA</strong>)을 선택하는 것이 유리합니다.
+            2시간 30분이 넘는 영화라면 등받이와 발받침을 조절하는 <strong>리클라이너관</strong>, 좌석 간격이 넓은 <strong>COMFORT관</strong>, 좌석 수가 적은 <strong>샤롯데·BOUTIQUE by MEGA</strong>가 편합니다.
           </p>
         </div>
       </section>
 
       <section className="section" aria-labelledby="naming">
         <h2 id="naming">브랜드마다 다른 특별관 이름</h2>
-        <p className="guide-copy">좌석 움직임과 바람·물 등 환경 효과를 사용하는 관은 CGV 4DX, 롯데시네마 수퍼4D·수퍼MX4D, 메가박스 MEGA | MX4D처럼 브랜드별 이름이 다릅니다. 리클라이너 좌석도 롯데시네마 리클라이너, 메가박스 LE RECLINER by MEGA처럼 표기가 다르며, 돌비 계열은 음향만 적용한 DOLBY ATMOS와 영상·음향을 함께 적용한 DOLBY CINEMA 계열을 구분해 표시했습니다.</p>
+        <p className="guide-copy">같은 방식이어도 브랜드마다 이름이 다릅니다. 좌석이 움직이는 관은 CGV 4DX, 롯데시네마 수퍼4D·수퍼MX4D, 메가박스 MEGA | MX4D이고, 리클라이너는 롯데시네마 리클라이너, 메가박스 LE RECLINER by MEGA라고 부릅니다. 돌비 계열은 음향만 바꾼 DOLBY ATMOS와 영상·음향을 함께 바꾼 DOLBY CINEMA를 나눠 적었습니다.</p>
       </section>
 
       <section className="section" aria-labelledby="screen-faq">
         <h2 id="screen-faq">특별관 자주 묻는 질문</h2>
         <dl className="faq-list">
           <div className="faq-item">
-            <dt>일반 영화 관람권이나 통신사 무료 예매로도 특별관을 예매할 수 있나요?</dt>
+            <dt>일반 관람권이나 통신사 무료 예매로 특별관도 볼 수 있나요?</dt>
             <dd>
-              대부분의 2D 일반 관람권과 통신사 기본 무료 예매 혜택은 일반관 전용입니다. IMAX, 4DX, 돌비 시네마, 샤롯데 등 특별관을 예매하려면 특별관 전용 관람권을 사용하거나 차액 결제가 지원되는지 예매 단계에서 확인해야 합니다.
+              대부분의 일반 관람권과 통신사 무료 예매는 일반관에서만 쓸 수 있습니다. IMAX, 4DX, 돌비 시네마, 샤롯데 같은 특별관은 전용 관람권을 쓰거나, 차액을 내고 예매할 수 있는지 예매 화면에서 확인하세요.
             </dd>
           </div>
           <div className="faq-item">
             <dt>DOLBY CINEMA와 DOLBY ATMOS는 무엇이 다른가요?</dt>
             <dd>
-              DOLBY ATMOS는 천장 스피커를 포함한 입체 음향 시스템을 적용한 상영관이며, DOLBY CINEMA는 돌비 애트모스 입체 음향에 더해 돌비 비전(Dolby Vision) 듀얼 레이저 영사기와 전용 상영관 설계를 함께 적용한 통합 규격입니다.
+              DOLBY ATMOS는 천장 스피커를 포함한 입체 음향만 갖춘 관입니다. DOLBY CINEMA는 여기에 돌비 비전 레이저 영사기와 전용 상영관 설계까지 더한 규격입니다.
             </dd>
           </div>
           <div className="faq-item">
-            <dt>리클라이너 상영관은 모두 추가요금이 붙나요?</dt>
+            <dt>리클라이너관은 늘 추가 요금이 있나요?</dt>
             <dd>
-              지점에 따라 일반관과 리클라이너관을 함께 운영하며 리클라이너관에 1,000원~3,000원의 추가요금을 두는 곳이 있는 반면, 전 상영관이 리클라이너로만 구성된 지점은 해당 요금이 그 지점의 기본 관람료가 됩니다.
+              일반관과 리클라이너관을 함께 둔 지점은 리클라이너관에 1,000~3,000원을 더 받기도 합니다. 모든 관이 리클라이너인 지점은 그 요금이 곧 기본 요금입니다.
             </dd>
           </div>
           <div className="faq-item">
-            <dt>우리 지역에서 가장 가까운 특별관 운영 지점은 어떻게 찾나요?</dt>
+            <dt>우리 동네 근처의 특별관은 어떻게 찾나요?</dt>
             <dd>
-              각 지점 상세 페이지 하단의 근처 영화관 표에서 주변 영화관의 특별관 보유 목록을 바로 비교할 수 있으며, 시도별 지점 목록 페이지에서도 해당 지역 내 특별관 운영 지점만 모아 확인할 수 있습니다.
+              지점 페이지 아래쪽 &lsquo;근처 다른 영화관&rsquo; 표에 주변 영화관의 특별관이 나옵니다. 시도별 지점 목록에서도 그 지역의 특별관 보유 지점만 모아 볼 수 있습니다.
             </dd>
           </div>
         </dl>
@@ -185,8 +180,8 @@ export default function SpecialScreensPage() {
 
       <section className="section" aria-labelledby="basis">
         <h2 id="basis">집계 기준</h2>
-        <p className="guide-copy">추가요금은 같은 지점의 기본관 평일 일반 시간대 성인 요금과 비교했습니다. 지점별 편차가 있는 경우 중앙값을 사용하고, 한 상영관 안에서 좌석 등급별 금액이 다르면 구간으로 표시합니다. 3D는 특별관 등급이 아니라 상영 방식 차이이므로 특별관 추가요금 집계에서 제외했습니다.</p>
-        <p className="section-kicker">요금 확인일 {meta.checkedAt} · 실제 운영 여부와 최종 금액은 각 지점 공식 페이지에서 확인하세요.</p>
+        <p className="guide-copy">추가 요금은 같은 지점 기본관의 평일 일반 시간대 성인 요금과 비교한 값입니다. 지점마다 다르면 중앙값을 쓰고, 한 관 안에서 좌석 등급별로 금액이 다르면 범위로 적었습니다. 3D는 특별관이 아니라 상영 방식이라 넣지 않았습니다.</p>
+        <p className="section-kicker">요금 확인일 {meta.checkedAt} · 운영 여부와 최종 금액은 지점 공식 페이지에서 확인하세요.</p>
       </section>
     </div>
   );

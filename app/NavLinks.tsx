@@ -53,19 +53,19 @@ export default function NavLinks({
       })}
       <span className="nav-sep" aria-hidden="true" />
       <Link href={guidePath(GUIDES.fares)} aria-current={isGuide(GUIDES.fares) ? 'page' : undefined}>
-        관람료비교
+        관람료 비교
       </Link>
       <Link href={guidePath(GUIDES.screens)} aria-current={isGuide(GUIDES.screens) ? 'page' : undefined}>
         특별관
       </Link>
       <Link href={guidePath(GUIDES.parking)} aria-current={isGuide(GUIDES.parking) ? 'page' : undefined}>
-        주차가이드
+        주차
       </Link>
       <Link href={guidePath(GUIDES.discounts)} aria-current={isGuide(GUIDES.discounts) ? 'page' : undefined}>
-        할인가이드
+        할인·우대
       </Link>
       <Link href={guidePath(GUIDES.boxoffice)} aria-current={isGuide(GUIDES.boxoffice) ? 'page' : undefined}>
-        영화순위
+        영화 순위
       </Link>
     </nav>
   );

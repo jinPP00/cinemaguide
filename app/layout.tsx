@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
         />
         <script
           type="application/ld+json"
@@ -100,16 +100,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href={guidePath(GUIDES.fares)}>관람료 비교</Link>
               </li>
               <li>
-                <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>
+                <Link href={guidePath(GUIDES.screens)}>특별관</Link>
               </li>
               <li>
-                <Link href={guidePath(GUIDES.parking)}>주차 가이드</Link>
+                <Link href={guidePath(GUIDES.parking)}>주차</Link>
               </li>
               <li>
-                <Link href={guidePath(GUIDES.discounts)}>할인·예매 가이드</Link>
+                <Link href={guidePath(GUIDES.discounts)}>할인·우대</Link>
               </li>
               <li>
-                <Link href={guidePath(GUIDES.boxoffice)}>박스오피스 순위</Link>
+                <Link href={guidePath(GUIDES.boxoffice)}>영화 순위</Link>
               </li>
             </ul>
 

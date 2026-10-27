@@ -52,7 +52,7 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
           className="quick-search-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="지점명, 지역(시·구), 특별관(IMAX·돌비·4DX)으로 바로 검색해 보세요"
+          placeholder="지점, 지역, 특별관 이름으로 찾기"
           aria-label="영화관 지점 빠른 검색"
         />
         {query && (
@@ -67,8 +67,8 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
         )}
       </div>
 
-      <div className="quick-search-tags" aria-label="추천 검색어">
-        <span className="quick-search-tags-label">빠른 태그</span>
+      <div className="quick-search-tags" aria-label="자주 찾는 곳">
+        <span className="quick-search-tags-label">자주 찾는 곳</span>
         {QUICK_KEYWORDS.map((kw) => (
           <button
             key={kw}
@@ -76,7 +76,7 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
             className={`quick-tag-btn${query === kw ? ' is-active' : ''}`}
             onClick={() => setQuery(query === kw ? '' : kw)}
           >
-            #{kw}
+            {kw}
           </button>
         ))}
       </div>
@@ -85,7 +85,7 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
         <div className="quick-search-results" role="region" aria-label="검색 결과">
           {results.length === 0 ? (
             <p className="quick-search-empty">
-              &lsquo;{query}&rsquo;에 해당하는 지점을 찾지 못했습니다. 지점명이나 시·구 이름으로 다시 검색해 보세요.
+              &lsquo;{query}&rsquo; 검색 결과가 없습니다. 지점 이름이나 시·구 이름으로 찾아 보세요.
             </p>
           ) : (
             <ul className="quick-search-list">

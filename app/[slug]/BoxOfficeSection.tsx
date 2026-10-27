@@ -40,8 +40,8 @@ export default function BoxOfficeSection({ data }: { data: BoxOffice | null }) {
 
   return (
     <section className="section" aria-labelledby="boxoffice">
-      <h2 id="boxoffice">현재 상영중인 영화 순위</h2>
-      <p className="card-sub" style={{ marginTop: 4 }}>영화를 누르면 상세정보를 볼 수 있습니다</p>
+      <h2 id="boxoffice">박스오피스 순위</h2>
+      <p className="section-kicker">영화를 누르면 감독, 출연, 러닝타임이 나옵니다.</p>
       <ol className="boxoffice-list">
         {data.movies.map((m) => {
             const isOpen = openCd === m.movieCd;
@@ -125,7 +125,7 @@ function MovieDetail({ movie: m }: { movie: BoxOfficeMovie }) {
   if (m.nations?.length) rows.push({ label: '제작국가', value: m.nations.join(', ') });
 
   if (rows.length === 0 && !m.posterUrl) {
-    return <div className="bo-detail bo-detail-empty">상세정보를 찾을 수 없습니다</div>;
+    return <div className="bo-detail bo-detail-empty">상세 정보가 없습니다</div>;
   }
 
   return (
@@ -149,7 +149,7 @@ function MovieDetail({ movie: m }: { movie: BoxOfficeMovie }) {
           ))}
         </dl>
       ) : (
-        <p className="bo-detail-empty" style={{ padding: 0 }}>상세정보를 찾을 수 없습니다</p>
+        <p className="bo-detail-empty" style={{ padding: 0 }}>상세 정보가 없습니다</p>
       )}
     </div>
   );

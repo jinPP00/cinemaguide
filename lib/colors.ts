@@ -1,10 +1,11 @@
 import type { BrandKey } from './types';
 
-/** 브랜드 카드 아이콘 칩 및 포인트 색. 서로 뚜렷이 구분되면서도 세련된 딥 톤을 쓴다. */
+/** 브랜드 구분색. 공식 브랜드색처럼 보이지 않게 채도를 낮춘 톤으로, 점·밑줄 같은
+ * 작은 표시에만 쓴다. */
 export const BRAND_ICON_COLOR: Record<BrandKey, { bg: string; fg: string }> = {
-  cgv: { bg: '#fff1f2', fg: '#be123c' },
-  lotte: { bg: '#fff7ed', fg: '#c2410c' },
-  megabox: { bg: '#eef2ff', fg: '#4338ca' },
+  cgv: { bg: '#f7eeee', fg: '#a13a3a' },
+  lotte: { bg: '#f8f0ea', fg: '#a8532a' },
+  megabox: { bg: '#efeef6', fg: '#4f4790' },
 };
 
 /** 홈 브랜드 카드의 로고체 표기. 한글 브랜드명은 표시용 글꼴에

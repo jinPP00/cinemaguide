@@ -19,7 +19,7 @@ export default function NotFound() {
     <div className="wrap page">
       <h1>페이지를 찾을 수 없음</h1>
       <p className="lead" style={{ marginTop: 12 }}>
-        요청하신 페이지를 찾을 수 없습니다. 주소가 바뀌었거나 삭제되었을 수 있습니다.
+        찾는 페이지가 없습니다. 주소가 바뀌었거나 지워졌을 수 있습니다.
       </p>
       <div className="badges" style={{ marginTop: 24 }}>
         <Link className="cta-button" href="/">

@@ -30,15 +30,15 @@ export default function SourceNote({
         <h2 id="detail-guides">다른 정보 보기</h2>
         <ul className="guide-jump-list">
           <li><Link className="guide-jump-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link></li>
-          <li><Link className="guide-jump-link" href={guidePath(GUIDES.screens)}>특별관 안내</Link></li>
-          <li><Link className="guide-jump-link" href={guidePath(GUIDES.parking)}>주차 가이드</Link></li>
-          <li><Link className="guide-jump-link" href={guidePath(GUIDES.discounts)}>할인·예매 가이드</Link></li>
-          <li><Link className="guide-jump-link" href={guidePath(GUIDES.boxoffice)}>영화순위</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.screens)}>특별관</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.parking)}>주차</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link></li>
+          <li><Link className="guide-jump-link" href={guidePath(GUIDES.boxoffice)}>영화 순위</Link></li>
         </ul>
       </section>
 
       <section className="section source-section" aria-labelledby="source">
-        <h2 id="source">정보 안내</h2>
+        <h2 id="source">정보 출처</h2>
         <dl className="source-list">
           <div>
             <dt>정보 확인일</dt>
@@ -59,8 +59,8 @@ export default function SourceNote({
             <span>
               관람료·주차·운영 정보는 변경될 수 있습니다.
               {needsRecheck
-                ? ' 이 지점은 재확인이 필요한 항목이 있으므로 방문 전 공식 페이지를 확인해 주세요.'
-                : ' 방문 전 공식 페이지에서 최신 정보를 한 번 더 확인해 주세요.'}
+                ? ' 이 지점은 다시 확인할 항목이 있으니 가기 전에 공식 페이지를 보세요.'
+                : ' 가기 전에 공식 페이지에서 한 번 더 확인하세요.'}
             </span>
           </p>
 
@@ -72,7 +72,7 @@ export default function SourceNote({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                공식 페이지에서 최신 정보 확인
+                공식 페이지 열기
                 <svg
                   width="15"
                   height="15"

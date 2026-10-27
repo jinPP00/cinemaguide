@@ -256,10 +256,7 @@ p {
 
 a.card:hover {
   text-decoration: none;
-  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
-  box-shadow: 0 20px 44px -18px color-mix(in srgb, var(--brand-fg, var(--accent)) 30%, transparent),
-    0 6px 16px rgba(22, 32, 44, 0.08);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
 }
 
 a.card:hover .brand-icon {
@@ -648,13 +645,10 @@ a.card:hover .brand-icon {
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  box-shadow: 0 4px 14px rgba(22, 32, 44, 0.18);
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
-.schedule-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(22, 32, 44, 0.24);
+.schedule-button:hover {
   filter: brightness(0.94);
   text-decoration: none;
 }
@@ -905,10 +899,7 @@ a.card:hover .brand-icon {
 }
 
 .brand-highlights li:hover {
-  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 45%, var(--hairline));
-  box-shadow: 0 20px 44px -18px color-mix(in srgb, var(--brand-fg, var(--accent)) 30%, transparent),
-    0 6px 16px rgba(22, 32, 44, 0.08);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 45%, var(--hairline));
 }
 
 .brand-highlights .bh-title {
@@ -948,10 +939,7 @@ a.card:hover .brand-icon {
 }
 
 .price-card:hover {
-  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
-  box-shadow: 0 20px 44px -18px color-mix(in srgb, var(--brand-fg, var(--accent)) 30%, transparent),
-    0 6px 16px rgba(22, 32, 44, 0.08);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
 }
 
 .price-card-title {
@@ -1036,10 +1024,7 @@ a.card:hover .brand-icon {
 }
 
 .transit-card:hover {
-  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
-  box-shadow: 0 20px 44px -18px color-mix(in srgb, var(--brand-fg, var(--accent)) 30%, transparent),
-    0 6px 16px rgba(22, 32, 44, 0.08);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
 }
 
 .transit-card-head {
@@ -1531,9 +1516,7 @@ a.card:hover .brand-icon {
 
 .nearby-item:hover {
   text-decoration: none;
-  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
-  box-shadow: 0 12px 26px -14px rgba(22, 32, 44, 0.28);
-  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand-fg, var(--accent)) 40%, var(--hairline));
 }
 
 .nearby-dist {

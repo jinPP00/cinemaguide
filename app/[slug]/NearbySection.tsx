@@ -15,8 +15,8 @@ export default function NearbySection({ branch }: { branch: Branch }) {
       <h2 id="nearby-cinemas">{branch.name} {branch.brandName} 근처 다른 영화관</h2>
       <p className="section-kicker">
         {isIsolated
-          ? `주변 3km 안에는 다른 영화관이 없습니다. 가장 가까운 영화관은 ${formatDistance(nearest)} 거리입니다.`
-          : '가까운 순서이며, 거리는 영화관 좌표를 기준으로 한 직선거리입니다.'}
+          ? `3km 안에는 다른 영화관이 없습니다. 가장 가까운 곳은 ${formatDistance(nearest)} 떨어져 있습니다.`
+          : '가까운 순서입니다. 거리는 직선거리입니다.'}
       </p>
 
       <div className="data-table-shell">
