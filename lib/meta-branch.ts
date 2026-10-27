@@ -50,7 +50,7 @@ export function branchDescription(branch: Branch): string {
   const full = `${branch.name} ${branch.brandName}`;
   const closed = closedLabel(branch);
   if (closed) {
-    return `${withJosa(full, '은')} 현재 ${closed} 상태입니다. 위치와 근처에서 대신 갈 수 있는 영화관을 정리했습니다.`;
+    return `${withJosa(full, '은')} 현재 ${closed} 상태예요. 위치와 근처에서 대신 갈 수 있는 영화관을 정리했어요.`;
   }
   const facts: string[] = [];
 
@@ -68,5 +68,5 @@ export function branchDescription(branch: Branch): string {
   }
 
   const head = facts.length > 0 ? `${full} ${facts.join(', ')}. ` : `${full} 안내. `;
-  return `${head}${branch.sido} 지역 요금 비교와 근처 영화관, 가는 길을 함께 정리했습니다. 공식 상영시간표로 바로 이동할 수 있습니다.`;
+  return `${head}${branch.sido} 지역 요금 비교와 근처 영화관, 가는 길을 함께 정리했어요. 공식 상영시간표로 바로 이동할 수 있어요.`;
 }

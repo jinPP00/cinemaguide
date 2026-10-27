@@ -53,22 +53,22 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: '아이맥스',
     group: '화면',
-    desc: '전용 규격의 대형 스크린과 영사·음향 장비를 함께 갖춘 상영관입니다. 요금표에는 레이저 영사기를 쓰는 IMAX LASER가 따로 잡히기도 합니다.',
+    desc: '전용 규격의 대형 스크린과 영사·음향 장비를 함께 갖춘 상영관이에요. 요금표에는 레이저 영사기를 쓰는 IMAX LASER가 따로 잡히기도 해요.',
     farePattern: /^IMAX/,
   },
   {
     name: 'SCREENX',
     group: '화면',
-    desc: '정면 스크린 양옆 벽면까지 영상을 이어 붙여 세 면으로 상영합니다. 모든 장면이 아니라 대응하는 구간에서만 좌우가 켜집니다.',
+    desc: '정면 스크린 양옆 벽면까지 영상을 이어 붙여 세 면으로 상영해요. 모든 장면이 아니라 대응하는 구간에서만 좌우가 켜져요.',
     farePattern: /^SCREENX/,
   },
   {
     name: '수퍼플렉스',
     group: '화면',
-    desc: '롯데시네마의 대형 스크린 상영관입니다.',
+    desc: '롯데시네마의 대형 스크린 상영관이에요.',
     farePattern: /^수퍼플렉스/,
   },
-  { name: '수퍼LED(일반)', group: '화면', desc: '영사기로 빛을 쏘는 대신 LED 패널이 직접 화면을 띄우는 상영관입니다.', farePattern: /^수퍼LED/ },
+  { name: '수퍼LED(일반)', group: '화면', desc: '영사기로 빛을 쏘는 대신 LED 패널이 직접 화면을 띄우는 상영관이에요.', farePattern: /^수퍼LED/ },
   { name: '수퍼LED(리클)', group: '화면', desc: null, farePattern: /^수퍼LED/ },
   { name: '광음LED', group: '화면', desc: null, farePattern: /^광음LED/ },
   { name: 'MEGA | LED', group: '화면', desc: null, farePattern: /^MEGA \| LED/ },
@@ -76,34 +76,34 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: 'DOLBY CINEMA',
     group: '음향',
-    desc: '돌비 비전 영상 규격과 돌비 애트모스 음향을 함께 적용한 상영관입니다.',
+    desc: '돌비 비전 영상 규격과 돌비 애트모스 음향을 함께 적용한 상영관이에요.',
     farePattern: /^DOLBY CINEMA/,
   },
   { name: 'DOLBY VISION+ATMOS', group: '음향', desc: null, farePattern: /^DOLBY VISION/ },
   {
     name: 'DOLBY ATMOS',
     group: '음향',
-    desc: '천장을 포함해 스피커를 배치하는 입체 음향 규격을 적용한 상영관입니다.',
+    desc: '천장을 포함해 스피커를 배치하는 입체 음향 규격을 적용한 상영관이에요.',
     farePattern: /^DOLBY ATMOS/,
   },
   { name: 'MEGA | DOLBY ATMOS', group: '음향', desc: null, farePattern: /^MEGA \| DOLBY ATMOS/ },
   {
     name: '광음시네마',
     group: '음향',
-    desc: '롯데시네마의 음향 특화 상영관입니다.',
+    desc: '롯데시네마의 음향 특화 상영관이에요.',
     farePattern: /^광음시네마/,
   },
 
   {
     name: '리클라이너',
     group: '좌석',
-    desc: '등받이가 뒤로 눕는 좌석을 넣은 상영관입니다. 같은 관 안에서도 좌석 등급에 따라 요금이 갈리는 지점이 있습니다.',
+    desc: '등받이가 뒤로 눕는 좌석을 넣은 상영관이에요. 같은 관 안에서도 좌석 등급에 따라 요금이 갈리는 지점이 있어요.',
     farePattern: /리클라이너/,
   },
   {
     name: 'COMFORT by MEGA',
     group: '좌석',
-    desc: '메가박스의 좌석 등급 구분입니다. 요금표에 일반석·스페셜석·커플석이 따로 잡혀 있어 같은 상영관이라도 어느 자리를 고르느냐로 금액이 달라집니다.',
+    desc: '메가박스의 좌석 등급 구분이에요. 요금표에 일반석·스페셜석·커플석이 따로 잡혀 있어 같은 상영관이라도 어느 자리를 고르느냐로 금액이 달라져요.',
     farePattern: /^COMFORT by MEGA/,
   },
   { name: 'LE RECLINER by MEGA', group: '좌석', desc: null, farePattern: /^LE RECLINER/ },
@@ -111,7 +111,7 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: '4DX',
     group: '체감 효과',
-    desc: '좌석이 영상에 맞춰 움직이고 바람·물·향 같은 효과가 함께 나오는 상영관입니다.',
+    desc: '좌석이 영상에 맞춰 움직이고 바람·물·향 같은 효과가 함께 나오는 상영관이에요.',
     farePattern: /^4DX/,
   },
   { name: '수퍼 4D', group: '체감 효과', desc: null, farePattern: /^수퍼 ?4D/ },
@@ -121,7 +121,7 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: '샤롯데',
     group: '소규모 프리미엄',
-    desc: '좌석 수를 줄이고 좌석·부대 서비스 등급을 높인 롯데시네마의 상영관입니다. 요금 차이가 다른 특별관과는 자릿수가 다릅니다.',
+    desc: '좌석 수를 줄이고 좌석·부대 서비스 등급을 높인 롯데시네마의 상영관이에요. 요금 차이가 다른 특별관과는 자릿수가 달라요.',
     // "샤롯데 프라이빗"은 별도 항목이라 여기서 끌어오면 안 된다
     farePattern: /^샤롯데(?! 프라이빗)/,
   },
@@ -129,7 +129,7 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: 'BOUTIQUE by MEGA',
     group: '소규모 프리미엄',
-    desc: '좌석 수가 적은 메가박스의 프리미엄 상영관입니다.',
+    desc: '좌석 수가 적은 메가박스의 프리미엄 상영관이에요.',
     farePattern: /^BOUTIQUE by MEGA/,
   },
   { name: 'BOUTIQUE SUITE by MEGA', group: '소규모 프리미엄', desc: null, farePattern: /^BOUTIQUE SUITE by MEGA/ },
@@ -142,7 +142,7 @@ export const SCREEN_KINDS: ScreenKind[] = [
   {
     name: 'MEGABOX KIDS',
     group: '그 밖의 상영관',
-    desc: '어린이 관람객을 위해 따로 운영하는 상영관입니다.',
+    desc: '어린이 관람객을 위해 따로 운영하는 상영관이에요.',
     farePattern: null,
   },
 ];

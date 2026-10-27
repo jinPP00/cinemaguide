@@ -35,7 +35,7 @@ import { baseFare } from '@/lib/fares';
 import { nearbyBranches, formatDistance } from '@/lib/geo';
 import { branchTitle, branchHeading, branchDescription } from '@/lib/meta-branch';
 import { GUIDES, guidePath } from '@/lib/paths';
-import { withJosa } from '@/lib/josa';
+import { copula, withJosa } from '@/lib/josa';
 import BoxOfficeGuide, { boxOfficeMetadata } from './guides/BoxOfficeGuide';
 import FareComparison, { fareComparisonMetadata } from './guides/FareComparison';
 import SpecialScreens, { specialScreensMetadata } from './guides/SpecialScreens';
@@ -92,7 +92,7 @@ export async function generateMetadata({
     const info = brandMeta(brandKey);
     return withOpenGraphUrl({
       title: `${info.name} 상영시간표·전국 지점 안내`,
-      description: `${info.name} 상영시간표를 지점별로 확인하는 방법과 전국 ${info.count}개 지점의 위치, 교통, 주차, 관람료 정보를 지역별로 정리했습니다.`,
+      description: `${info.name} 상영시간표를 지점별로 확인하는 방법과 전국 ${info.count}개 지점의 위치, 교통, 주차, 관람료 정보를 지역별로 정리했어요.`,
       alternates: { canonical: brandPath(info.segment) },
     });
   }
@@ -251,8 +251,8 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
       <section className="section" aria-labelledby="how-schedule">
         <h2 id="how-schedule">{info.name} 상영시간표 확인 방법</h2>
         <p className="guide-copy">
-          실시간 상영시간표와 예매는 {info.name} 공식 사이트에서만 볼 수 있습니다. 위 목록에서 지점을
-          고르면 가는 길, 주차, 관람료를 먼저 보고 그 지점의 공식 상영시간표로 넘어갈 수 있습니다.
+          실시간 상영시간표와 예매는 {info.name} 공식 사이트에서만 볼 수 있어요. 위 목록에서 지점을
+          고르면 가는 길, 주차, 관람료를 먼저 보고 그 지점의 공식 상영시간표로 넘어갈 수 있어요.
         </p>
       </section>
 
@@ -324,8 +324,8 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
 
       <section className="section">
         <div className="note">
-          {info.name} 지점 정보는 공식 사이트에서 모아 정리했습니다. 이 사이트는 {info.name}{' '}
-          공식 서비스가 아닙니다.
+          {info.name} 지점 정보는 공식 사이트에서 모아 정리했어요. 이 사이트는 {info.name}{' '}
+          공식 서비스가 아니에요.
         </div>
       </section>
     </div>
@@ -371,7 +371,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
       </a>
-      <p className="schedule-caption">{info.name} 공식 사이트로 이동합니다</p>
+      <p className="schedule-caption">{info.name} 공식 사이트로 이동해요</p>
     </div>
   );
 
@@ -485,7 +485,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
 
       {b.status === '휴관' && (
         <p className="notice-closed">
-          이 지점은 지금 <strong>휴관</strong> 중입니다. 다시 여는지는 공식 사이트에서
+          이 지점은 지금 <strong>휴관</strong> 중이에요. 다시 여는지는 공식 사이트에서
           확인하세요.
         </p>
       )}
@@ -577,7 +577,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       )}
 
       {/* 색인 대상이 아닌 지점도 본문은 똑같이 다 보여준다 — 없는 항목만 각
-          섹션에서 "확인하지 못했습니다"로 표시된다. 예전에는 여기서 페이지를
+          섹션에서 "확인하지 못했어요"로 표시된다. 예전에는 여기서 페이지를
           통째로 "준비 중인 정보" 안내 하나로 갈아치웠는데, 그러면 갖고 있는
           요금표까지 같이 숨기게 돼서 없앴다. 단, 휴관·폐점 지점은 예외다(위 주석). */}
       {operating && <ContentPreview branch={b} scheduleBar={scheduleBar} />}
@@ -640,7 +640,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
 
       <section className="section">
         <div className="note">
-          이 사이트는 {info.name} 공식 서비스가 아닙니다. 틀린 정보가 있으면{' '}
+          이 사이트는 {info.name} 공식 서비스가 아니에요. 틀린 정보가 있으면{' '}
           <Link href="/contact/">정정 요청</Link>으로 알려 주세요.
         </div>
       </section>
@@ -655,16 +655,16 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
 function buildBranchLeadSummary(b: Branch, brandName: string): string {
   const full = `${b.name} ${brandName}`;
   const region = [b.sido, b.sigungu].filter(Boolean).join(' ');
-  const sentences = [`${withJosa(full, '은')} ${region}에 있습니다.`];
+  const sentences = [`${withJosa(full, '은')} ${region}에 있어요.`];
 
   const seats = b.seatCount != null ? `(${b.seatCount.toLocaleString()}석)` : '';
   const special = b.specialScreens.join(', ');
   if (b.screenCount != null && special) {
-    sentences.push(`상영관은 ${b.screenCount}개${seats}이고, 특별관으로 ${withJosa(special, '이')} 있습니다.`);
+    sentences.push(`상영관은 ${b.screenCount}개${seats}이고, 특별관으로 ${withJosa(special, '이')} 있어요.`);
   } else if (b.screenCount != null) {
-    sentences.push(`상영관은 ${b.screenCount}개${seats}이며 모두 일반관입니다.`);
+    sentences.push(`상영관은 ${b.screenCount}개${seats}이며 모두 일반관이에요.`);
   } else if (special) {
-    sentences.push(`특별관으로 ${withJosa(special, '이')} 있습니다.`);
+    sentences.push(`특별관으로 ${withJosa(special, '이')} 있어요.`);
   }
 
   return sentences.join(' ');
@@ -708,18 +708,18 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
           {priceGroups.length > 0 ? (
             <>
               {withJosa(full, '은')} <strong>{priceGroups.map((g) => g.label).join(', ')}</strong>{' '}
-              요금표가 있고, 회차 시간대는 <strong>{timeSlots.join('·')}</strong>로 나뉩니다.{' '}
+              요금표가 있고, 회차 시간대는 <strong>{timeSlots.join('·')}</strong>로 나뉘어요.{' '}
               {fare && fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult
                 ? `평일 ${fare.morningSlot} 회차는 성인 ${won(fare.morningAdult)}원으로 일반 회차(${won(
                     fare.weekdayAdult,
-                  )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 납니다. `
+                  )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 나요. `
                 : ''}
               청소년·경로(만 65세 이상)·장애인 요금으로 예매했다면 입장할 때 학생증, 신분증, 복지카드
-              같은 증빙을 보여 줘야 합니다. 온라인 예매는 보통 상영 20분 전까지 취소할 수 있습니다.
+              같은 증빙을 보여 줘야 해요. 온라인 예매는 보통 상영 20분 전까지 취소할 수 있어요.
             </>
           ) : (
             <>
-              상영관 형태가 일반 극장과 달라 요금 체계가 따로 있을 수 있습니다. 회차별 요금과 예매 취소
+              상영관 형태가 일반 극장과 달라 요금 체계가 따로 있을 수 있어요. 회차별 요금과 예매 취소
               마감 시간(보통 상영 20분 전)은 {brandName} 공식 앱이나 웹에서 확인하세요.
             </>
           )}
@@ -729,17 +729,17 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
         <p>
           {pGroups.length > 0 ? (
             <>
-              {parkingLoc ? `주차 위치는 '${parkingLoc}'입니다. ` : ''}
-              {parkingFree ? `관람객 혜택은 '${parkingFree}'입니다. ` : ''}
-              {parkingAuth ? `인증은 '${parkingAuth}' 방식입니다. ` : ''}
-              {parkingExtra ? `무료 시간을 넘기면 '${parkingExtra}' 기준으로 요금이 붙습니다. ` : ''}
+              {parkingLoc ? `주차 위치는 '${parkingLoc}'${copula(parkingLoc)}. ` : ''}
+              {parkingFree ? `관람객 혜택은 '${parkingFree}'${copula(parkingFree)}. ` : ''}
+              {parkingAuth ? `인증은 '${parkingAuth}' 방식이에요. ` : ''}
+              {parkingExtra ? `무료 시간을 넘기면 '${parkingExtra}' 기준으로 요금이 붙어요. ` : ''}
               주차 시간은 입차부터 출차까지라서, 상영 시간에 광고(15~20분)와 입장 대기, 퇴장 후 출차
-              시간을 더해 계산해야 합니다.
+              시간을 더해 계산해야 해요.
             </>
           ) : (
             <>
               주차 가능 여부와 근처 공영·제휴 주차장은 {brandName} 공식 페이지에서 확인하세요. 주말과
-              공휴일에는 대중교통이 편합니다.
+              공휴일에는 대중교통이 편해요.
             </>
           )}
         </p>
@@ -766,7 +766,7 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
           ) : (
             <>
               {b.sido}의 다른 {brandName} 지점이나 가까운 지역 영화관을 함께 보면 원하는 시간대 회차를
-              찾기 쉽습니다.
+              찾기 쉬워요.
             </>
           )}
         </p>
@@ -1627,7 +1627,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
           <h2 id="prices">관람료</h2>
           <div className="note" style={{ marginTop: 12 }}>
             이 지점은 드라이브인처럼 상영 형태가 일반 극장과 달라 표준 요금표를 확인하지
-            못했습니다. 요금은 {info.name} 공식 사이트에서 확인하세요.
+            못했어요. 요금은 {info.name} 공식 사이트에서 확인하세요.
           </div>
         </section>
       )}
@@ -1635,7 +1635,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
       {priceGroups.length > 0 && (
         <section className="section" aria-labelledby="prices">
           <h2 id="prices">관람료</h2>
-          <p className="section-kicker">앞은 성인, 뒤는 청소년 요금입니다.</p>
+          <p className="section-kicker">앞은 성인, 뒤는 청소년 요금이에요.</p>
           <div className="price-grid">
             {priceGroups.map((g) => (
               <div className="price-card" key={g.label}>
@@ -1687,7 +1687,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
           <section className="section" aria-labelledby="transit">
             <h2 id="transit">대중교통 이용 방법</h2>
             <div className="note" style={{ marginTop: 12 }}>
-              이 지점의 대중교통 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
+              이 지점의 대중교통 안내는 아직 확인하지 못했어요. {info.name} 공식 사이트에서
               확인해주세요.
             </div>
           </section>
@@ -1755,7 +1755,7 @@ function ContentPreview({ branch: b, scheduleBar }: { branch: Branch; scheduleBa
         <section className="section" aria-labelledby="parking">
           <h2 id="parking">주차 안내</h2>
           <div className="note" style={{ marginTop: 12 }}>
-            이 지점의 주차 안내는 아직 확인하지 못했습니다. {info.name} 공식 사이트에서
+            이 지점의 주차 안내는 아직 확인하지 못했어요. {info.name} 공식 사이트에서
             확인해주세요.
           </div>
         </section>
@@ -1822,12 +1822,12 @@ function buildBrandFaqs(
 
   faqs.push({
     q: `${brandName} 상영시간표는 어디서 확인하나요?`,
-    a: `실시간 상영시간표와 예매는 ${brandName} 공식 사이트에서만 볼 수 있습니다. 지점 페이지의 '상영시간표 확인' 버튼을 누르면 그 지점의 공식 시간표로 연결됩니다.`,
+    a: `실시간 상영시간표와 예매는 ${brandName} 공식 사이트에서만 볼 수 있어요. 지점 페이지의 '상영시간표 확인' 버튼을 누르면 그 지점의 공식 시간표로 연결돼요.`,
   });
 
   faqs.push({
     q: `${brandName}는 전국에 몇 개 지점이 있나요?`,
-    a: `전국 ${sidoCount}개 시도에 ${branchCount}개 지점이 있고, 이 중 ${specialCount}곳에 특별관이 있습니다.`,
+    a: `전국 ${sidoCount}개 시도에 ${branchCount}개 지점이 있고, 이 중 ${specialCount}곳에 특별관이 있어요.`,
   });
 
   // 관람료 — 표준 2D·일반 회차·성인 기준 최빈값으로 답한다.
@@ -1845,7 +1845,7 @@ function buildBrandFaqs(
   if (wk != null && we != null) {
     faqs.push({
       q: `${brandName} 관람료는 얼마인가요?`,
-      a: `대부분의 지점이 일반 2D 성인 기준 평일 ${wk.toLocaleString()}원, 주말 ${we.toLocaleString()}원입니다. 상영관 종류와 시간대(모닝·조조 등)에 따라 달라지니 지점 페이지의 요금표를 확인하세요.`,
+      a: `대부분의 지점이 일반 2D 성인 기준 평일 ${wk.toLocaleString()}원, 주말 ${we.toLocaleString()}원이에요. 상영관 종류와 시간대(모닝·조조 등)에 따라 달라지니 지점 페이지의 요금표를 확인하세요.`,
     });
   }
 
@@ -1858,13 +1858,13 @@ function buildBrandFaqs(
   if (top.length > 0) {
     faqs.push({
       q: `${brandName} 특별관에는 어떤 것이 있나요?`,
-      a: `많은 순으로 ${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등이 있습니다. 어느 지점에 어떤 관이 있는지와 요금은 지점 페이지에서 볼 수 있습니다.`,
+      a: `많은 순으로 ${top.map(([n, c]) => `${n} ${c}곳`).join(', ')} 등이 있어요. 어느 지점에 어떤 관이 있는지와 요금은 지점 페이지에서 볼 수 있어요.`,
     });
   }
 
   faqs.push({
     q: `${brandName} 주차는 몇 시간 무료인가요?`,
-    a: `관람객은 보통 2시간~3시간 30분 무료 또는 정액 요금으로 주차할 수 있습니다. 다만 백화점·쇼핑몰·단독 건물 등 입점 건물에 따라 티켓 바코드 정산, 매표소 차량번호 등록, 영수증 합산 여부가 다릅니다. 정확한 기준은 지점 페이지의 주차 항목에 있습니다.`,
+    a: `관람객은 보통 2시간~3시간 30분 무료 또는 정액 요금으로 주차할 수 있어요. 다만 백화점·쇼핑몰·단독 건물 등 입점 건물에 따라 티켓 바코드 정산, 매표소 차량번호 등록, 영수증 합산 여부가 달라요. 정확한 기준은 지점 페이지의 주차 항목에 있어요.`,
   });
 
   return faqs;
@@ -1903,9 +1903,9 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
     faqs.push({
       q: `${full} 관람료는 얼마인가요?`,
       a:
-        `${fare.label} 성인 기준 ${parts.join(', ')}입니다.` +
-        (extras.length > 0 ? ` ${extras.join(', ')}입니다.` : '') +
-        ' 특별관 요금과 다른 시간대 요금은 위 요금표에 있습니다.',
+        `${fare.label} 성인 기준 ${parts.join(', ')}이에요.` +
+        (extras.length > 0 ? ` ${extras.join(', ')}이에요.` : '') +
+        ' 특별관 요금과 다른 시간대 요금은 위 요금표에 있어요.',
     });
   }
 
@@ -1919,7 +1919,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
   if (parkingSummary.length > 0) {
     faqs.push({
       q: `${full} 주차 요금과 인증 방법은 어떻게 되나요?`,
-      a: `${parkingSummary.join(' · ')}. 주차 위치와 유의사항은 위 주차 항목에 있습니다.`,
+      a: `${parkingSummary.join(' · ')}. 주차 위치와 유의사항은 위 주차 항목에 있어요.`,
     });
   }
 
@@ -1927,12 +1927,12 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
   if (b.screenCount != null || b.specialScreens.length > 0 || priceLabels.length > 0) {
     const answer = [
       b.screenCount != null
-        ? `상영관은 ${b.screenCount}개${b.seatCount != null ? `(${b.seatCount.toLocaleString()}석)` : ''}입니다.`
+        ? `상영관은 ${b.screenCount}개${b.seatCount != null ? `(${b.seatCount.toLocaleString()}석)이에요` : '예요'}.`
         : null,
       b.specialScreens.length > 0
-        ? `특별관으로 ${withJosa(b.specialScreens.join(', '), '이')} 있습니다.`
-        : '특별관은 없고 일반 상영관만 있습니다.',
-      priceLabels.length > 0 ? `요금표는 ${priceLabels.join(', ')} ${priceLabels.length}종입니다.` : null,
+        ? `특별관으로 ${withJosa(b.specialScreens.join(', '), '이')} 있어요.`
+        : '특별관은 없고 일반 상영관만 있어요.',
+      priceLabels.length > 0 ? `요금표는 ${priceLabels.join(', ')} ${priceLabels.length}종이에요.` : null,
     ]
       .filter(Boolean)
       .join(' ');
@@ -1950,7 +1950,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
       .join(', ');
     faqs.push({
       q: `${full} 근처에 다른 영화관이 있나요?`,
-      a: `가까운 순으로 ${topNearby} 등이 있습니다. 위 '근처 다른 영화관' 표에서 각 지점의 요금과 특별관을 비교할 수 있습니다.`,
+      a: `가까운 순으로 ${topNearby} 등이 있어요. 위 '근처 다른 영화관' 표에서 각 지점의 요금과 특별관을 비교할 수 있어요.`,
     });
   }
 

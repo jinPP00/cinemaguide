@@ -43,7 +43,7 @@ export default function SourceNote({
           <div>
             <dt>정보 확인일</dt>
             <dd>
-              {checked ?? '확인 기록이 없습니다'}
+              {checked ?? '확인 기록이 없어요'}
               {needsRecheck && <span className="source-flag">재확인 필요</span>}
             </dd>
           </div>
@@ -57,7 +57,7 @@ export default function SourceNote({
           <p className="source-caution">
             <span className="source-caution-icon" aria-hidden="true">i</span>
             <span>
-              관람료·주차·운영 정보는 변경될 수 있습니다.
+              관람료·주차·운영 정보는 변경될 수 있어요.
               {needsRecheck
                 ? ' 이 지점은 다시 확인할 항목이 있으니 가기 전에 공식 페이지를 보세요.'
                 : ' 가기 전에 공식 페이지에서 한 번 더 확인하세요.'}

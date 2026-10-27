@@ -42,7 +42,7 @@ export default function SpecialScreenSection({ branch }: { branch: Branch }) {
       {fares.length > 0 && (
         <>
           <p className="card-sub" style={{ marginTop: 12 }}>
-            평일 일반 시간대, 성인 요금입니다. 실제 금액은 시간대와 좌석에 따라 달라집니다.
+            평일 일반 시간대, 성인 요금이에요. 실제 금액은 시간대와 좌석에 따라 달라져요.
           </p>
           <div className="table-scroll" style={{ marginTop: 10 }}>
             <table className="fare-table">
@@ -77,7 +77,7 @@ export default function SpecialScreenSection({ branch }: { branch: Branch }) {
       )}
 
       <p className="card-sub" style={{ marginTop: 14 }}>
-        전국 특별관 종류와 있는 지점은 <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>에 있습니다.
+        전국 특별관 종류와 있는 지점은 <Link href={guidePath(GUIDES.screens)}>특별관 안내</Link>에 있어요.
       </p>
     </section>
   );

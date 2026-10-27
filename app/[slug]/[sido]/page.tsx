@@ -44,7 +44,7 @@ export async function generateMetadata({
 
   return withOpenGraphUrl({
     title: `${sido} ${info.name} 지점 ${count}곳 위치와 상영시간표 안내`,
-    description: `${sido} ${info.name} 지점 ${count}곳의 주소, 가는 길, 주차 조건, 관람료. 지점마다 공식 상영시간표로 연결합니다.`,
+    description: `${sido} ${info.name} 지점 ${count}곳의 주소, 가는 길, 주차 조건, 관람료. 지점마다 공식 상영시간표로 연결해요.`,
     alternates: { canonical: sidoPath(info.segment, sido) },
   });
 }
@@ -159,7 +159,7 @@ export default async function SidoPage({
       <section className="section" aria-labelledby="branch-summary-table">
         <h2 id="branch-summary-table">{sido} {info.name} 지점별 요금·주차·상영관</h2>
         <p className="section-kicker">
-          지점별 성인 평일·주말 요금, 무료 주차 조건, 특별관을 한 표에 모았습니다. 지점 이름을 누르면 교통편과 시간대별 요금표가 나옵니다.
+          지점별 성인 평일·주말 요금, 무료 주차 조건, 특별관을 한 표에 모았어요. 지점 이름을 누르면 교통편과 시간대별 요금표가 나와요.
         </p>
         <div className="data-table-shell">
           <table className="data-table data-table--fare">
@@ -215,7 +215,7 @@ export default async function SidoPage({
       {fare && (
         <section className="section" aria-labelledby="sido-fare">
           <h2 id="sido-fare">{sido} {info.name} 관람료 요약</h2>
-          <p className="section-kicker">일반관 2D(없으면 그 지점의 기본 상영관), 일반 시간대, 성인 기준입니다.</p>
+          <p className="section-kicker">일반관 2D(없으면 그 지점의 기본 상영관), 일반 시간대, 성인 기준이에요.</p>
           <div className="data-table-shell">
             <table className="data-table data-table--region">
               <thead>
@@ -247,7 +247,7 @@ export default async function SidoPage({
             </table>
           </div>
           <p className="section-kicker">
-            상영관·시간대별 금액은 지점 페이지에, 세 브랜드 전국 비교는 <Link className="guide-inline-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link>와 <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대 안내</Link>에 있습니다.
+            상영관·시간대별 금액은 지점 페이지에, 세 브랜드 전국 비교는 <Link className="guide-inline-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link>와 <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대 안내</Link>에 있어요.
           </p>
         </section>
       )}
@@ -255,7 +255,7 @@ export default async function SidoPage({
       {screens.length > 0 && (
         <section className="section" aria-labelledby="sido-screens">
           <h2 id="sido-screens">{sido}에서 볼 수 있는 {info.name} 특별관</h2>
-          <p className="section-kicker">{sido}의 {info.name} 지점 중 {specialCount}곳에 특별관이 있습니다.</p>
+          <p className="section-kicker">{sido}의 {info.name} 지점 중 {specialCount}곳에 특별관이 있어요.</p>
           <dl className="screen-notes" style={{ marginTop: 14 }}>
             {screens.map((s) => (
               <div key={s.name}>
@@ -268,7 +268,7 @@ export default async function SidoPage({
               </div>
             ))}
           </dl>
-          <p className="section-kicker">상영 방식과 요금은 <Link className="guide-inline-link" href={guidePath(GUIDES.screens)}>특별관 안내</Link>에 있습니다.</p>
+          <p className="section-kicker">상영 방식과 요금은 <Link className="guide-inline-link" href={guidePath(GUIDES.screens)}>특별관 안내</Link>에 있어요.</p>
         </section>
       )}
 
@@ -278,17 +278,17 @@ export default async function SidoPage({
           <div className="faq-item">
             <dt>{sido}에는 {info.name} 지점이 어디에 있나요?</dt>
             <dd>
-              {citySummaryText}에 모두 {list.length}곳({list.map((b) => b.name).join(', ')})이 있습니다. 지점 이름을
-              누르면 도로명 주소와 지하철·버스 노선이 나옵니다.
+              {citySummaryText}에 모두 {list.length}곳({list.map((b) => b.name).join(', ')})이 있어요. 지점 이름을
+              누르면 도로명 주소와 지하철·버스 노선이 나와요.
             </dd>
           </div>
           {fare && (
             <div className="faq-item">
               <dt>{sido} {info.name} 관람료는 평일·주말, {morningLabel}에 얼마인가요?</dt>
               <dd>
-                기본 상영관 성인 대표 요금은 평일 {won(fare.weekdayCommon)}, 주말 {won(fare.weekendCommon)}입니다.
-                {fare.morningLow != null ? ` 평일 ${morningLabel}는 ${won(fare.morningLow)}부터입니다. ` : ' '}
-                청소년·경로·장애인 요금과 좌석 등급별 금액은 지점 페이지 요금표에 있습니다.
+                기본 상영관 성인 대표 요금은 평일 {won(fare.weekdayCommon)}, 주말 {won(fare.weekendCommon)}이에요.
+                {fare.morningLow != null ? ` 평일 ${morningLabel}는 ${won(fare.morningLow)}부터예요. ` : ' '}
+                청소년·경로·장애인 요금과 좌석 등급별 금액은 지점 페이지 요금표에 있어요.
               </dd>
             </div>
           )}
@@ -296,14 +296,14 @@ export default async function SidoPage({
             <dt>{sido} {info.name}는 무료 주차가 되나요?</dt>
             <dd>
               {freeParkingBranches.length > 0
-                ? `${freeParkingBranches.map((b) => b.name).join(', ')} 등 ${freeParkingBranches.length}곳은 그날 관람하면 무료로 주차할 수 있습니다. 무료 시간(3시간~3시간 30분, 또는 관람 시 무료)과 등록 방법은 지점마다 달라서 지점 페이지에서 확인하세요.`
-                : `주차 요금과 정산 방법은 지점이 들어선 건물에 따라 다릅니다. 지점 페이지의 주차 항목에서 주차장 위치와 요금을 확인하세요.`}
+                ? `${freeParkingBranches.map((b) => b.name).join(', ')} 등 ${freeParkingBranches.length}곳은 그날 관람하면 무료로 주차할 수 있어요. 무료 시간(3시간~3시간 30분, 또는 관람 시 무료)과 등록 방법은 지점마다 달라서 지점 페이지에서 확인하세요.`
+                : `주차 요금과 정산 방법은 지점이 들어선 건물에 따라 달라요. 지점 페이지의 주차 항목에서 주차장 위치와 요금을 확인하세요.`}
             </dd>
           </div>
           <div className="faq-item">
             <dt>{sido} {info.name} 상영시간표는 어디서 보고, 예매 취소는 언제까지 되나요?</dt>
             <dd>
-              지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 그 지점의 {info.name} 공식 시간표·예매 페이지로 연결됩니다. 웹·앱 예매는 보통 상영 20분 전까지 취소할 수 있습니다. 주차 정산과 우대 요금은 <Link className="guide-inline-link" href={guidePath(GUIDES.parking)}>주차</Link>, <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link> 안내에 있습니다.
+              지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 그 지점의 {info.name} 공식 시간표·예매 페이지로 연결돼요. 웹·앱 예매는 보통 상영 20분 전까지 취소할 수 있어요. 주차 정산과 우대 요금은 <Link className="guide-inline-link" href={guidePath(GUIDES.parking)}>주차</Link>, <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link> 안내에 있어요.
             </dd>
           </div>
         </dl>

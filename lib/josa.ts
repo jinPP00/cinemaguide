@@ -69,6 +69,14 @@ export function josa(word: string, kind: JosaKind): string {
   return hasFinalConsonant(word) ? withFinal : withoutFinal;
 }
 
+/**
+ * 해요체 서술격 조사. 값이 바뀌는 자리 뒤에 "입니다"를 박아 두면 해요체로 옮길 때
+ * "이에요/예요" 중 하나를 고를 수 없어서, 앞 단어 받침으로 고른다.
+ */
+export function copula(word: string): string {
+  return hasFinalConsonant(word) ? '이에요' : '예요';
+}
+
 /** 단어와 조사를 붙여서 돌려준다 */
 export function withJosa(word: string, kind: JosaKind): string {
   return `${word}${josa(word, kind)}`;
