@@ -724,82 +724,72 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
   return (
     <section className="section" aria-labelledby="visit-checklist">
       <h2 id="visit-checklist">{full} 방문 전 확인 가이드</h2>
-      <div className="card-grid cols-3" style={{ marginTop: 14 }}>
-        <div className="card" style={{ cursor: 'default' }}>
-          <div className="card-title" style={{ fontSize: 16 }}>
-            1. 시간대·우대 요금 및 예매 취소 기준
-          </div>
-          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
-            {priceGroups.length > 0 ? (
-              <>
-                현재 {full}는 <strong>{priceGroups.map((g) => g.label).join(', ')}</strong> 등 총{' '}
-                {priceGroups.length}종의 상영관 요금표를 운영하며, 회차 시간대는{' '}
-                <strong>{timeSlots.join('·')}</strong> 구분으로 나뉩니다.{' '}
-                {fare && fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult
-                  ? `평일 ${fare.morningSlot} 회차(성인 ${won(fare.morningAdult)}원)는 일반 회차(${won(
-                      fare.weekdayAdult,
-                    )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 납니다. `
-                  : ''}
-                청소년·경로(만 65세 이상)·장애인 우대 할인을 적용해 예매한 경우 입장 시 학생증·신분증·복지카드 등 증빙 서류 확인이 필요하며, 온라인 예매 취소는 상영 시작 20분 전까지 가능합니다.
-              </>
-            ) : (
-              <>
-                상영관 형태에 따라 일반 극장과 별도의 요금 체계가 적용될 수 있으므로 {brandName} 공식 앱·웹에서 회차별 관람료와 예매 취소 마감 시간(통상 상영 20분 전)을 미리 확인하시기 바랍니다.
-              </>
-            )}
-          </p>
-        </div>
+      {/* 긴 설명 세 개를 3열 카드에 넣으면 한 줄에 20자 남짓만 들어가 문단이 계속 끊긴다.
+          가이드 페이지와 같은 한 장짜리 본문 카드로 위아래로 이어 읽게 한다. */}
+      <div className="prose">
+        <h3>1. 시간대·우대 요금 및 예매 취소 기준</h3>
+        <p>
+          {priceGroups.length > 0 ? (
+            <>
+              현재 {full}는 <strong>{priceGroups.map((g) => g.label).join(', ')}</strong> 등 총{' '}
+              {priceGroups.length}종의 상영관 요금표를 운영하며, 회차 시간대는{' '}
+              <strong>{timeSlots.join('·')}</strong> 구분으로 나뉩니다.{' '}
+              {fare && fare.morningAdult != null && fare.morningAdult !== fare.weekdayAdult
+                ? `평일 ${fare.morningSlot} 회차(성인 ${won(fare.morningAdult)}원)는 일반 회차(${won(
+                    fare.weekdayAdult,
+                  )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 납니다. `
+                : ''}
+              청소년·경로(만 65세 이상)·장애인 우대 할인을 적용해 예매한 경우 입장 시 학생증·신분증·복지카드 등 증빙 서류 확인이 필요하며, 온라인 예매 취소는 상영 시작 20분 전까지 가능합니다.
+            </>
+          ) : (
+            <>
+              상영관 형태에 따라 일반 극장과 별도의 요금 체계가 적용될 수 있으므로 {brandName} 공식 앱·웹에서 회차별 관람료와 예매 취소 마감 시간(통상 상영 20분 전)을 미리 확인하시기 바랍니다.
+            </>
+          )}
+        </p>
 
-        <div className="card" style={{ cursor: 'default' }}>
-          <div className="card-title" style={{ fontSize: 16 }}>
-            2. 주차 인증 및 총 체류 시간 계산
-          </div>
-          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
-            {pGroups.length > 0 ? (
-              <>
-                {parkingLoc ? `주차 공간은 ${parkingLoc} 기준이며, ` : ''}
-                {parkingFree ? `기본 혜택은 '${parkingFree}'입니다. ` : ''}
-                {parkingAuth ? `인증은 '${parkingAuth}' 방식으로 진행됩니다. ` : ''}
-                {parkingExtra ? `무료 시간 경과 시 '${parkingExtra}' 기준이 부과되므로, ` : ''}
-                영화 본편 러닝타임뿐 아니라 상영 전 대기 시간, 본편 시작 전 광고(약 15~20분), 퇴장 후 엘리베이터·출차 이동 시간까지 합산해 입차~출차 소요 시간을 계산하는 것이 안전합니다.
-              </>
-            ) : (
-              <>
-                방문 전 {brandName} 공식 페이지에서 주차 가능 여부와 인근 공영·제휴 주차장 위치를 확인하시고, 주말·공휴일 피크 시간대에는 가급적 대중교통 이용을 권장합니다.
-              </>
-            )}
-          </p>
-        </div>
+        <h3>2. 주차 인증 및 총 체류 시간 계산</h3>
+        <p>
+          {pGroups.length > 0 ? (
+            <>
+              {parkingLoc ? `주차 공간은 ${parkingLoc} 기준이며, ` : ''}
+              {parkingFree ? `기본 혜택은 '${parkingFree}'입니다. ` : ''}
+              {parkingAuth ? `인증은 '${parkingAuth}' 방식으로 진행됩니다. ` : ''}
+              {parkingExtra ? `무료 시간 경과 시 '${parkingExtra}' 기준이 부과되므로, ` : ''}
+              영화 본편 러닝타임뿐 아니라 상영 전 대기 시간, 본편 시작 전 광고(약 15~20분), 퇴장 후 엘리베이터·출차 이동 시간까지 합산해 입차~출차 소요 시간을 계산하는 것이 안전합니다.
+            </>
+          ) : (
+            <>
+              방문 전 {brandName} 공식 페이지에서 주차 가능 여부와 인근 공영·제휴 주차장 위치를 확인하시고, 주말·공휴일 피크 시간대에는 가급적 대중교통 이용을 권장합니다.
+            </>
+          )}
+        </p>
 
-        <div className="card" style={{ cursor: 'default' }}>
-          <div className="card-title" style={{ fontSize: 16 }}>
-            3. 매진·혼잡 시 주변 대안 극장 비교
-          </div>
-          <p className="card-sub" style={{ marginTop: 8, lineHeight: 1.65 }}>
-            {nearby.length > 0 && nearestOne ? (
-              <>
-                원하는 시간대 좌석이 매진되었거나 주차장이 혼잡할 때는 직선거리{' '}
-                <strong>{formatDistance(nearestOne.km)}</strong> 거리의{' '}
-                <Link className="guide-inline-link" href={branchPath(nearestOne.branch)}>
-                  {nearestOne.branch.name} {nearestOne.branch.brandName}
-                </Link>
-                {nearestTwo ? (
-                  <>
-                    {' '}또는 <strong>{formatDistance(nearestTwo.km)}</strong> 거리의{' '}
-                    <Link className="guide-inline-link" href={branchPath(nearestTwo.branch)}>
-                      {nearestTwo.branch.name} {nearestTwo.branch.brandName}
-                    </Link>
-                  </>
-                ) : null}{' '}
-                등 주변 {nearby.length}개 영화관의 상영시간표·주차 조건·특별관 유무를 위 비교 표에서 함께 대조해 볼 수 있습니다.
-              </>
-            ) : (
-              <>
-                {b.sido} 지역 내 다른 {brandName} 지점이나 인접 지역 영화관의 상영시간표와 주차 조건을 함께 비교하면 원하는 시간대 회차를 찾기가 한결 수월합니다.
-              </>
-            )}
-          </p>
-        </div>
+        <h3>3. 매진·혼잡 시 주변 대안 극장 비교</h3>
+        <p>
+          {nearby.length > 0 && nearestOne ? (
+            <>
+              원하는 시간대 좌석이 매진되었거나 주차장이 혼잡할 때는 직선거리{' '}
+              <strong>{formatDistance(nearestOne.km)}</strong> 거리의{' '}
+              <Link className="guide-inline-link" href={branchPath(nearestOne.branch)}>
+                {nearestOne.branch.name} {nearestOne.branch.brandName}
+              </Link>
+              {nearestTwo ? (
+                <>
+                  {' '}또는 <strong>{formatDistance(nearestTwo.km)}</strong> 거리의{' '}
+                  <Link className="guide-inline-link" href={branchPath(nearestTwo.branch)}>
+                    {nearestTwo.branch.name} {nearestTwo.branch.brandName}
+                  </Link>
+                </>
+              ) : null}{' '}
+              등 주변 {nearby.length}개 영화관의 상영시간표·주차 조건·특별관 유무를 위 비교 표에서 함께 대조해 볼 수 있습니다.
+            </>
+          ) : (
+            <>
+              {b.sido} 지역 내 다른 {brandName} 지점이나 인접 지역 영화관의 상영시간표와 주차 조건을 함께 비교하면 원하는 시간대 회차를 찾기가 한결 수월합니다.
+            </>
+          )}
+        </p>
       </div>
     </section>
   );

@@ -527,7 +527,6 @@ body {
 
 /* 정책·소개 문서(.page > .prose)를 깔끔한 에디토리얼 아티클 카드로 감싼다 */
 .page > .prose {
-  max-width: 820px;
   background: var(--canvas);
   border: 1px solid var(--hairline-strong);
   border-radius: var(--radius);
@@ -550,7 +549,6 @@ body {
 
 .guide-lead {
   margin-top: 12px;
-  max-width: 920px;
   color: var(--ink-soft);
   font-size: 1.02rem;
   line-height: 1.75;
@@ -558,7 +556,6 @@ body {
 
 .guide-copy {
   margin-top: 12px;
-  max-width: 920px;
   color: var(--ink);
   line-height: 1.75;
 }
@@ -576,7 +573,6 @@ body {
 
 .section-kicker {
   margin: 6px 0 0;
-  max-width: 920px;
   color: var(--ink-soft);
   font-size: 0.9rem;
   line-height: 1.65;
@@ -913,5 +909,187 @@ body {
 
   .fact-card {
     padding: 14px 15px;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 본문 가독성 통일 (2026-10-28)
+ *
+ * 같은 페이지 안에서 문단 폭이 599px(.prose 68ch)·920px(리드)·998px(FAQ)·
+ * 1040px로 제각각이었고, 지점 상세의 3열 카드는 한 줄에 20자 남짓만 들어가
+ * 글을 읽다가 문단이 갑자기 좁아지거나 줄이 계속 끊겼다. 본문 글은 모두
+ * 콘텐츠 폭 전체를 쓰고, 긴 설명 글은 표·FAQ와 같은 흰 카드 안에 넣어
+ * 위에서 아래로 끊김 없이 읽히게 한다.
+ * ------------------------------------------------------------------ */
+
+/* 마지막 줄에 한 단어만 덩그러니 남는 줄바꿈을 줄인다 */
+p,
+dd,
+li {
+  text-wrap: pretty;
+}
+
+/* 섹션 안의 설명 글: 표·카드와 같은 폭의 한 장짜리 본문 카드 */
+.section .prose {
+  margin-top: 16px;
+  padding: 26px 30px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.section .prose > :first-child {
+  margin-top: 0;
+}
+
+.section .prose > :last-child {
+  margin-bottom: 0;
+}
+
+.section .prose h3 {
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* 소제목이 여러 개인 글은 항목 사이를 얇은 선으로 나눠 어디서 다음 이야기가
+   시작되는지 분명히 한다 */
+.section .prose h3 ~ h3 {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+}
+
+.section .prose h3 + p,
+.section .prose h3 + ul {
+  margin-top: 8px;
+}
+
+.section .prose p,
+.section .prose li {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.section .prose ul {
+  margin-top: 12px;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.section .prose ul > li {
+  position: relative;
+  margin: 0;
+  padding-left: 16px;
+}
+
+.section .prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.78em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand-fg, var(--accent));
+}
+
+/* 리드·보충 설명·FAQ 답변의 글자 크기와 줄간격을 본문과 같은 단계로 맞춘다 */
+.lead,
+.guide-lead {
+  font-size: 1.04rem;
+  line-height: 1.8;
+}
+
+.guide-copy {
+  line-height: 1.8;
+}
+
+.section-kicker {
+  margin-top: 8px;
+  font-size: 0.94rem;
+}
+
+.faq-item dt {
+  font-size: 1rem;
+}
+
+.faq-item dd {
+  margin-top: 8px;
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+/* 섹션 제목: 브랜드 페이지는 브랜드색, 그 외는 강조색의 짧은 세로 막대로
+   통일해 페이지가 달라도 같은 위계로 읽히게 한다 */
+.section > h2 {
+  position: relative;
+  padding-left: 14px;
+}
+
+.section > h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.22em;
+  width: 4px;
+  height: 1.05em;
+  border-radius: 4px;
+  background: var(--brand-fg, var(--accent));
+}
+
+.section {
+  margin-top: 56px;
+}
+
+/* 모바일 상단 메뉴: 메뉴 8개가 세 줄로 쌓여 화면 위쪽 200px를 차지했다.
+   로고 아래 한 줄로 두고 옆으로 밀어서 보게 한다 */
+@media (max-width: 720px) {
+  .site-header .inner {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0;
+    min-height: 0;
+    padding-top: 10px;
+  }
+
+  .nav {
+    margin: 0 -18px;
+    padding: 8px 18px 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+    mask-image: linear-gradient(to right, #000 88%, transparent);
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    margin-top: 44px;
+  }
+
+  .section .prose {
+    padding: 20px 18px;
+  }
+
+  .section .prose p,
+  .section .prose li,
+  .faq-item dd {
+    font-size: 0.98rem;
   }
 }

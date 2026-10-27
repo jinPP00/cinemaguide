@@ -216,6 +216,8 @@ p {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  /* 모바일에서 링크만 터치 높이 44px라, 마지막(현재 위치) 글자가 위로 떠 보이지 않게 가운데 정렬 */
+  align-items: center;
   gap: 6px;
   margin: 0;
   padding: 0;
@@ -591,8 +593,10 @@ a.card:hover .brand-icon {
   flex-wrap: wrap;
 }
 
+/* 좁은 화면에서 주소가 버튼에 밀려 한두 단어씩 끊기지 않게, 공간이 모자라면
+   버튼을 다음 줄로 보낸다 */
 .address-row .address-text {
-  flex: 1;
+  flex: 1 1 240px;
   min-width: 0;
 }
 
@@ -709,8 +713,9 @@ a.card:hover .brand-icon {
 }
 
 /* 정책·안내 문서 본문 --------------------------------------------- */
+/* 폭 제한(68ch)을 두지 않는다. 표·카드는 콘텐츠 폭 전체를 쓰는데 글만 좁아지면
+   같은 페이지 안에서 문단 폭이 갑자기 바뀌어 읽는 흐름이 끊긴다. */
 .prose {
-  max-width: 68ch;
   margin-top: 24px;
 }
 
@@ -849,17 +854,18 @@ a.card:hover .brand-icon {
  * ------------------------------------------------------------------ */
 .brand-themed h2 {
   position: relative;
-  padding-left: 15px;
+  padding-left: 14px;
 }
 
+/* 다른 페이지 섹션 제목(editorial-polish.css)과 같은 짧은 세로 막대 */
 .brand-themed h2::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.5em;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  top: 0.22em;
+  width: 4px;
+  height: 1.05em;
+  border-radius: 4px;
   background: var(--brand-fg);
 }
 
