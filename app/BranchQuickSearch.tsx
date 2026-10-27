@@ -52,7 +52,7 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
           className="quick-search-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="지점, 지역, 특별관 이름으로 찾기"
+          placeholder="지점, 지역, 특별관 이름으로 찾아보세요"
           aria-label="영화관 지점 빠른 검색"
         />
         {query && (
@@ -85,7 +85,7 @@ export default function BranchQuickSearch({ items }: { items: SearchableBranch[]
         <div className="quick-search-results" role="region" aria-label="검색 결과">
           {results.length === 0 ? (
             <p className="quick-search-empty">
-              &lsquo;{query}&rsquo; 검색 결과가 없습니다. 지점 이름이나 시·구 이름으로 찾아 보세요.
+              &lsquo;{query}&rsquo; 검색 결과가 없어요. 지점 이름이나 시·구 이름으로 찾아보세요.
             </p>
           ) : (
             <ul className="quick-search-list">

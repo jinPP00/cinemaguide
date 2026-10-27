@@ -311,8 +311,12 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
               className="card brand-card"
               style={brandThemeVars(b.key) as CSSProperties}
             >
-              <div className="brand-card-name">{b.name}</div>
-              <div className="card-sub">전국 {b.count}개 지점</div>
+              <div className="brand-card-tile">
+                <span className="brand-card-mark">{b.name}</span>
+              </div>
+              <div className="brand-card-figure">
+                지점 <em>{b.count}곳</em>
+              </div>
             </Link>
           ))}
         </div>
