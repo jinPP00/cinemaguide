@@ -10,6 +10,8 @@ export const SITE = {
     'CGV·롯데시네마·메가박스 전국 425개 지점의 위치, 가는 길, 주차, 관람료.',
   operator: '영화관 지점안내 운영자',
   email: 'contact@cinemaguide.kr',
+  /** Google Analytics 4 측정 ID (savezenith 계정 속성 561187024) */
+  gaMeasurementId: 'G-FVSVDPVRFF',
 } as const;
 
 /** 전 페이지 푸터에 노출하는 비공식 고지 (기획서 13장) */

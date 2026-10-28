@@ -65,6 +65,13 @@ export default function PrivacyPage() {
                 <td>접속 IP 주소, 접속 일시, 브라우저 종류·버전(User-Agent), 운영체제, 요청 URL, 참조 페이지(Referer)</td>
                 <td>웹사이트 접속 시 호스팅 및 CDN 인프라에서 자동 생성</td>
               </tr>
+              {LEGAL.usesAnalytics && (
+                <tr>
+                  <th>방문 통계 정보</th>
+                  <td>쿠키 식별자, 방문 페이지, 체류 시간, 유입 경로, 기기·브라우저 환경 정보, 대략적인 지역</td>
+                  <td>방문 통계 도구(Google Analytics) 스크립트를 통해 자동 생성</td>
+                </tr>
+              )}
               {LEGAL.usesAds && (
                 <tr>
                   <th>광고 게재 및 쿠키 정보</th>
@@ -96,6 +103,12 @@ export default function PrivacyPage() {
             <strong>서비스 안정성 확보 및 보안 관리</strong>: 웹 페이지의 정상적인 전송, 서버 장애
             대응, 악성 봇 및 비정상적 트래픽 차단
           </li>
+          {LEGAL.usesAnalytics && (
+            <li>
+              <strong>방문 통계 분석</strong>: 많이 찾는 페이지와 유입 경로를 파악해 안내 내용과 화면을
+              개선. 개인을 식별하는 용도로 쓰지 않습니다.
+            </li>
+          )}
           {LEGAL.usesAds && (
             <li>
               <strong>광고 게재 및 사이트 운영 재원 마련</strong>: 무료 정보 제공 서비스를 지속적으로
@@ -168,6 +181,21 @@ export default function PrivacyPage() {
                 를 방문하면 제3자 광고 사업자가 맞춤형 광고를 위해 쿠키를 사용하는 것을 일괄적으로
                 차단하는 방법을 안내받을 수 있습니다.
               </li>
+              {LEGAL.usesAnalytics && (
+                <li>
+                  <strong>방문 통계 도구</strong>: 사이트는 방문 통계를 위해 Google LLC의{' '}
+                  <strong>Google Analytics</strong>를 사용하며, 이 과정에서 쿠키가 저장됩니다. 수집을
+                  원하지 않으면{' '}
+                  <a
+                    href="https://tools.google.com/dlpage/gaoptout"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Google 애널리틱스 차단 브라우저 부가기능
+                  </a>
+                  을 설치하거나 브라우저에서 쿠키를 차단할 수 있습니다.
+                </li>
+              )}
               <li>
                 <strong>브라우저 쿠키 차단 설정</strong>: 이용자는 사용 중인 웹 브라우저의 옵션을
                 조정하여 모든 쿠키의 저장을 허용하거나, 쿠키가 저장될 때마다 확인을 거치거나, 모든
@@ -222,6 +250,14 @@ export default function PrivacyPage() {
                 <td>발신자 이메일 주소, 문의 내용</td>
                 <td>{LEGAL.emailProvider.country} (이메일 발송 시 네트워크 전송)</td>
               </tr>
+              {LEGAL.usesAnalytics && (
+                <tr>
+                  <td>{LEGAL.analyticsProvider.name}</td>
+                  <td>{LEGAL.analyticsProvider.role}</td>
+                  <td>쿠키 식별자, IP 주소, 방문 페이지, 브라우저·기기 정보</td>
+                  <td>{LEGAL.analyticsProvider.country} (페이지 열람 시 네트워크 전송)</td>
+                </tr>
+              )}
               {LEGAL.usesAds && (
                 <tr>
                   <td>{LEGAL.adsProvider.name}</td>

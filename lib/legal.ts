@@ -9,10 +9,10 @@ export const LEGAL = {
   /** 정책 시행일 */
   effectiveDate: '2026-07-26',
   /** 마지막 개정일 */
-  updatedDate: '2026-10-25',
+  updatedDate: '2026-10-28',
 
   /** 현재 실제로 사용 중인 도구 — 도입 시 true로 바꾼다 */
-  usesAnalytics: false,
+  usesAnalytics: true,
   usesAds: true,
   usesContactForm: false,
 
@@ -30,6 +30,13 @@ export const LEGAL = {
     role: '문의 이메일 수신·보관',
   },
 
+  /** 접속 통계 (Google Analytics 4) */
+  analyticsProvider: {
+    name: 'Google LLC (Google Analytics)',
+    country: '미국',
+    role: '방문 통계 분석',
+  },
+
   /** 광고 (Google AdSense) */
   adsProvider: {
     name: 'Google LLC (AdSense)',
@@ -43,4 +50,5 @@ export const REVISIONS = [
   { date: '2026-07-26', note: '최초 시행' },
   { date: '2026-08-14', note: 'Google AdSense 광고 관련 내용 추가' },
   { date: '2026-10-25', note: '제3자 쿠키 및 맞춤형 광고 해제 방법·안전성 확보 조치 안내 보강' },
+  { date: '2026-10-28', note: 'Google Analytics 방문 통계 도입 안내 추가' },
 ];
