@@ -143,14 +143,12 @@ export default function ContactPage() {
           </table>
         </div>
 
-        <h2>4. 광고·제휴 문의 및 개인정보 안내</h2>
+        <h2>광고·제휴 문의</h2>
         <p>
-          사이트 운영과 관련한 기타 의견이나 광고·제휴 문의도 동일한 이메일(<a href={`mailto:${SITE.email}`}>{SITE.email}</a>)로
-          접수해요. 광고 및 제휴 링크 운영 원칙은{' '}
-          <Link href="/affiliate-disclosure/">광고·제휴 고지</Link> 페이지에 투명하게 공개되어
-          있으며, 문의 이메일을 통해 전달된 발신자 정보는 문의 처리 목적 외에는 절대 사용되지
-          않아요. 자세한 내용은 <Link href="/privacy/">개인정보처리방침</Link>과{' '}
-          <Link href="/about/">사이트 소개</Link>를 참고해 주세요.
+          광고·제휴 문의와 그 밖의 의견도 같은 주소(<a href={`mailto:${SITE.email}`}>{SITE.email}</a>)로 받아요.
+          광고와 제휴 링크를 싣는 기준은 <Link href="/affiliate-disclosure/">광고·제휴 고지</Link>에 적어 두었어요.
+          메일에 담긴 이름과 주소는 답장할 때만 쓰고, 자세한 처리 기준은{' '}
+          <Link href="/privacy/">개인정보처리방침</Link>에 있어요.
         </p>
       </div>
     </div>

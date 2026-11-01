@@ -39,6 +39,22 @@ export function webPageJsonLd(path: string, dateModified: string) {
   };
 }
 
+/**
+ * FAQPage 구조화 데이터. 화면에 보이는 질문·답과 글자까지 같아야 하므로
+ * app/FaqList.tsx가 화면 목록과 이 객체를 같은 배열로 함께 만든다.
+ */
+export function faqPageJsonLd(items: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  };
+}
+
 /** 여러 JSON-LD 객체를 <script> 하나에 배열로 담아 출력할 때 쓴다. */
 export function jsonLdScript(...objects: object[]) {
   return { __html: JSON.stringify(objects.length === 1 ? objects[0] : objects) };

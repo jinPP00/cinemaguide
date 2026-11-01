@@ -23,6 +23,8 @@ import { dataGeneratedAt } from '@/lib/dates';
 import { brandThemeVars } from '@/lib/colors';
 import type { Branch } from '@/lib/types';
 import type { CSSProperties } from 'react';
+import { withJosa } from '@/lib/josa';
+import FaqList from '../../FaqList';
 
 export function generateStaticParams() {
   return meta.brands.flatMap((b) =>
@@ -274,39 +276,44 @@ export default async function SidoPage({
 
       <section className="section" aria-labelledby="sido-faq">
         <h2 id="sido-faq">{sido} {info.name} 자주 묻는 질문</h2>
-        <dl className="faq-list">
-          <div className="faq-item">
-            <dt>{sido}에는 {info.name} 지점이 어디에 있나요?</dt>
-            <dd>
-              {citySummaryText}에 모두 {list.length}곳({list.map((b) => b.name).join(', ')})이 있어요. 지점 이름을
-              누르면 도로명 주소와 지하철·버스 노선이 나와요.
-            </dd>
-          </div>
-          {fare && (
-            <div className="faq-item">
-              <dt>{sido} {info.name} 관람료는 평일·주말, {morningLabel}에 얼마인가요?</dt>
-              <dd>
-                기본 상영관 성인 대표 요금은 평일 {won(fare.weekdayCommon)}, 주말 {won(fare.weekendCommon)}이에요.
-                {fare.morningLow != null ? ` 평일 ${morningLabel}는 ${won(fare.morningLow)}부터예요. ` : ' '}
-                청소년·경로·장애인 요금과 좌석 등급별 금액은 지점 페이지 요금표에 있어요.
-              </dd>
-            </div>
-          )}
-          <div className="faq-item">
-            <dt>{sido} {info.name}는 무료 주차가 되나요?</dt>
-            <dd>
-              {freeParkingBranches.length > 0
-                ? `${freeParkingBranches.map((b) => b.name).join(', ')} 등 ${freeParkingBranches.length}곳은 그날 관람하면 무료로 주차할 수 있어요. 무료 시간(3시간~3시간 30분, 또는 관람 시 무료)과 등록 방법은 지점마다 달라서 지점 페이지에서 확인하세요.`
-                : `주차 요금과 정산 방법은 지점이 들어선 건물에 따라 달라요. 지점 페이지의 주차 항목에서 주차장 위치와 요금을 확인하세요.`}
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>{sido} {info.name} 상영시간표는 어디서 보고, 예매 취소는 언제까지 되나요?</dt>
-            <dd>
-              지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 그 지점의 {info.name} 공식 시간표·예매 페이지로 연결돼요. 웹·앱 예매는 보통 상영 20분 전까지 취소할 수 있어요. 주차 정산과 우대 요금은 <Link className="guide-inline-link" href={guidePath(GUIDES.parking)}>주차</Link>, <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link> 안내에 있어요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          items={[
+            {
+              q: `${sido}에는 ${info.name} 지점이 어디에 있나요?`,
+              a: `${citySummaryText}에 모두 ${list.length}곳(${list.map((b) => b.name).join(', ')})이 있어요. 지점 이름을 누르면 도로명 주소와 지하철·버스 노선이 나와요.`,
+            },
+            ...(fare
+              ? [
+                  {
+                    q: `${sido} ${info.name} 관람료는 평일·주말, ${morningLabel}에 얼마인가요?`,
+                    a:
+                      `기본 상영관 성인 대표 요금은 평일 ${won(fare.weekdayCommon)}, 주말 ${won(fare.weekendCommon)}이에요.` +
+                      (fare.morningLow != null ? ` 평일 ${withJosa(morningLabel, '은')} ${won(fare.morningLow)}부터예요.` : '') +
+                      ' 청소년·경로·장애인 요금과 좌석 등급별 금액은 지점 페이지 요금표에 나와요.',
+                  },
+                ]
+              : []),
+            {
+              q: `${sido} ${info.name}는 무료 주차가 되나요?`,
+              a:
+                freeParkingBranches.length > 0
+                  ? `${freeParkingBranches.map((b) => b.name).join(', ')} 등 ${freeParkingBranches.length}곳은 그날 관람하면 무료로 주차할 수 있어요. 무료 시간(3시간~3시간 30분, 또는 관람 시 무료)과 등록 방법은 지점마다 달라서 지점 페이지에서 확인하세요.`
+                  : '주차 요금과 정산 방법은 지점이 들어선 건물에 따라 달라요. 지점 페이지의 주차 항목에서 주차장 위치와 요금을 확인하세요.',
+            },
+            {
+              q: `${sido} ${info.name} 상영시간표는 어디서 보고, 예매 취소는 언제까지 되나요?`,
+              a: `지점 페이지의 ‘상영시간표 확인’ 버튼을 누르면 그 지점의 ${info.name} 공식 시간표·예매 페이지로 연결돼요. 웹·앱 예매는 보통 상영 20분 전까지 취소할 수 있어요. 주차 정산과 우대 요금은 주차, 할인·우대 안내에서 다뤄요.`,
+              node: (
+                <>
+                  지점 페이지의 &lsquo;상영시간표 확인&rsquo; 버튼을 누르면 그 지점의 {info.name} 공식 시간표·예매 페이지로
+                  연결돼요. 웹·앱 예매는 보통 상영 20분 전까지 취소할 수 있어요. 주차 정산과 우대 요금은{' '}
+                  <Link className="guide-inline-link" href={guidePath(GUIDES.parking)}>주차</Link>,{' '}
+                  <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대</Link> 안내에서 다뤄요.
+                </>
+              ),
+            },
+          ]}
+        />
       </section>
 
       <section className="section" aria-labelledby="other-regions">

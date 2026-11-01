@@ -6,6 +6,7 @@ import { guidePath, GUIDES } from '@/lib/paths';
 import { parkingSummary, parkingGroups } from '@/lib/parking';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
+import FaqList from '../../FaqList';
 
 const PATH = guidePath(GUIDES.parking);
 
@@ -206,32 +207,14 @@ export default function ParkingGuidePage() {
 
       <section className="section" aria-labelledby="parking-faq">
         <h2 id="parking-faq">주차 자주 묻는 질문</h2>
-        <dl className="faq-list">
-          <div className="faq-item">
-            <dt>모바일 티켓으로 예매했는데 주차 등록은 어떻게 하나요?</dt>
-            <dd>
-              로비의 주차 등록 키오스크에 차량 번호 4자리를 넣고 모바일 티켓 바코드(또는 예매번호)를 찍으면 돼요. 일부 지점은 공식 앱의 모바일 티켓 화면에서 차량 번호를 바로 넣을 수 있어요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>두 편을 이어서 보면 무료 시간도 두 배가 되나요?</dt>
-            <dd>
-              키오스크에서는 차량당 한 번(보통 3시간)만 등록되는 경우가 많아요. 티켓 두 장을 들고 매표소나 직원에게 합산할 수 있는지, 최대 몇 시간까지 되는지 물어보세요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>주차 요금을 현금으로 결제할 수 있나요?</dt>
-            <dd>
-              요즘은 출구가 무인으로 바뀐 곳이 많아 대부분 카드나 삼성페이 같은 간편결제만 받고 현금은 받지 않아요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>등록을 잊고 출구까지 왔다면 어떻게 하나요?</dt>
-            <dd>
-              출구 정산기에 바코드 스캐너가 있으면 거기서 티켓을 찍으면 돼요. 없으면 호출 버튼을 눌러 관리실에 그날 티켓 번호를 확인받으세요. 등록하지 않고 일반 요금을 낸 뒤에는 환불해 주지 않는 주차장이 많아요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          items={[
+            { q: `모바일 티켓으로 예매했는데 주차 등록은 어떻게 하나요?`, a: `로비의 주차 등록 키오스크에 차량 번호 4자리를 넣고 모바일 티켓 바코드(또는 예매번호)를 찍으면 돼요. 일부 지점은 공식 앱의 모바일 티켓 화면에서 차량 번호를 바로 넣을 수 있어요.` },
+            { q: `두 편을 이어서 보면 무료 시간도 두 배가 되나요?`, a: `키오스크에서는 차량당 한 번(보통 3시간)만 등록되는 경우가 많아요. 티켓 두 장을 들고 매표소나 직원에게 합산할 수 있는지, 최대 몇 시간까지 되는지 물어보세요.` },
+            { q: `주차 요금을 현금으로 결제할 수 있나요?`, a: `요즘은 출구가 무인으로 바뀐 곳이 많아 대부분 카드나 삼성페이 같은 간편결제만 받고 현금은 받지 않아요.` },
+            { q: `등록을 잊고 출구까지 왔다면 어떻게 하나요?`, a: `출구 정산기에 바코드 스캐너가 있으면 거기서 티켓을 찍으면 돼요. 없으면 호출 버튼을 눌러 관리실에 그날 티켓 번호를 확인받으세요. 등록하지 않고 일반 요금을 낸 뒤에는 환불해 주지 않는 주차장이 많아요.` },
+          ]}
+        />
       </section>
 
       <section className="section">

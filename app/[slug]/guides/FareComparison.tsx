@@ -14,6 +14,7 @@ import {
 import { screenStats, comparableBranchCount, formatExtra } from '@/lib/screens';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
+import FaqList from '../../FaqList';
 
 const PATH = guidePath(GUIDES.fares);
 
@@ -171,7 +172,7 @@ export default function FareComparisonPage() {
           </table>
         </div>
         <p className="section-kicker" style={{ marginTop: 12 }}>
-          조조·심야 시간 기준, 청소년·경로·장애인 우대, 문화가 있는 날은 <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대 안내</Link>에 정리했어요.
+          조조·심야 시간 기준, 청소년·경로·장애인 우대, 문화가 있는 날은 <Link className="guide-inline-link" href={guidePath(GUIDES.discounts)}>할인·우대 안내</Link>에서 다뤄요.
         </p>
       </section>
 
@@ -241,32 +242,14 @@ export default function FareComparisonPage() {
 
       <section className="section" aria-labelledby="fare-faq">
         <h2 id="fare-faq">관람료 자주 묻는 질문</h2>
-        <dl className="faq-list">
-          <div className="faq-item">
-            <dt>CGV·롯데시네마·메가박스는 기본 관람료가 다른가요?</dt>
-            <dd>
-              가장 흔한 요금은 세 브랜드 모두 일반관 2D 성인 평일 14,000원, 주말 15,000원으로 같아요. 요금은 브랜드보다 지점의 상영관 구성(일반석인지 리클라이너·컴포트석인지)과 시간대(조조·모닝·브런치·일반)에 따라 더 크게 달라져요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>조조(모닝)로 보면 얼마나 덜 내나요?</dt>
-            <dd>
-              평일 일반 시간대 성인 요금과 조조 요금의 차이는 지점별 중앙값으로 {won(insight.morningDiscount)}이에요. 지점과 상영관에 따라 3,000~5,000원 사이예요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>청소년 요금은 몇 살까지인가요?</dt>
-            <dd>
-              보통 만 7세~만 18세(초·중·고등학생)까지이고, 평일 일반관 기준 성인 요금보다 2,000~4,000원 낮아요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>같은 상영관인데 좌석마다 가격이 다른 이유는 뭔가요?</dt>
-            <dd>
-              롯데시네마와 메가박스 일부 상영관, CGV 일부 특별관·리클라이너관은 한 관 안에 일반석·스페셜석·커플석·모션석을 함께 두고 좌석 종류별로 요금을 다르게 받기 때문이에요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          items={[
+            { q: `CGV·롯데시네마·메가박스는 기본 관람료가 다른가요?`, a: `가장 흔한 요금은 세 브랜드 모두 일반관 2D 성인 평일 14,000원, 주말 15,000원으로 같아요. 요금은 브랜드보다 지점의 상영관 구성(일반석인지 리클라이너·컴포트석인지)과 시간대(조조·모닝·브런치·일반)에 따라 더 크게 달라져요.` },
+            { q: `조조(모닝)로 보면 얼마나 덜 내나요?`, a: `평일 일반 시간대 성인 요금과 조조 요금의 차이는 지점별 중앙값으로 ${won(insight.morningDiscount)}이에요. 지점과 상영관에 따라 3,000~5,000원 사이예요.` },
+            { q: `청소년 요금은 몇 살까지인가요?`, a: `보통 만 7세~만 18세(초·중·고등학생)까지이고, 평일 일반관 기준 성인 요금보다 2,000~4,000원 낮아요.` },
+            { q: `같은 상영관인데 좌석마다 가격이 다른 이유는 뭔가요?`, a: `롯데시네마와 메가박스 일부 상영관, CGV 일부 특별관·리클라이너관은 한 관 안에 일반석·스페셜석·커플석·모션석을 함께 두고 좌석 종류별로 요금을 다르게 받기 때문이에요.` },
+          ]}
+        />
       </section>
 
       <section className="section" aria-labelledby="basis">

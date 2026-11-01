@@ -52,6 +52,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
+        {/* 피드·AI 참조 문서 위치를 알린다. 페이지마다 alternates.canonical을 덮어쓰므로
+            metadata.alternates.types 대신 여기 직접 둔다. */}
+        <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+        <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />
+        <link rel="alternate" type="text/plain" title="llms-full.txt" href="/llms-full.txt" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"

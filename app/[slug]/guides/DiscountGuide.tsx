@@ -6,6 +6,7 @@ import { guidePath, GUIDES } from '@/lib/paths';
 import { baseFare, brandFareSummaries, fareInsight, MORNING_SLOT, won } from '@/lib/fares';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
+import FaqList from '../../FaqList';
 
 const PATH = guidePath(GUIDES.discounts);
 
@@ -95,7 +96,7 @@ export default function DiscountGuidePage() {
       <h1>영화관 조조·우대 요금과 할인</h1>
       <p className="guide-lead">
         지점 요금표를 바탕으로 조조(모닝)·심야 요금 차이, 청소년·경로·장애인 우대 기준을 적었어요. 문화가 있는 날과
-        통신사·카드 할인을 쓸 때 걸리는 조건도 함께 정리했어요.
+        통신사·카드 할인을 쓸 때 걸리는 조건도 함께 적었어요.
       </p>
 
       <ul className="guide-jump-list" aria-label="다른 안내">
@@ -221,32 +222,14 @@ export default function DiscountGuidePage() {
 
       <section className="section" aria-labelledby="discount-faq">
         <h2 id="discount-faq">할인·우대 자주 묻는 질문</h2>
-        <dl className="faq-list">
-          <div className="faq-item">
-            <dt>조조 요금에 통신사나 카드 할인을 겹쳐 받을 수 있나요?</dt>
-            <dd>
-              대부분의 통신사 멤버십과 제휴 카드는 &lsquo;조조·우대·문화가 있는 날 등 다른 할인과 중복 불가&rsquo;이거나 &lsquo;티켓당 10,000~12,000원 이상 결제&rsquo; 같은 조건이 있어요. 조조는 이미 요금이 낮으니 일반 시간대에 할인을 받은 금액과 비교해 보고 고르세요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>부모님 경로 우대 티켓을 제가 앱으로 예매해도 되나요?</dt>
-            <dd>
-              돼요. 다만 실제로 보시는 분이 입장할 때 만 65세 이상임을 확인할 신분증을 가져가셔야 해요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>만 48개월이 안 된 아이도 표를 사야 하나요?</dt>
-            <dd>
-              세 브랜드 모두 만 48개월 미만 아이가 증빙(건강보험증, 가족관계증명서 등)을 가지고 보호자와 한 좌석에 앉으면 무료예요. 좌석을 따로 쓰려면 청소년(어린이) 요금으로 예매해야 해요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>지점마다 조조·일반 요금이 다른 이유는 뭔가요?</dt>
-            <dd>
-              같은 브랜드라도 지역과 상영관 좌석 구성(일반석인지 전 좌석 리클라이너·컴포트석인지)에 따라 지점 요금표가 달라요. 지점별 요금은 각 지점 페이지와 관람료 비교 페이지에 있어요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          items={[
+            { q: `조조 요금에 통신사나 카드 할인을 겹쳐 받을 수 있나요?`, a: `대부분의 통신사 멤버십과 제휴 카드는 '조조·우대·문화가 있는 날 등 다른 할인과 중복 불가'이거나 '티켓당 10,000~12,000원 이상 결제' 같은 조건이 있어요. 조조는 이미 요금이 낮으니 일반 시간대에 할인을 받은 금액과 비교해 보고 고르세요.` },
+            { q: `부모님 경로 우대 티켓을 제가 앱으로 예매해도 되나요?`, a: `돼요. 다만 실제로 보시는 분이 입장할 때 만 65세 이상임을 확인할 신분증을 가져가셔야 해요.` },
+            { q: `만 48개월이 안 된 아이도 표를 사야 하나요?`, a: `세 브랜드 모두 만 48개월 미만 아이가 증빙(건강보험증, 가족관계증명서 등)을 가지고 보호자와 한 좌석에 앉으면 무료예요. 좌석을 따로 쓰려면 청소년(어린이) 요금으로 예매해야 해요.` },
+            { q: `지점마다 조조·일반 요금이 다른 이유는 뭔가요?`, a: `같은 브랜드라도 지역과 상영관 좌석 구성(일반석인지 전 좌석 리클라이너·컴포트석인지)에 따라 지점 요금표가 달라요. 지점별 요금은 각 지점 페이지와 관람료 비교 페이지에 있어요.` },
+          ]}
+        />
       </section>
 
       <section className="section">

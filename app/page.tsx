@@ -8,10 +8,13 @@ import { brandThemeVars } from '@/lib/colors';
 import type { CSSProperties, ReactNode } from 'react';
 import { IconChart, IconClapper, IconCoin, IconCar, IconPercent, IconPin, IconSparkle, IconTicket } from './icons';
 import BranchQuickSearch, { type SearchableBranch } from './BranchQuickSearch';
+import FaqList from './FaqList';
+import { jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 
 export const metadata = withOpenGraphUrl({
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
-  description: SITE.description,
+  description: `CGV·롯데시네마·메가박스 전국 ${meta.totalBranches}개 지점의 주소와 가는 길, 무료 주차 시간, 상영관별 관람료를 지점마다 적었어요. 상영시간표는 각 영화관 공식 사이트로 연결해요.`,
   alternates: { canonical: '/' },
 });
 
@@ -48,12 +51,14 @@ export default function HomePage() {
     { href: guidePath(GUIDES.fares), label: '관람료 비교', title: ['브랜드·시간대별', '요금을 비교해요'], tone: 'blue', icon: <IconCoin /> },
     { href: guidePath(GUIDES.screens), label: '특별관', title: ['IMAX·4DX 있는', `${specialBranches}곳을 모았어요`], tone: 'purple', icon: <IconSparkle /> },
     { href: guidePath(GUIDES.parking), label: '주차', title: ['무료 시간과', '정산 방법을 알려 드려요'], tone: 'green', icon: <IconCar /> },
-    { href: guidePath(GUIDES.discounts), label: '할인·우대', title: ['조조·우대 요금을', '정리했어요'], tone: 'pink', icon: <IconPercent /> },
+    { href: guidePath(GUIDES.discounts), label: '할인·우대', title: ['조조·심야 요금과', '우대 받는 법'], tone: 'pink', icon: <IconPercent /> },
     { href: guidePath(GUIDES.boxoffice), label: '영화 순위', title: ['박스오피스 순위를', '볼 수 있어요'], tone: 'orange', icon: <IconChart /> },
   ];
 
   return (
     <div className="wrap page">
+      {/* 사이트맵의 홈 lastmod와 같은 날짜를 dateModified로 알린다 */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(webPageJsonLd('/', dataGeneratedAt.toISOString()))} />
       <div className="home-intro">
         <span className="home-badge" aria-hidden="true">
           <IconClapper />
@@ -219,35 +224,32 @@ export default function HomePage() {
 
       <section className="section" aria-labelledby="home-faq">
         <h2 id="home-faq">자주 묻는 질문</h2>
-        <dl className="faq-list" style={{ marginTop: 18 }}>
-          <div className="faq-item">
-            <dt>상영시간표와 남은 좌석은 어디서 보나요?</dt>
-            <dd>
-              이 사이트에는 상영시간표가 없어요. 시간표는 하루에도 여러 번 바뀌어서, 지점 페이지의
-              &lsquo;상영시간표 확인&rsquo; 버튼으로 해당 영화관의 공식 페이지에 연결해 드려요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>조조 요금과 주말 요금은 평일과 얼마나 다른가요?</dt>
-            <dd>
-              3사 지점 요금표의 중앙값으로 보면, 평일 조조(모닝) 성인 요금은 평일 일반 시간대보다{' '}
-              {won(insight.morningDiscount)} 낮고 주말 일반 시간대는 평일보다 {won(insight.weekendPremium)} 높아요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>주차 무료 시간은 지점마다 같나요?</dt>
-            <dd>
-              달라요. 3시간 무료인 지점이 가장 많지만, 건물에 따라 3시간 30분~4시간 무료, 시간 제한 없이 무료,
-              3시간에 1,500~3,500원을 받는 곳도 있고 전용 주차장이 없는 지점도 있어요. 갈 지점 페이지의 주차
-              항목을 확인하세요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          style={{ marginTop: 18 }}
+          items={[
+            {
+              q: 'CGV·롯데시네마·메가박스는 전국에 지점이 몇 곳인가요?',
+              a: `${meta.brands.map((b) => `${b.name} ${b.count}곳`).join(', ')}으로 모두 ${total}곳이에요.`,
+            },
+            {
+              q: '상영시간표와 남은 좌석은 어디서 보나요?',
+              a: "이 사이트에는 상영시간표가 없어요. 시간표는 하루에도 여러 번 바뀌어서, 지점 페이지의 '상영시간표 확인' 버튼으로 해당 영화관의 공식 페이지에 연결해 드려요.",
+            },
+            {
+              q: '조조 요금과 주말 요금은 평일과 얼마나 다른가요?',
+              a: `3사 지점 요금표의 중앙값으로 보면, 평일 조조(모닝) 성인 요금은 평일 일반 시간대보다 ${won(insight.morningDiscount)} 낮고 주말 일반 시간대는 평일보다 ${won(insight.weekendPremium)} 높아요.`,
+            },
+            {
+              q: '주차 무료 시간은 지점마다 같나요?',
+              a: '달라요. 3시간 무료인 지점이 가장 많지만, 건물에 따라 3시간 30분~4시간 무료, 시간 제한 없이 무료, 3시간에 1,500~3,500원을 받는 곳도 있고 전용 주차장이 없는 지점도 있어요. 갈 지점 페이지의 주차 항목을 확인하세요.',
+            },
+          ]}
+        />
       </section>
 
       <section className="section">
         <div className="note">
-          지점 정보는 각 브랜드 공식 사이트를 기준으로 정리했어요. 바뀌었거나 틀린 정보는{' '}
+          지점 정보는 각 브랜드 공식 사이트에서 가져왔어요. 바뀌었거나 틀린 정보는{' '}
           <Link href="/contact/">정정 요청</Link>으로 알려 주세요.
         </div>
       </section>

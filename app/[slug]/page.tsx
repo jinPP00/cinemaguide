@@ -30,6 +30,7 @@ import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import NearbySection from './NearbySection';
 import SpecialScreenSection from './SpecialScreenSection';
 import SourceNote from './SourceNote';
+import FaqList from '../FaqList';
 import { parkingGroups as buildParkingGroups } from '@/lib/parking';
 import { baseFare } from '@/lib/fares';
 import { nearbyBranches, formatDistance } from '@/lib/geo';
@@ -92,7 +93,7 @@ export async function generateMetadata({
     const info = brandMeta(brandKey);
     return withOpenGraphUrl({
       title: `${info.name} 상영시간표·전국 지점 안내`,
-      description: `${info.name} 상영시간표를 지점별로 확인하는 방법과 전국 ${info.count}개 지점의 위치, 교통, 주차, 관람료 정보를 지역별로 정리했어요.`,
+      description: `${info.name} 상영시간표를 지점별로 확인하는 방법과 전국 ${info.count}개 지점의 주소, 가는 길, 주차, 관람료를 지역별로 모았어요.`,
       alternates: { canonical: brandPath(info.segment) },
     });
   }
@@ -264,14 +265,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
       {faqs.length > 0 && (
         <section className="section" aria-labelledby="brand-faq">
           <h2 id="brand-faq">{info.name} 자주 묻는 질문</h2>
-          <dl className="faq-list">
-            {faqs.map((item) => (
-              <div className="faq-item" key={item.q}>
-                <dt>{item.q}</dt>
-                <dd>{item.a}</dd>
-              </div>
-            ))}
-          </dl>
+          <FaqList items={faqs} />
         </section>
       )}
 
@@ -324,7 +318,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
 
       <section className="section">
         <div className="note">
-          {info.name} 지점 정보는 공식 사이트에서 모아 정리했어요. 이 사이트는 {info.name}{' '}
+          {info.name} 지점 정보는 공식 사이트에서 가져왔어요. 이 사이트는 {info.name}{' '}
           공식 서비스가 아니에요.
         </div>
       </section>
@@ -597,14 +591,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
       {operating && faqs.length > 0 && (
         <section className="section" aria-labelledby="faq">
           <h2 id="faq">자주 묻는 질문</h2>
-          <dl className="faq-list">
-            {faqs.map((item) => (
-              <div className="faq-item" key={item.q}>
-                <dt>{item.q}</dt>
-                <dd>{item.a}</dd>
-              </div>
-            ))}
-          </dl>
+          <FaqList items={faqs} />
         </section>
       )}
 
@@ -703,7 +690,7 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
       {/* 긴 설명 세 개를 3열 카드에 넣으면 한 줄에 20자 남짓만 들어가 문단이 계속 끊긴다.
           가이드 페이지와 같은 한 장짜리 본문 카드로 위아래로 이어 읽게 한다. */}
       <div className="prose">
-        <h3>요금과 예매 취소</h3>
+        <h3>요금표와 시간대</h3>
         <p>
           {priceGroups.length > 0 ? (
             <>
@@ -714,8 +701,6 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
                     fare.weekdayAdult,
                   )}원)와 ${won(fare.weekdayAdult - fare.morningAdult)}원 차이가 나요. `
                 : ''}
-              청소년·경로(만 65세 이상)·장애인 요금으로 예매했다면 입장할 때 학생증, 신분증, 복지카드
-              같은 증빙을 보여 줘야 해요. 온라인 예매는 보통 상영 20분 전까지 취소할 수 있어요.
             </>
           ) : (
             <>
@@ -725,16 +710,14 @@ function BranchVisitChecklist({ branch: b, brandName }: { branch: Branch; brandN
           )}
         </p>
 
-        <h3>주차 시간 계산</h3>
+        <h3>주차</h3>
         <p>
           {pGroups.length > 0 ? (
             <>
               {parkingLoc ? `주차 위치는 '${parkingLoc}'${copula(parkingLoc)}. ` : ''}
               {parkingFree ? `관람객 혜택은 '${parkingFree}'${copula(parkingFree)}. ` : ''}
               {parkingAuth ? `인증은 '${parkingAuth}' 방식이에요. ` : ''}
-              {parkingExtra ? `무료 시간을 넘기면 '${parkingExtra}' 기준으로 요금이 붙어요. ` : ''}
-              주차 시간은 입차부터 출차까지라서, 상영 시간에 광고(15~20분)와 입장 대기, 퇴장 후 출차
-              시간을 더해 계산해야 해요.
+              {parkingExtra ? `무료 시간을 넘기면 '${parkingExtra}' 기준으로 요금이 붙어요.` : ''}
             </>
           ) : (
             <>
@@ -1904,8 +1887,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
       q: `${full} 관람료는 얼마인가요?`,
       a:
         `${fare.label} 성인 기준 ${parts.join(', ')}이에요.` +
-        (extras.length > 0 ? ` ${extras.join(', ')}이에요.` : '') +
-        ' 특별관 요금과 다른 시간대 요금은 위 요금표에 있어요.',
+        (extras.length > 0 ? ` ${extras.join(', ')}이에요.` : ''),
     });
   }
 
@@ -1919,7 +1901,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
   if (parkingSummary.length > 0) {
     faqs.push({
       q: `${full} 주차 요금과 인증 방법은 어떻게 되나요?`,
-      a: `${parkingSummary.join(' · ')}. 주차 위치와 유의사항은 위 주차 항목에 있어요.`,
+      a: `${parkingSummary.join(' · ')}.`,
     });
   }
 
@@ -1950,7 +1932,7 @@ function buildBranchFaqs(b: Branch, brandName: string): { q: string; a: string }
       .join(', ');
     faqs.push({
       q: `${full} 근처에 다른 영화관이 있나요?`,
-      a: `가까운 순으로 ${topNearby} 등이 있어요. 위 '근처 다른 영화관' 표에서 각 지점의 요금과 특별관을 비교할 수 있어요.`,
+      a: `가까운 순으로 ${topNearby} 등이 있어요.`,
     });
   }
 

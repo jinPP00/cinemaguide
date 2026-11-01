@@ -17,3 +17,25 @@
 
 /robots.txt
   Cache-Control: public, max-age=3600
+
+# 확장자 없는 생성 이미지는 정적 호스팅이 Content-Type을 붙이지 않는다.
+# 위의 X-Content-Type-Options: nosniff 때문에 타입이 없으면 미리보기 크롤러가 이미지를 버린다.
+/opengraph-image
+  Content-Type: image/png
+
+/*/opengraph-image
+  Content-Type: image/png
+
+/apple-icon
+  Content-Type: image/png
+
+# 한글 문서라 charset을 명시하지 않으면 일부 AI 크롤러가 글자를 깨뜨려 읽는다.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+
+/rss.xml
+  Content-Type: application/rss+xml; charset=utf-8
+  Cache-Control: public, max-age=3600

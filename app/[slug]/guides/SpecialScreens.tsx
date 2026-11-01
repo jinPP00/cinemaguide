@@ -15,6 +15,7 @@ import {
 } from '@/lib/screens';
 import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
+import FaqList from '../../FaqList';
 
 const PATH = guidePath(GUIDES.screens);
 
@@ -150,32 +151,14 @@ export default function SpecialScreensPage() {
 
       <section className="section" aria-labelledby="screen-faq">
         <h2 id="screen-faq">특별관 자주 묻는 질문</h2>
-        <dl className="faq-list">
-          <div className="faq-item">
-            <dt>일반 관람권이나 통신사 무료 예매로 특별관도 볼 수 있나요?</dt>
-            <dd>
-              대부분의 일반 관람권과 통신사 무료 예매는 일반관에서만 쓸 수 있어요. IMAX, 4DX, 돌비 시네마, 샤롯데 같은 특별관은 전용 관람권을 쓰거나, 차액을 내고 예매할 수 있는지 예매 화면에서 확인하세요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>DOLBY CINEMA와 DOLBY ATMOS는 무엇이 다른가요?</dt>
-            <dd>
-              DOLBY ATMOS는 천장 스피커를 포함한 입체 음향만 갖춘 관이에요. DOLBY CINEMA는 여기에 돌비 비전 레이저 영사기와 전용 상영관 설계까지 더한 규격이에요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>리클라이너관은 늘 추가 요금이 있나요?</dt>
-            <dd>
-              일반관과 리클라이너관을 함께 둔 지점은 리클라이너관에 1,000~3,000원을 더 받기도 해요. 모든 관이 리클라이너인 지점은 그 요금이 곧 기본 요금이에요.
-            </dd>
-          </div>
-          <div className="faq-item">
-            <dt>우리 동네 근처의 특별관은 어떻게 찾나요?</dt>
-            <dd>
-              지점 페이지 아래쪽 &lsquo;근처 다른 영화관&rsquo; 표에 주변 영화관의 특별관이 나와요. 시도별 지점 목록에서도 그 지역의 특별관 보유 지점만 모아 볼 수 있어요.
-            </dd>
-          </div>
-        </dl>
+        <FaqList
+          items={[
+            { q: `일반 관람권이나 통신사 무료 예매로 특별관도 볼 수 있나요?`, a: `대부분의 일반 관람권과 통신사 무료 예매는 일반관에서만 쓸 수 있어요. IMAX, 4DX, 돌비 시네마, 샤롯데 같은 특별관은 전용 관람권을 쓰거나, 차액을 내고 예매할 수 있는지 예매 화면에서 확인하세요.` },
+            { q: `DOLBY CINEMA와 DOLBY ATMOS는 무엇이 다른가요?`, a: `DOLBY ATMOS는 천장 스피커를 포함한 입체 음향만 갖춘 관이에요. DOLBY CINEMA는 여기에 돌비 비전 레이저 영사기와 전용 상영관 설계까지 더한 규격이에요.` },
+            { q: `리클라이너관은 늘 추가 요금이 있나요?`, a: `일반관과 리클라이너관을 함께 둔 지점은 리클라이너관에 1,000~3,000원을 더 받기도 해요. 모든 관이 리클라이너인 지점은 그 요금이 곧 기본 요금이에요.` },
+            { q: `우리 동네 근처의 특별관은 어떻게 찾나요?`, a: `지점 페이지 아래쪽 '근처 다른 영화관' 표에 주변 영화관의 특별관이 나와요. 시도별 지점 목록에서도 그 지역의 특별관 보유 지점만 모아 볼 수 있어요.` },
+          ]}
+        />
       </section>
 
       <section className="section" aria-labelledby="basis">
