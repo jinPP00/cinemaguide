@@ -1,15 +1,15 @@
 {
-  "targetDate": "20261025",
-  "fetchedAt": "2026-10-26T03:35:23.271Z",
+  "targetDate": "20261101",
+  "fetchedAt": "2026-11-02T04:48:14.912Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20261807",
       "name": "극장판 치이카와: 인어 섬의 비밀",
       "openDate": "2026-09-30",
-      "audienceToday": 135454,
-      "audienceTotal": 2248137,
-      "salesShare": 49.9,
+      "audienceToday": 93014,
+      "audienceTotal": 2583855,
+      "salesShare": 35,
       "directors": [
         "오이카와 케이"
       ],
@@ -32,12 +32,66 @@
     },
     {
       "rank": 2,
+      "movieCd": "20264498",
+      "name": "하트 오브 비스트",
+      "openDate": "2026-10-28",
+      "audienceToday": 63965,
+      "audienceTotal": 215794,
+      "salesShare": 23.7,
+      "directors": [
+        "데이비드 에이어"
+      ],
+      "actors": [
+        "브래드 피트",
+        "J.K. 시몬스"
+      ],
+      "genres": [
+        "드라마",
+        "액션"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 101,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/60/tn_DPF034087.jpg"
+    },
+    {
+      "rank": 3,
+      "movieCd": "20231795",
+      "name": "수능, 출제의 비밀",
+      "openDate": "2026-10-28",
+      "audienceToday": 15203,
+      "audienceTotal": 71768,
+      "salesShare": 5.5,
+      "directors": [
+        "이용재"
+      ],
+      "actors": [
+        "이선빈",
+        "유재명",
+        "김영민",
+        "전석호",
+        "김경민"
+      ],
+      "genres": [
+        "코미디"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 99,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026458.jpg"
+    },
+    {
+      "rank": 4,
       "movieCd": "20255033",
       "name": "암살자(들)",
       "openDate": "2026-09-23",
-      "audienceToday": 26114,
-      "audienceTotal": 3374514,
-      "salesShare": 9.4,
+      "audienceToday": 15187,
+      "audienceTotal": 3447957,
+      "salesShare": 5.6,
       "directors": [
         "허진호"
       ],
@@ -59,39 +113,36 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPK026317.jpg"
     },
     {
-      "rank": 3,
-      "movieCd": "20250053",
-      "name": "실낙원",
-      "openDate": "2026-10-21",
-      "audienceToday": 22311,
-      "audienceTotal": 104876,
-      "salesShare": 8,
+      "rank": 5,
+      "movieCd": "20155762",
+      "name": "진격의 거인: 홍련의 화살",
+      "openDate": "2015-01-28",
+      "audienceToday": 11458,
+      "audienceTotal": 72324,
+      "salesShare": 4.9,
       "directors": [
-        "연상호"
+        "아라키 테츠로"
       ],
-      "actors": [
-        "김현주",
-        "배현성"
-      ],
+      "actors": [],
       "genres": [
-        "스릴러",
-        "드라마"
+        "애니메이션",
+        "판타지"
       ],
       "watchGrade": "15세이상관람가",
-      "runtime": 100,
+      "runtime": 119,
       "nations": [
-        "한국"
+        "일본"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026480.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPF034069.jpg"
     },
     {
-      "rank": 4,
+      "rank": 6,
       "movieCd": "20256161",
       "name": "타짜: 벨제붑의 노래",
       "openDate": "2026-09-23",
-      "audienceToday": 16772,
-      "audienceTotal": 1999477,
-      "salesShare": 6.3,
+      "audienceToday": 8991,
+      "audienceTotal": 2055476,
+      "salesShare": 3.5,
       "directors": [
         "최국희"
       ],
@@ -114,13 +165,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPK026376.jpg"
     },
     {
-      "rank": 5,
+      "rank": 7,
       "movieCd": "20267571",
       "name": "클레이페이스",
       "openDate": "2026-10-21",
-      "audienceToday": 15978,
-      "audienceTotal": 77153,
-      "salesShare": 6.1,
+      "audienceToday": 5388,
+      "audienceTotal": 115464,
+      "salesShare": 2.2,
       "directors": [
         "제임스 왓킨스"
       ],
@@ -141,13 +192,39 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPF034011.jpg"
     },
     {
-      "rank": 6,
+      "rank": 8,
+      "movieCd": "20250053",
+      "name": "실낙원",
+      "openDate": "2026-10-21",
+      "audienceToday": 5209,
+      "audienceTotal": 151427,
+      "salesShare": 1.8,
+      "directors": [
+        "연상호"
+      ],
+      "actors": [
+        "김현주",
+        "배현성"
+      ],
+      "genres": [
+        "스릴러",
+        "드라마"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 100,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026480.jpg"
+    },
+    {
+      "rank": 9,
       "movieCd": "20250654",
       "name": "오디세이",
       "openDate": "2026-08-05",
-      "audienceToday": 7510,
-      "audienceTotal": 12311213,
-      "salesShare": 2.9,
+      "audienceToday": 5100,
+      "audienceTotal": 12335269,
+      "salesShare": 2,
       "directors": [
         "크리스토퍼 놀란"
       ],
@@ -171,115 +248,32 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/49/tn_DPF033591.jpg"
     },
     {
-      "rank": 7,
-      "movieCd": "20266189",
-      "name": "여전히 찬란하게",
-      "openDate": "2026-10-21",
-      "audienceToday": 7089,
-      "audienceTotal": 41037,
-      "salesShare": 2.3,
-      "directors": [
-        "송일곤"
-      ],
-      "actors": [
-        "김혜자",
-        "박서경",
-        "최주은",
-        "문성현",
-        "차미경"
-      ],
-      "genres": [
-        "드라마"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 117,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026510.jpg"
-    },
-    {
-      "rank": 8,
-      "movieCd": "20265062",
-      "name": "룩백",
-      "openDate": "2026-10-08",
-      "audienceToday": 4995,
-      "audienceTotal": 131051,
-      "salesShare": 1.9,
-      "directors": [
-        "고레에다 히로카즈"
-      ],
-      "actors": [
-        "데구치 나츠키",
-        "마키타 아쥬",
-        "나나세 후리",
-        "오카다 로카"
-      ],
-      "genres": [
-        "드라마"
-      ],
-      "watchGrade": "전체관람가",
-      "runtime": 100,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033819.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20264015",
-      "name": "베러티",
-      "openDate": "2026-10-22",
-      "audienceToday": 4306,
-      "audienceTotal": 25190,
-      "salesShare": 1.6,
-      "directors": [
-        "마이클 쇼월터"
-      ],
-      "actors": [
-        "앤 해서웨이",
-        "다코타 존슨",
-        "조쉬 하트넷"
-      ],
-      "genres": [
-        "범죄",
-        "드라마",
-        "미스터리",
-        "멜로/로맨스",
-        "스릴러"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 116,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPF034015.jpg"
-    },
-    {
       "rank": 10,
-      "movieCd": "20246036",
-      "name": "킬링타임",
-      "openDate": "2026-10-21",
-      "audienceToday": 4087,
-      "audienceTotal": 19121,
-      "salesShare": 1.5,
+      "movieCd": "20259894",
+      "name": "최종면접 ",
+      "openDate": "2026-11-04",
+      "audienceToday": 3744,
+      "audienceTotal": 14574,
+      "salesShare": 1.8,
       "directors": [
-        "장준엽"
+        "김정훈"
       ],
       "actors": [
-        "류혜영",
-        "남윤수"
+        "조이현",
+        "김재원",
+        "신승호",
+        "강유석",
+        "곽동연"
       ],
       "genres": [
-        "공포(호러)",
-        "스릴러"
+        "미스터리"
       ],
       "watchGrade": "15세이상관람가",
-      "runtime": 83,
+      "runtime": 107,
       "nations": [
         "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026488.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026465.jpg"
     }
   ]
 }
