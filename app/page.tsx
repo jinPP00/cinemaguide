@@ -9,14 +9,33 @@ import type { CSSProperties, ReactNode } from 'react';
 import { IconChart, IconClapper, IconCoin, IconCar, IconPercent, IconPin, IconSparkle, IconTicket } from './icons';
 import BranchQuickSearch, { type SearchableBranch } from './BranchQuickSearch';
 import FaqList from './FaqList';
-import { jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { howToJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { dataGeneratedAt } from '@/lib/dates';
 
 export const metadata = withOpenGraphUrl({
   title: `${SITE.name} - CGV·롯데시네마·메가박스 전국 지점 정보`,
-  description: `CGV·롯데시네마·메가박스 전국 ${meta.totalBranches}개 지점의 주소와 가는 길, 무료 주차 시간, 상영관별 관람료를 지점마다 적었어요. 상영시간표는 각 영화관 공식 사이트로 연결해요.`,
+  description: `CGV·롯데시네마·메가박스 전국 ${meta.totalBranches}개 영화관 지점의 주소, 가는 길, 무료 주차 시간, 상영관별 관람료와 상영시간표를 안내해요.`,
   alternates: { canonical: '/' },
 });
+
+const homeHowTo = howToJsonLd(
+  '전국 영화관 지점·주차·관람료·상영시간표 확인 방법',
+  'CGV·롯데시네마·메가박스 전국 지점의 무료 주차 시간, 관람료, 가는 길과 공식 상영시간표를 확인하는 절차예요.',
+  [
+    {
+      name: '지점 검색 또는 브랜드·지역 선택',
+      text: '홈 화면 검색창에 지점명을 입력하거나 CGV·롯데시네마·메가박스 및 시·도를 선택해 갈 영화관을 찾아요.',
+    },
+    {
+      name: '무료 주차 시간·관람료·가는 길 확인',
+      text: '지점 상세 페이지에서 지하철·버스 노선, 무료 주차 시간과 정산 방법, 시간대·상영관별 관람료를 확인해요.',
+    },
+    {
+      name: '공식 사이트에서 상영시간표·예매 진행',
+      text: "지점 페이지의 '상영시간표 확인' 버튼으로 해당 영화관 공식 페이지로 이동해 실시간 시간표와 잔여 좌석을 확인해요.",
+    },
+  ],
+);
 
 export default function HomePage() {
   const total = meta.totalBranches;
@@ -58,7 +77,10 @@ export default function HomePage() {
   return (
     <div className="wrap page">
       {/* 사이트맵의 홈 lastmod와 같은 날짜를 dateModified로 알린다 */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(webPageJsonLd('/', dataGeneratedAt.toISOString()))} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(webPageJsonLd('/', dataGeneratedAt.toISOString()), homeHowTo)}
+      />
       <div className="home-intro">
         <span className="home-badge" aria-hidden="true">
           <IconClapper />

@@ -22,7 +22,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
 }
 
 /**
- * WebPage 구조화 데이터 — dateModified 신호 전용.
+ * WebPage 구조화 데이터 — dateModified 및 SpeakableSpecification 신호 전용.
  *
  * MovieTheater(schema.org LocalBusiness 계열)에는 dateModified가 표준 속성으로
  * 없어서, "이 URL이 실제로 언제 바뀌었는지"를 별도 WebPage 객체로 붙인다.
@@ -36,6 +36,32 @@ export function webPageJsonLd(path: string, dateModified: string) {
     '@type': 'WebPage',
     url: `${base}${path}`,
     dateModified,
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '.guide-lead', '.section-kicker'],
+    },
+  };
+}
+
+/**
+ * HowTo 구조화 데이터 — 영화관 지점·관람료·주차·상영시간표 확인 절차 안내용.
+ */
+export function howToJsonLd(
+  name: string,
+  description: string,
+  steps: { name: string; text: string }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    step: steps.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    })),
   };
 }
 

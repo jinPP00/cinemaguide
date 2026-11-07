@@ -13,7 +13,7 @@ const PATH = guidePath(GUIDES.discounts);
 export const discountGuideMetadata: Metadata = withOpenGraphUrl({
   title: '영화관 조조·우대 요금과 문화가 있는 날',
   description:
-    'CGV·롯데시네마·메가박스의 조조(모닝)·브런치·심야 요금 차이, 청소년·경로·장애인 우대 기준, 문화가 있는 날, 통신사·카드 할인을 쓸 때 확인할 점.',
+    'CGV·롯데시네마·메가박스 조조·심야 요금 차이, 청소년·경로·장애인 우대 기준, 문화가 있는 날과 통신사·카드 할인 안내.',
   alternates: { canonical: PATH },
 });
 

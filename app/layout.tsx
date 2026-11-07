@@ -21,7 +21,10 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
   },
   verification: {
-    other: { 'naver-site-verification': '344923e4820bd695f73d807549b2018d9dc235c8' },
+    other: {
+      'naver-site-verification': '344923e4820bd695f73d807549b2018d9dc235c8',
+      'msvalidate.01': '0C39D6EF0E3450B5505673CDD09A0F21',
+    },
   },
 };
 

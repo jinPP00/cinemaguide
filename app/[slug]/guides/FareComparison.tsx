@@ -21,7 +21,7 @@ const PATH = guidePath(GUIDES.fares);
 export const fareComparisonMetadata: Metadata = withOpenGraphUrl({
   title: 'CGV·롯데시네마·메가박스 관람료 비교',
   description:
-    'CGV·롯데시네마·메가박스 공식 요금표에서 일반관 2D 성인 요금을 모아 비교했어요. 브랜드별 평일·주말 요금, 지점별 요금 범위, 시간대·지역별 차이.',
+    'CGV·롯데시네마·메가박스 공식 요금표 기준 일반관 2D 성인 평일·주말 요금, 지점별 요금 범위, 시간대·지역별 차이를 비교해요.',
   alternates: { canonical: PATH },
 });
 

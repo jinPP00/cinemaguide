@@ -22,7 +22,7 @@ const PATH = guidePath(GUIDES.screens);
 export const specialScreensMetadata: Metadata = withOpenGraphUrl({
   title: '전국 특별관 안내 — IMAX·4DX·SCREENX·돌비 등',
   description:
-    'CGV·롯데시네마·메가박스 특별관을 상영 방식별로 묶었어요. IMAX, 4DX, SCREENX, 돌비 계열, 리클라이너가 있는 지점과 추가 요금.',
+    'CGV·롯데시네마·메가박스 특별관(IMAX·4DX·SCREENX·돌비·리클라이너) 운영 지점과 기본관 대비 추가 요금을 비교해요.',
   alternates: { canonical: PATH },
 });
 
