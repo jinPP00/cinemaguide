@@ -1,4 +1,6 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
@@ -14,6 +16,16 @@ export const metadata: Metadata = withOpenGraphUrl({
 export default function TermsPage() {
   return (
     <div className="wrap page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: '홈', path: '/' },
+            { name: '이용약관', path: '/terms/' },
+          ]),
+          webPageJsonLd('/terms/', dataGeneratedAt.toISOString()),
+        )}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

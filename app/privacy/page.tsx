@@ -1,4 +1,6 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
@@ -7,13 +9,23 @@ import { LEGAL, REVISIONS } from '@/lib/legal';
 export const metadata: Metadata = withOpenGraphUrl({
   title: '개인정보처리방침',
   description:
-    '영화관 지점안내가 수집하는 개인정보 항목, 이용 목적, 보관 기간, 쿠키 및 맞춤형 광고 설정, 처리 위탁과 국외 이전, 이용자 권리를 안내합니다.',
+    '영화관 지점안내의 개인정보 수집 항목, 이용 목적, 보관 기간, 쿠키·맞춤형 광고 설정과 국외 이전을 안내합니다.',
   alternates: { canonical: '/privacy/' },
 });
 
 export default function PrivacyPage() {
   return (
     <div className="wrap page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: '홈', path: '/' },
+            { name: '개인정보처리방침', path: '/privacy/' },
+          ]),
+          webPageJsonLd('/privacy/', dataGeneratedAt.toISOString()),
+        )}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

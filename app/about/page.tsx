@@ -1,4 +1,6 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { meta, brandPath } from '@/lib/data';
@@ -15,6 +17,16 @@ export const metadata: Metadata = withOpenGraphUrl({
 export default function AboutPage() {
   return (
     <div className="wrap page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: '홈', path: '/' },
+            { name: '사이트 소개', path: '/about/' },
+          ]),
+          webPageJsonLd('/about/', dataGeneratedAt.toISOString()),
+        )}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

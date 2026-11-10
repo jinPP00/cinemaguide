@@ -1,4 +1,6 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
@@ -16,6 +18,16 @@ export default function AffiliateDisclosurePage() {
 
   return (
     <div className="wrap page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: '홈', path: '/' },
+            { name: '광고·제휴 고지', path: '/affiliate-disclosure/' },
+          ]),
+          webPageJsonLd('/affiliate-disclosure/', dataGeneratedAt.toISOString()),
+        )}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

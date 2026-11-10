@@ -1,4 +1,6 @@
 import { withOpenGraphUrl } from '@/lib/metadata';
+import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
+import { dataGeneratedAt } from '@/lib/dates';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
@@ -27,6 +29,16 @@ const CORRECTION_BODY = encodeURIComponent(
 export default function ContactPage() {
   return (
     <div className="wrap page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: '홈', path: '/' },
+            { name: '문의·정정 요청', path: '/contact/' },
+          ]),
+          webPageJsonLd('/contact/', dataGeneratedAt.toISOString()),
+        )}
+      />
       <nav className="crumbs" aria-label="현재 위치">
         <ol>
           <li>

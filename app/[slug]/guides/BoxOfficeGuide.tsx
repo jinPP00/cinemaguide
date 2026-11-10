@@ -7,6 +7,7 @@ import { breadcrumbJsonLd, jsonLdScript, webPageJsonLd } from '@/lib/jsonld';
 import { boxOfficeLastModified } from '@/lib/dates';
 import type { BoxOffice } from '@/lib/types';
 import BoxOfficeSection from '../BoxOfficeSection';
+import FaqList from '../../FaqList';
 import boxofficeData from '../../../public/boxoffice.json';
 import { copula } from '@/lib/josa';
 
@@ -30,6 +31,7 @@ function formatTargetDate(yyyymmdd: string): string {
 export default function BoxOfficePage() {
   const movies = boxoffice.movies;
   const top1 = movies[0];
+  const targetDateLabel = formatTargetDate(boxoffice.targetDate);
   const top3Share = movies
     .slice(0, 3)
     .reduce((sum, m) => sum + (m.salesShare || 0), 0)
@@ -44,6 +46,45 @@ export default function BoxOfficePage() {
     { name: '영화순위', path: PATH },
   ];
 
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${targetDateLabel} 박스오피스 순위`,
+    itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    numberOfItems: movies.length,
+    itemListElement: movies.map((m) => ({
+      '@type': 'ListItem',
+      position: m.rank,
+      item: {
+        '@type': 'Movie',
+        name: m.name,
+        ...(m.openDate ? { dateCreated: m.openDate } : {}),
+        ...(m.directors && m.directors.length > 0
+          ? { director: m.directors.map((d) => ({ '@type': 'Person', name: d })) }
+          : {}),
+      },
+    })),
+  };
+
+  const faqs = [
+    ...(top1
+      ? [
+          {
+            q: `${targetDateLabel} 기준 박스오피스 1위 영화는 무엇인가요?`,
+            a: `${targetDateLabel} 영화진흥위원회 통합전산망(KOBIS) 집계 기준 1위는 '${top1.name}'이며, 일일 관객 ${top1.audienceToday.toLocaleString()}명·누적 관객 ${top1.audienceTotal.toLocaleString()}명을 기록했어요.`,
+          },
+        ]
+      : []),
+    {
+      q: '누적 관객 수가 더 많은 영화가 왜 순위 아래에 있나요?',
+      a: '박스오피스 순위는 개봉 이후 누적 관객 수가 아니라 해당 집계일 하루 동안 발권된 관객 수 순서로 매겨지기 때문이에요.',
+    },
+    {
+      q: '박스오피스 순위는 얼마나 자주 바뀌나요?',
+      a: '이 페이지의 순위는 영화진흥위원회(KOBIS) 전날 일별 집계 데이터를 기준으로 매주 월요일에 자동 갱신해요.',
+    },
+  ];
+
   return (
     <div className="wrap page">
       <script
@@ -51,6 +92,7 @@ export default function BoxOfficePage() {
         dangerouslySetInnerHTML={jsonLdScript(
           breadcrumbJsonLd(crumbs),
           webPageJsonLd(PATH, boxOfficeLastModified.toISOString()),
+          itemListJsonLd,
         )}
       />
       <nav className="crumbs" aria-label="현재 위치">
@@ -61,7 +103,7 @@ export default function BoxOfficePage() {
       </nav>
 
       <h1>영화순위</h1>
-      <p className="guide-lead">영화진흥위원회 통합전산망(KOBIS)의 {formatTargetDate(boxoffice.targetDate)} 박스오피스예요. 그날 관객 수 순서이고, 매주 월요일에 새로 받아 와요.</p>
+      <p className="guide-lead">영화진흥위원회 통합전산망(KOBIS)의 {targetDateLabel} 박스오피스예요. 그날 관객 수 순서이고, 매주 월요일에 새로 받아 와요.</p>
 
       <ul className="guide-jump-list" aria-label="다른 안내">
         <li><Link className="guide-jump-link" href={guidePath(GUIDES.fares)}>관람료 비교</Link></li>
@@ -72,7 +114,7 @@ export default function BoxOfficePage() {
 
       {top1 && (
         <section className="section" aria-labelledby="bo-summary">
-          <h2 id="bo-summary">{formatTargetDate(boxoffice.targetDate)} 요약</h2>
+          <h2 id="bo-summary">{targetDateLabel} 요약</h2>
           <p className="guide-copy">
             1위는 <strong>{top1.name}</strong>{copula(top1.name)}. 이날 <span className="num">{top1.audienceToday.toLocaleString()}</span>명,
             개봉 뒤 누적 <span className="num">{top1.audienceTotal.toLocaleString()}</span>명이 봤어요. 1~3위가 이날 매출의{' '}
@@ -129,6 +171,11 @@ export default function BoxOfficePage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="section" aria-labelledby="bo-faq">
+        <h2 id="bo-faq">자주 묻는 질문</h2>
+        <FaqList style={{ marginTop: 18 }} items={faqs} />
       </section>
 
       <section className="section">
