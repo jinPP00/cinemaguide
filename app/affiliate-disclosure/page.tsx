@@ -11,6 +11,7 @@ export const metadata: Metadata = withOpenGraphUrl({
   description:
     '영화관 지점안내의 광고 게재 여부와 제휴 관계, 편집 독립성 및 외부 링크 운영 원칙을 투명하게 밝힙니다.',
   alternates: { canonical: '/affiliate-disclosure/' },
+  robots: { index: false, follow: true },
 });
 
 export default function AffiliateDisclosurePage() {

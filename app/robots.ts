@@ -19,6 +19,7 @@ const AI_BOTS = [
   'PerplexityBot',
   'Perplexity-User',
   'Google-Extended',
+  'GoogleOther',
   'Applebot-Extended',
 ];
 

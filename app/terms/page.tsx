@@ -11,6 +11,7 @@ export const metadata: Metadata = withOpenGraphUrl({
   description:
     '영화관 지점안내 이용에 관한 조건과 서비스 범위, 정보 정확성의 한계, 저작권, 외부 링크 정책을 안내합니다.',
   alternates: { canonical: '/terms/' },
+  robots: { index: false, follow: true },
 });
 
 export default function TermsPage() {

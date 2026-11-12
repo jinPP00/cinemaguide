@@ -11,6 +11,7 @@ export const metadata: Metadata = withOpenGraphUrl({
   description:
     '영화관 지점안내는 각 영화관 공식 서비스와 무관한 비공식 정보 사이트입니다. 정보의 한계와 책임 범위, 이용자 확인 사항을 안내합니다.',
   alternates: { canonical: '/disclaimer/' },
+  robots: { index: false, follow: true },
 });
 
 export default function DisclaimerPage() {

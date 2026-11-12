@@ -37,15 +37,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entries.push({ url: `${base}${path}`, lastModified: modified, changeFrequency, priority: 0.7 });
   }
 
-  // 소개·문의·정책 페이지 (가이드 5.8 — 일반적으로 색인 가능)
-  for (const path of [
-    '/about/',
-    '/contact/',
-    '/privacy/',
-    '/terms/',
-    '/disclaimer/',
-    '/affiliate-disclosure/',
-  ]) {
+  // 소개·문의 페이지 (법적 고지 페이지 /privacy/, /terms/, /disclaimer/, /affiliate-disclosure/ 는
+  // 푸터 열람용 200 OK + noindex,follow 로 분리하여 핵심 콘텐츠에만 크롤링·색인을 집중시킨다)
+  for (const path of ['/about/', '/contact/']) {
     entries.push({
       url: `${base}${path}`,
       lastModified,

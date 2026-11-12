@@ -11,6 +11,7 @@ export const metadata: Metadata = withOpenGraphUrl({
   description:
     '영화관 지점안내의 개인정보 수집 항목, 이용 목적, 보관 기간, 쿠키·맞춤형 광고 설정과 국외 이전을 안내합니다.',
   alternates: { canonical: '/privacy/' },
+  robots: { index: false, follow: true },
 });
 
 export default function PrivacyPage() {

@@ -40,8 +40,6 @@ ${meta.brands.map(b => `- [${b.name} 지점](${link(b.segment)}): ${b.count}개 
 
 - [사이트 소개](${base}/about/): 운영 목적, 자료를 모으고 확인하는 방법, 갱신 주기
 - [문의·정정 요청](${base}/contact/)
-- [개인정보처리방침](${base}/privacy/)
-- [이용약관](${base}/terms/)
 `;
 
 writeFileSync(new URL('../public/llms.txt', import.meta.url), content);

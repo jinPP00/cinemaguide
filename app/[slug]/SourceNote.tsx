@@ -37,7 +37,7 @@ export default function SourceNote({
         </ul>
       </section>
 
-      <section className="section source-section" aria-labelledby="source">
+      <section className="section" aria-labelledby="source">
         <h2 id="source">정보 출처</h2>
         <dl className="source-list">
           <div>

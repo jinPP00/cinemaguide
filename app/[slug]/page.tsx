@@ -152,7 +152,7 @@ function BrandHub({ brandKey }: { brandKey: Parameters<typeof brandMeta>[0] }) {
   ];
 
   return (
-    <div className="wrap page brand-themed" style={themeVars}>
+    <div className="wrap page" style={themeVars}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(
@@ -440,7 +440,7 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
   } : null;
 
   return (
-    <div className="wrap page brand-themed" style={themeVars}>
+    <div className="wrap page" style={themeVars}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(
@@ -624,13 +624,6 @@ function BranchDetail({ branch: b }: { branch: Branch }) {
           </p>
         </section>
       )}
-
-      <section className="section">
-        <div className="note">
-          이 사이트는 {info.name} 공식 서비스가 아니에요. 틀린 정보가 있으면{' '}
-          <Link href="/contact/">정정 요청</Link>으로 알려 주세요.
-        </div>
-      </section>
     </div>
   );
 }
@@ -1037,7 +1030,17 @@ function parseRoutes(value: string): string[] | null {
   // "2"·"000여대" 두 조각으로 쪼개져 노선번호처럼 칩화되던 버그(강변 CGV
   // 주차 안내 등) — "대"·"명"·"석"·"원" 같은 수량 단위로 끝나는 조각이
   // 하나라도 있으면 노선 목록이 아니라고 보고 통째로 포기한다.
-  if (!parts.every((p) => p.length <= 8 && !/\s/.test(p) && /\d/.test(p) && balanced(p) && !NOT_ROUTE_SUFFIX_RE.test(p)))
+  if (
+    !parts.every(
+      (p) =>
+        p.length <= 8 &&
+        !/\s/.test(p) &&
+        /\d/.test(p) &&
+        !/^\([^()]+\)$/.test(p) &&
+        balanced(p) &&
+        !NOT_ROUTE_SUFFIX_RE.test(p),
+    )
+  )
     return null;
   return parts.map((p) => p.replace(/번$/, ''));
 }
@@ -1195,7 +1198,7 @@ function TransitItemsList({ items }: { items: TransitItem[] }) {
             <span className="tb-routes">
               {item.routes.map((r, j) => (
                 <span className="tb-route" key={`${r}-${j}`}>
-                  {r}
+                  {r.includes('번') || /\)$/.test(r) ? r : `${r}번`}
                 </span>
               ))}
             </span>

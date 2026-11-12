@@ -106,7 +106,7 @@ export default async function SidoPage({
   ];
 
   return (
-    <div className="wrap page brand-themed" style={themeVars}>
+    <div className="wrap page" style={themeVars}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(

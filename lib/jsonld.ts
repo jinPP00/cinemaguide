@@ -38,7 +38,7 @@ export function webPageJsonLd(path: string, dateModified: string) {
     dateModified,
     speakable: {
       '@type': 'SpeakableSpecification',
-      cssSelector: ['h1', '.guide-lead', '.section-kicker'],
+      cssSelector: ['h1', '.lead', '.guide-lead', '.section-kicker'],
     },
   };
 }
