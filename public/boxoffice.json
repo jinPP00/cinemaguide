@@ -1,15 +1,15 @@
 {
-  "targetDate": "20261108",
-  "fetchedAt": "2026-11-09T04:58:27.559Z",
+  "targetDate": "20261115",
+  "fetchedAt": "2026-11-16T05:09:22.741Z",
   "movies": [
     {
       "rank": 1,
       "movieCd": "20261807",
       "name": "극장판 치이카와: 인어 섬의 비밀",
       "openDate": "2026-09-30",
-      "audienceToday": 62976,
-      "audienceTotal": 2788841,
-      "salesShare": 26.6,
+      "audienceToday": 46032,
+      "audienceTotal": 2949096,
+      "salesShare": 19.6,
       "directors": [
         "오이카와 케이"
       ],
@@ -32,12 +32,42 @@
     },
     {
       "rank": 2,
+      "movieCd": "20264957",
+      "name": "폴2: 데드포인트",
+      "openDate": "2026-11-11",
+      "audienceToday": 39938,
+      "audienceTotal": 140037,
+      "salesShare": 17.4,
+      "directors": [
+        "마이클 스피어리그",
+        "피터 스피어이그"
+      ],
+      "actors": [
+        "버지니아 가드너",
+        "그레이스 캐롤라인 커리",
+        "해리엇 슬레이터",
+        "아르세마 토마스",
+        "톰 브리트니"
+      ],
+      "genres": [
+        "스릴러",
+        "액션"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 98,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/62/tn_DPF034209.jpg"
+    },
+    {
+      "rank": 3,
       "movieCd": "20259894",
       "name": "최종면접",
       "openDate": "2026-11-04",
-      "audienceToday": 37117,
-      "audienceTotal": 166802,
-      "salesShare": 16.1,
+      "audienceToday": 23894,
+      "audienceTotal": 283290,
+      "salesShare": 10.9,
       "directors": [
         "김정훈"
       ],
@@ -59,39 +89,13 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026465.jpg"
     },
     {
-      "rank": 3,
-      "movieCd": "20264498",
-      "name": "하트 오브 비스트",
-      "openDate": "2026-10-28",
-      "audienceToday": 32397,
-      "audienceTotal": 379761,
-      "salesShare": 13.8,
-      "directors": [
-        "데이비드 에이어"
-      ],
-      "actors": [
-        "브래드 피트",
-        "J.K. 시몬스"
-      ],
-      "genres": [
-        "드라마",
-        "액션"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 101,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/60/tn_DPF034087.jpg"
-    },
-    {
       "rank": 4,
       "movieCd": "20267697",
       "name": "명탐정 코난: 30호 살인 사건",
       "openDate": "2026-11-05",
-      "audienceToday": 27386,
-      "audienceTotal": 108164,
-      "salesShare": 11.7,
+      "audienceToday": 13006,
+      "audienceTotal": 173355,
+      "salesShare": 5.7,
       "directors": [
         "카마나카 노부하루"
       ],
@@ -113,12 +117,118 @@
     },
     {
       "rank": 5,
+      "movieCd": "20267846",
+      "name": "극장판 마카앤로니: 기억탐험 대소동!",
+      "openDate": "2026-11-14",
+      "audienceToday": 12473,
+      "audienceTotal": 25481,
+      "salesShare": 4.9,
+      "directors": [
+        "우경민"
+      ],
+      "actors": [],
+      "genres": [
+        "애니메이션"
+      ],
+      "watchGrade": "전체관람가",
+      "runtime": 71,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPK026547.jpg"
+    },
+    {
+      "rank": 6,
+      "movieCd": "20167904",
+      "name": "라라랜드",
+      "openDate": "2016-12-07",
+      "audienceToday": 12361,
+      "audienceTotal": 3861037,
+      "salesShare": 5.7,
+      "directors": [
+        "데이미언 셔젤"
+      ],
+      "actors": [
+        "엠마 스톤",
+        "라이언 고슬링",
+        "핀 위트록",
+        "J.K. 시몬스",
+        "로즈마리 드윗"
+      ],
+      "genres": [
+        "드라마",
+        "뮤지컬",
+        "멜로/로맨스"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 127,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/63/tn_DPF034250.jpg"
+    },
+    {
+      "rank": 7,
+      "movieCd": "20264498",
+      "name": "하트 오브 비스트",
+      "openDate": "2026-10-28",
+      "audienceToday": 12028,
+      "audienceTotal": 452536,
+      "salesShare": 5.2,
+      "directors": [
+        "데이비드 에이어"
+      ],
+      "actors": [
+        "브래드 피트",
+        "J.K. 시몬스"
+      ],
+      "genres": [
+        "드라마",
+        "액션"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 101,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/60/tn_DPF034087.jpg"
+    },
+    {
+      "rank": 8,
+      "movieCd": "20210087",
+      "name": "듄",
+      "openDate": "2021-10-20",
+      "audienceToday": 6030,
+      "audienceTotal": 1691824,
+      "salesShare": 4.9,
+      "directors": [
+        "드니 빌뇌브"
+      ],
+      "actors": [
+        "티모시 샬라메",
+        "레베카 퍼거슨",
+        "오스카 아이삭",
+        "조슈 브롤린",
+        "제이슨 모모아"
+      ],
+      "genres": [
+        "SF"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 155,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/17/39/tn_DPF023799.jpg"
+    },
+    {
+      "rank": 9,
       "movieCd": "20264481",
       "name": "모자 쓴 고양이",
       "openDate": "2026-11-06",
-      "audienceToday": 14194,
-      "audienceTotal": 31447,
-      "salesShare": 5.6,
+      "audienceToday": 6022,
+      "audienceTotal": 52675,
+      "salesShare": 2.4,
       "directors": [
         "알레산드로 칼로니",
         "에리카 리비노자"
@@ -141,133 +251,34 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/61/tn_DPF034154.jpg"
     },
     {
-      "rank": 6,
-      "movieCd": "20267412",
-      "name": "극장판 마법소녀 마도카☆마기카〈발푸르기스의 회천〉",
-      "openDate": "2026-11-04",
-      "audienceToday": 6956,
-      "audienceTotal": 43319,
-      "salesShare": 3.3,
+      "rank": 10,
+      "movieCd": "20265420",
+      "name": "스크루지: 크리스마스 캐럴",
+      "openDate": "2026-11-11",
+      "audienceToday": 4605,
+      "audienceTotal": 19794,
+      "salesShare": 2,
       "directors": [
-        "신보 아키유키"
+        "티 웨스트"
       ],
       "actors": [
-        "유키 아오이",
-        "사이토 치와"
+        "조니 뎁",
+        "이안 맥켈런",
+        "루퍼트 그린트",
+        "샘 클라플린",
+        "데이지 리들리"
       ],
       "genres": [
-        "애니메이션"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 119,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": null
-    },
-    {
-      "rank": 7,
-      "movieCd": "20155762",
-      "name": "진격의 거인: 홍련의 화살",
-      "openDate": "2015-01-28",
-      "audienceToday": 6225,
-      "audienceTotal": 97105,
-      "salesShare": 3.1,
-      "directors": [
-        "아라키 테츠로"
-      ],
-      "actors": [],
-      "genres": [
-        "애니메이션",
-        "판타지"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 119,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPF034069.jpg"
-    },
-    {
-      "rank": 8,
-      "movieCd": "20266765",
-      "name": "와일드 호스 나인",
-      "openDate": "2026-11-04",
-      "audienceToday": 5583,
-      "audienceTotal": 21393,
-      "salesShare": 2.6,
-      "directors": [
-        "마틴 맥도나"
-      ],
-      "actors": [
-        "존 말코비치",
-        "샘 록웰",
-        "스티브 부세미",
-        "톰 웨이츠",
-        "파커 포시"
-      ],
-      "genres": [
-        "미스터리",
-        "범죄",
+        "드라마",
+        "판타지",
         "스릴러"
       ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 116,
+      "watchGrade": "12세이상관람가",
+      "runtime": 115,
       "nations": [
-        "영국",
         "미국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033881.jpg"
-    },
-    {
-      "rank": 9,
-      "movieCd": "20255033",
-      "name": "암살자(들)",
-      "openDate": "2026-09-23",
-      "audienceToday": 4474,
-      "audienceTotal": 3476471,
-      "salesShare": 1.9,
-      "directors": [
-        "허진호"
-      ],
-      "actors": [
-        "유해진",
-        "박해일",
-        "이민호",
-        "소타 신고"
-      ],
-      "genres": [
-        "범죄",
-        "드라마"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 130,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/54/tn_DPK026317.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20256757",
-      "name": "극장판 체인소 맨: 레제편",
-      "openDate": "2025-09-24",
-      "audienceToday": 2467,
-      "audienceTotal": 3464574,
-      "salesShare": 1.3,
-      "directors": [],
-      "actors": [],
-      "genres": [
-        "애니메이션",
-        "액션",
-        "어드벤처"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 99,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/14/tn_DPF031898.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/62/tn_DPF034195.jpg"
     }
   ]
 }
