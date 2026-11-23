@@ -1,15 +1,45 @@
 {
-  "targetDate": "20261115",
-  "fetchedAt": "2026-11-16T05:09:22.741Z",
+  "targetDate": "20261122",
+  "fetchedAt": "2026-11-23T06:07:57.016Z",
   "movies": [
     {
       "rank": 1,
+      "movieCd": "20247221",
+      "name": "폭설",
+      "openDate": "2026-11-18",
+      "audienceToday": 111489,
+      "audienceTotal": 423196,
+      "salesShare": 39.5,
+      "directors": [
+        "박선우",
+        "홍의정"
+      ],
+      "actors": [
+        "김윤석",
+        "구교환",
+        "박수영",
+        "노윤서",
+        "곽민규"
+      ],
+      "genres": [
+        "미스터리",
+        "드라마"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 88,
+      "nations": [
+        "한국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/62/tn_DPK026664.jpg"
+    },
+    {
+      "rank": 2,
       "movieCd": "20261807",
       "name": "극장판 치이카와: 인어 섬의 비밀",
       "openDate": "2026-09-30",
-      "audienceToday": 46032,
-      "audienceTotal": 2949096,
-      "salesShare": 19.6,
+      "audienceToday": 37808,
+      "audienceTotal": 3069420,
+      "salesShare": 13.1,
       "directors": [
         "오이카와 케이"
       ],
@@ -31,13 +61,43 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/55/tn_DPF033835.jpg"
     },
     {
-      "rank": 2,
+      "rank": 3,
+      "movieCd": "20267121",
+      "name": "헝거게임 50번째 추첨의 날",
+      "openDate": "2026-11-18",
+      "audienceToday": 19531,
+      "audienceTotal": 91632,
+      "salesShare": 7.3,
+      "directors": [
+        "프란시스 로렌스"
+      ],
+      "actors": [
+        "조셉 자다",
+        "맥케나 그레이스",
+        "엘 패닝",
+        "랄프 파인즈",
+        "제시 플레먼스"
+      ],
+      "genres": [
+        "액션",
+        "스릴러",
+        "어드벤처"
+      ],
+      "watchGrade": "15세이상관람가",
+      "runtime": 158,
+      "nations": [
+        "미국"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/60/tn_DPF034094.jpg"
+    },
+    {
+      "rank": 4,
       "movieCd": "20264957",
       "name": "폴2: 데드포인트",
       "openDate": "2026-11-11",
-      "audienceToday": 39938,
-      "audienceTotal": 140037,
-      "salesShare": 17.4,
+      "audienceToday": 18443,
+      "audienceTotal": 240826,
+      "salesShare": 6.5,
       "directors": [
         "마이클 스피어리그",
         "피터 스피어이그"
@@ -61,90 +121,38 @@
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/62/tn_DPF034209.jpg"
     },
     {
-      "rank": 3,
-      "movieCd": "20259894",
-      "name": "최종면접",
-      "openDate": "2026-11-04",
-      "audienceToday": 23894,
-      "audienceTotal": 283290,
-      "salesShare": 10.9,
-      "directors": [
-        "김정훈"
-      ],
-      "actors": [
-        "조이현",
-        "김재원",
-        "신승호",
-        "강유석",
-        "곽동연"
-      ],
-      "genres": [
-        "미스터리"
-      ],
-      "watchGrade": "15세이상관람가",
-      "runtime": 107,
-      "nations": [
-        "한국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026465.jpg"
-    },
-    {
-      "rank": 4,
-      "movieCd": "20267697",
-      "name": "명탐정 코난: 30호 살인 사건",
-      "openDate": "2026-11-05",
-      "audienceToday": 13006,
-      "audienceTotal": 173355,
-      "salesShare": 5.7,
-      "directors": [
-        "카마나카 노부하루"
-      ],
-      "actors": [
-        "타카야마 미나미",
-        "야마구치 캇페이"
-      ],
-      "genres": [
-        "애니메이션",
-        "액션",
-        "미스터리"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 93,
-      "nations": [
-        "일본"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/61/tn_DPF034138.jpg"
-    },
-    {
       "rank": 5,
-      "movieCd": "20267846",
-      "name": "극장판 마카앤로니: 기억탐험 대소동!",
-      "openDate": "2026-11-14",
-      "audienceToday": 12473,
-      "audienceTotal": 25481,
-      "salesShare": 4.9,
+      "movieCd": "20268264",
+      "name": "임영웅ㅣ아임 히어로 더 스타디움 2",
+      "openDate": "2026-11-18",
+      "audienceToday": 10395,
+      "audienceTotal": 61861,
+      "salesShare": 10.2,
       "directors": [
-        "우경민"
+        "송두선",
+        "오윤동"
       ],
-      "actors": [],
+      "actors": [
+        "임영웅"
+      ],
       "genres": [
-        "애니메이션"
+        "공연"
       ],
       "watchGrade": "전체관람가",
-      "runtime": 71,
+      "runtime": 144,
       "nations": [
         "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPK026547.jpg"
+      "posterUrl": null
     },
     {
       "rank": 6,
       "movieCd": "20167904",
       "name": "라라랜드",
       "openDate": "2016-12-07",
-      "audienceToday": 12361,
-      "audienceTotal": 3861037,
-      "salesShare": 5.7,
+      "audienceToday": 7334,
+      "audienceTotal": 3903541,
+      "salesShare": 2.9,
       "directors": [
         "데이미언 셔젤"
       ],
@@ -169,66 +177,89 @@
     },
     {
       "rank": 7,
-      "movieCd": "20264498",
-      "name": "하트 오브 비스트",
-      "openDate": "2026-10-28",
-      "audienceToday": 12028,
-      "audienceTotal": 452536,
-      "salesShare": 5.2,
+      "movieCd": "20267846",
+      "name": "극장판 마카앤로니: 기억탐험 대소동!",
+      "openDate": "2026-11-14",
+      "audienceToday": 7303,
+      "audienceTotal": 41101,
+      "salesShare": 2.4,
       "directors": [
-        "데이비드 에이어"
+        "우경민"
       ],
-      "actors": [
-        "브래드 피트",
-        "J.K. 시몬스"
-      ],
+      "actors": [],
       "genres": [
-        "드라마",
-        "액션"
+        "애니메이션"
       ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 101,
+      "watchGrade": "전체관람가",
+      "runtime": 71,
       "nations": [
-        "미국"
+        "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/60/tn_DPF034087.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/59/tn_DPK026547.jpg"
     },
     {
       "rank": 8,
-      "movieCd": "20210087",
-      "name": "듄",
-      "openDate": "2021-10-20",
-      "audienceToday": 6030,
-      "audienceTotal": 1691824,
-      "salesShare": 4.9,
+      "movieCd": "20259894",
+      "name": "최종면접",
+      "openDate": "2026-11-04",
+      "audienceToday": 6518,
+      "audienceTotal": 325272,
+      "salesShare": 2.4,
       "directors": [
-        "드니 빌뇌브"
+        "김정훈"
       ],
       "actors": [
-        "티모시 샬라메",
-        "레베카 퍼거슨",
-        "오스카 아이삭",
-        "조슈 브롤린",
-        "제이슨 모모아"
+        "조이현",
+        "김재원",
+        "신승호",
+        "강유석",
+        "곽동연"
       ],
       "genres": [
-        "SF"
+        "미스터리"
       ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 155,
+      "watchGrade": "15세이상관람가",
+      "runtime": 107,
       "nations": [
-        "미국"
+        "한국"
       ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/17/39/tn_DPF023799.jpg"
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/58/tn_DPK026465.jpg"
     },
     {
       "rank": 9,
+      "movieCd": "20267697",
+      "name": "명탐정 코난: 30호 살인 사건",
+      "openDate": "2026-11-05",
+      "audienceToday": 5068,
+      "audienceTotal": 199460,
+      "salesShare": 1.8,
+      "directors": [
+        "카마나카 노부하루"
+      ],
+      "actors": [
+        "타카야마 미나미",
+        "야마구치 캇페이"
+      ],
+      "genres": [
+        "애니메이션",
+        "액션",
+        "미스터리"
+      ],
+      "watchGrade": "12세이상관람가",
+      "runtime": 93,
+      "nations": [
+        "일본"
+      ],
+      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/61/tn_DPF034138.jpg"
+    },
+    {
+      "rank": 10,
       "movieCd": "20264481",
       "name": "모자 쓴 고양이",
       "openDate": "2026-11-06",
-      "audienceToday": 6022,
-      "audienceTotal": 52675,
-      "salesShare": 2.4,
+      "audienceToday": 3576,
+      "audienceTotal": 66730,
+      "salesShare": 1.1,
       "directors": [
         "알레산드로 칼로니",
         "에리카 리비노자"
@@ -249,36 +280,6 @@
         "미국"
       ],
       "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/61/tn_DPF034154.jpg"
-    },
-    {
-      "rank": 10,
-      "movieCd": "20265420",
-      "name": "스크루지: 크리스마스 캐럴",
-      "openDate": "2026-11-11",
-      "audienceToday": 4605,
-      "audienceTotal": 19794,
-      "salesShare": 2,
-      "directors": [
-        "티 웨스트"
-      ],
-      "actors": [
-        "조니 뎁",
-        "이안 맥켈런",
-        "루퍼트 그린트",
-        "샘 클라플린",
-        "데이지 리들리"
-      ],
-      "genres": [
-        "드라마",
-        "판타지",
-        "스릴러"
-      ],
-      "watchGrade": "12세이상관람가",
-      "runtime": 115,
-      "nations": [
-        "미국"
-      ],
-      "posterUrl": "http://file.koreafilm.or.kr/thm/02/99/19/62/tn_DPF034195.jpg"
     }
   ]
 }
